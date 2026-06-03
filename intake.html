@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Rhyahn Brock Health &amp; Fitness - New Client Intake</title>
+
+  <!-- Tabler outline icons (webfont) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/dist/tabler-icons.min.css">
+
+  <style>
+    /* =============================================================
+       ROOT VARIABLES
+       Tweak these to change brand colours, radii, and type scale.
+       ============================================================= */
+    :root {
+      --accent:        #10B981;   /* primary brand colour */
+      --accent-light:  #D1FAE5;   /* light tint for selected states */
+      --accent-dark:   #059669;   /* deeper shade for hover / press */
+      --accent-glow:   rgba(16, 185, 129, 0.22);
+      --bg:            #F0FDF8;   /* page background */
+      --card-bg:       #FFFFFF;
+      --text:          #0F172A;
+      --text-muted:    #64748B;
+      --danger:        #EF4444;
+      --radius-sm:     10px;
+      --radius:        18px;
+      --radius-lg:     26px;
+      --shadow-sm:     0 2px 10px rgba(0,0,0,0.06);
+      --shadow:        0 4px 28px rgba(0,0,0,0.10);
+      --spring:        cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* =============================================================
+       RESET
+       ============================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* =============================================================
+       APP WRAPPER
+       ============================================================= */
+    #app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* =============================================================
+       HUD  (sticky header: progress + coins + level)
+       ============================================================= */
+    #hud {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--card-bg);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: opacity 0.3s;
+    }
+    #hud.hidden { opacity: 0; pointer-events: none; height: 0; padding: 0; overflow: hidden; border: none; }
+
+    .hud-progress-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .hud-progress-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+    .hud-bar { height: 7px; background: #E2E8F0; border-radius: 99px; overflow: hidden; }
+    #hud-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.7s var(--spring);
+    }
+
+    .hud-badges { display: flex; gap: 7px; align-items: center; flex-shrink: 0; }
+    .hud-badge {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 800;
+      padding: 4px 10px; border-radius: 99px;
+      transition: transform 0.3s var(--spring);
+    }
+    .hud-badge i { font-size: 13px; }
+    #coins-display { background: #FEF3C7; color: #D97706; }
+    #level-display { background: var(--accent-light); color: var(--accent-dark); }
+
+    /* =============================================================
+       SCREEN TRANSITIONS
+       ============================================================= */
+    .screen {
+      display: none;
+      flex-direction: column;
+      gap: 22px;
+      padding: 28px 16px 100px;
+    }
+    .screen.active {
+      display: flex;
+      animation: screenIn 0.32s ease both;
+    }
+    .screen.going-back.active {
+      animation: screenInBack 0.32s ease both;
+    }
+    @keyframes screenIn     { from { opacity:0; transform: translateX(36px)  } to { opacity:1; transform:translateX(0) } }
+    @keyframes screenInBack { from { opacity:0; transform: translateX(-36px) } to { opacity:1; transform:translateX(0) } }
+    @media (prefers-reduced-motion: reduce) {
+      .screen.active, .screen.going-back.active { animation: none; }
+    }
+
+    /* =============================================================
+       BOTTOM NAV  (fixed Next / Back)
+       ============================================================= */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      padding: 10px 16px 22px;
+      background: linear-gradient(to top, var(--bg) 65%, transparent);
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+    #bottom-nav.hidden { display: none; }
+
+    .btn {
+      border: none; border-radius: var(--radius);
+      font-size: 16px; font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s var(--spring), box-shadow 0.18s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px 24px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.95); }
+
+    .btn-back {
+      background: var(--card-bg); color: var(--text-muted);
+      border: 1.5px solid #E2E8F0;
+      width: 54px; padding: 14px; flex-shrink: 0;
+    }
+    .btn-next {
+      flex: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-next:hover { box-shadow: 0 7px 30px var(--accent-glow); }
+    .btn-next i { transition: transform 0.22s var(--spring); }
+    .btn-next:not(:disabled):hover i { transform: translateX(4px); }
+    .btn-next:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* =============================================================
+       TYPOGRAPHY
+       ============================================================= */
+    .screen-title {
+      font-size: 26px; font-weight: 900; line-height: 1.15; color: var(--text);
+    }
+    .screen-subtitle {
+      font-size: 15px; color: var(--text-muted); line-height: 1.65; margin-top: -10px;
+    }
+    .section-tag {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--accent-dark); background: var(--accent-light);
+      display: inline-block; padding: 3px 11px; border-radius: 99px;
+    }
+    .microcopy {
+      font-size: 13px; color: var(--text-muted); text-align: center;
+      background: var(--card-bg); border: 1px solid #E2E8F0;
+      border-radius: 99px; padding: 8px 16px; align-self: center;
+    }
+
+    /* =============================================================
+       FORM FIELDS
+       ============================================================= */
+    .field-group { display: flex; flex-direction: column; gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text-muted);
+    }
+    .field input, .field textarea, .field select {
+      background: var(--card-bg);
+      border: 1.5px solid #E2E8F0;
+      border-radius: var(--radius-sm);
+      padding: 14px 15px;
+      font-size: 16px; /* prevents iOS auto-zoom */
+      color: var(--text);
+      width: 100%;
+      -webkit-appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .field textarea { resize: vertical; min-height: 110px; }
+    .field.error input, .field.error textarea, .field.error select { border-color: var(--danger); }
+    .field .err-msg { font-size: 12px; color: var(--danger); display: none; }
+    .field.error .err-msg { display: block; }
+
+    /* =============================================================
+       OPTION CARDS (icon tiles: multi or single select)
+       ============================================================= */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+    .cards-grid.single-col {
+      grid-template-columns: 1fr;
+    }
+
+    .option-card {
+      background: var(--card-bg);
+      border: 2px solid #E2E8F0;
+      border-radius: var(--radius);
+      padding: 18px 12px 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      cursor: pointer; text-align: center;
+      position: relative;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .option-card:active { transform: scale(0.96); }
+
+    /* Per-card colour variables set via JS */
+    .option-card.selected {
+      border-color: var(--card-color, var(--accent));
+      background: var(--card-color-bg, var(--accent-light));
+      box-shadow: 0 4px 18px var(--card-glow, var(--accent-glow));
+      animation: cardPop 0.28s var(--spring) both;
+    }
+    @keyframes cardPop {
+      0%   { transform: scale(1); }
+      45%  { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .option-card.selected { animation: none; }
+    }
+
+    /* Circle check badge */
+    .card-check {
+      position: absolute; top: 8px; right: 8px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--card-color, var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: scale(0);
+      transition: opacity 0.2s, transform 0.25s var(--spring);
+    }
+    .card-check i { font-size: 12px; color: white; }
+    .option-card.selected .card-check { opacity: 1; transform: scale(1); }
+
+    /* Icon wrapper */
+    .card-icon {
+      font-size: 34px; color: var(--card-color, var(--accent));
+      line-height: 1; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-label { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+
+    /* Single-col cards are horizontal */
+    .cards-grid.single-col .option-card {
+      flex-direction: row; text-align: left; padding: 16px;
+      align-items: center; gap: 14px;
+    }
+    .cards-grid.single-col .card-icon { flex-shrink: 0; height: auto; }
+    .cards-grid.single-col .card-label { font-size: 14px; flex: 1; }
+    .cards-grid.single-col .card-check { top: 50%; transform: translateY(-50%) scale(0); }
+    .cards-grid.single-col .option-card.selected .card-check {
+      transform: translateY(-50%) scale(1);
+    }
+
+    /* ---- Icon animations: varied so they don't all move in sync ---- */
+    @media (prefers-reduced-motion: no-preference) {
+      .anim-float   { animation: iconFloat   3.2s ease-in-out infinite; }
+      .anim-wiggle  { animation: iconWiggle  2.8s ease-in-out infinite; }
+      .anim-pulse   { animation: iconPulse   2.1s ease-in-out infinite; }
+      .anim-bounce  { animation: iconBounce  1.9s ease-in-out infinite; }
+      .anim-shake   { animation: iconShake   2.5s ease-in-out infinite; }
+      .anim-spin    { animation: iconSpin    4.0s linear        infinite; }
+    }
+    @keyframes iconFloat  { 0%,100%{transform:translateY(0)}     50%{transform:translateY(-6px)} }
+    @keyframes iconWiggle { 0%,88%,100%{transform:rotate(0)} 92%{transform:rotate(-9deg)} 96%{transform:rotate(9deg)} }
+    @keyframes iconPulse  { 0%,100%{transform:scale(1)}          50%{transform:scale(1.14)} }
+    @keyframes iconBounce { 0%,55%,100%{transform:translateY(0)} 28%{transform:translateY(-7px)} }
+    @keyframes iconShake  { 0%,82%,100%{transform:rotate(0)} 86%{transform:rotate(-7deg)} 90%{transform:rotate(7deg)} 94%{transform:rotate(-4deg)} }
+    @keyframes iconSpin   { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+    /* Selection count pill */
+    .select-count {
+      font-size: 13px; font-weight: 700;
+      color: var(--accent-dark); background: var(--accent-light);
+      padding: 7px 16px; border-radius: 99px; text-align: center;
+      align-self: flex-start;
+      transition: all 0.2s;
+    }
+    .select-count.warn { color: var(--danger); background: #FEE2E2; }
+
+    /* Other text box */
+    .other-box { display: none; margin-top: 2px; }
+    .other-box.visible { display: block; }
+    .other-box input {
+      width: 100%; background: var(--card-bg);
+      border: 1.5px solid var(--accent); border-radius: var(--radius-sm);
+      padding: 12px 14px; font-size: 15px; color: var(--text);
+      transition: box-shadow 0.2s;
+    }
+    .other-box input:focus { outline: none; box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    /* =============================================================
+       YES / NO TOGGLES
+       ============================================================= */
+    .toggle-group { display: flex; flex-direction: column; gap: 10px; }
+    .toggle-item {
+      background: var(--card-bg); border: 1.5px solid #E2E8F0;
+      border-radius: var(--radius-sm); padding: 13px 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .toggle-item label { font-size: 14px; line-height: 1.45; color: var(--text); flex: 1; }
+    .yn-btns { display: flex; gap: 6px; flex-shrink: 0; }
+    .yn-btn {
+      padding: 6px 13px; border-radius: 8px; border: 1.5px solid #E2E8F0;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      background: white; color: var(--text-muted);
+      transition: all 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .yn-btn.yes.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .yn-btn.no.active  { background: #FEE2E2; border-color: var(--danger); color: #DC2626; }
+    .sub-reveal { margin-top: 8px; display: none; }
+    .sub-reveal.visible { display: block; }
+
+    /* =============================================================
+       IMPORTANCE SLIDER
+       ============================================================= */
+    .slider-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      padding: 16px 0 8px;
+    }
+    .slider-number {
+      font-size: 88px; font-weight: 900; color: var(--accent); line-height: 1;
+      transition: color 0.15s;
+    }
+    .slider-hint { font-size: 13px; color: var(--text-muted); }
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 7px;
+      border-radius: 99px; background: #E2E8F0; outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 30px; height: 30px;
+      border-radius: 50%; background: var(--accent);
+      box-shadow: 0 2px 14px var(--accent-glow); cursor: pointer;
+      transition: transform 0.2s var(--spring);
+    }
+    input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.22); }
+    .slider-labels {
+      display: flex; justify-content: space-between; width: 100%;
+      font-size: 11px; color: var(--text-muted); font-weight: 600;
+    }
+
+    /* =============================================================
+       BODY MAP  (SVG silhouettes)
+       ============================================================= */
+    .body-map-wrap { display: flex; gap: 14px; justify-content: center; }
+    .body-map-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; max-width: 180px; }
+    .body-map-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+    .body-svg { width: 100%; }
+    .body-part {
+      cursor: pointer; fill: #E2E8F0; stroke: #CBD5E1; stroke-width: 1.5;
+      transition: fill 0.2s, stroke 0.2s;
+    }
+    .body-part:hover { fill: var(--accent-light); stroke: var(--accent); }
+    .body-part.selected { fill: var(--accent); stroke: var(--accent-dark); }
+
+    /* =============================================================
+       AVAILABILITY GRID
+       ============================================================= */
+    .avail-scroll { overflow-x: auto; border-radius: var(--radius-sm); }
+    .avail-table { border-collapse: collapse; width: 100%; min-width: 310px; }
+    .avail-table th {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--text-muted); padding: 6px 3px;
+      text-align: center;
+    }
+    .avail-table td { padding: 3px; text-align: center; }
+    .avail-row-label {
+      font-size: 12px; font-weight: 700; color: var(--text-muted);
+      padding-right: 6px; text-align: left; white-space: nowrap;
+    }
+    .avail-cell {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 8px;
+      background: #F1F5F9; border: 1.5px solid #E2E8F0;
+      cursor: pointer; margin: auto; font-size: 11px; font-weight: 700; color: transparent;
+      transition: all 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .avail-cell:hover { background: var(--accent-light); border-color: var(--accent); }
+    .avail-cell.selected { background: var(--accent); border-color: var(--accent-dark); color: white; }
+
+    /* =============================================================
+       DIVIDER + PRIVACY NOTE
+       ============================================================= */
+    .divider { height: 1px; background: #E2E8F0; }
+    .privacy-note {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 13px; color: var(--text-muted); line-height: 1.6;
+      background: #F8FAFC; border: 1px solid #E2E8F0;
+      border-radius: var(--radius-sm); padding: 12px 14px;
+    }
+    .privacy-note i { color: var(--accent); flex-shrink: 0; margin-top: 1px; font-size: 16px; }
+
+    /* =============================================================
+       SUBSECTION HEADING (inside health check)
+       ============================================================= */
+    .sub-heading { font-size: 15px; font-weight: 800; color: var(--text); }
+
+    /* =============================================================
+       ALERT BANNERS
+       ============================================================= */
+    .alert { padding: 14px 16px; border-radius: var(--radius-sm); font-size: 14px; line-height: 1.5; display: none; }
+    .alert.visible { display: block; }
+    .alert-error { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+
+    /* =============================================================
+       WELCOME SCREEN
+       ============================================================= */
+    .welcome-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 88vh; text-align: center; gap: 22px; padding: 20px;
+    }
+    .brand-mark {
+      width: 82px; height: 82px; border-radius: 24px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; color: white;
+      box-shadow: 0 8px 32px var(--accent-glow);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .brand-mark i { animation: iconBounce 2.4s ease-in-out infinite; }
+    }
+    .welcome-brand  { font-size: 28px; font-weight: 900; line-height: 1.1; }
+    .welcome-sub    { font-size: 15px; color: var(--text-muted); line-height: 1.7; max-width: 300px; }
+    .time-badge {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 13px; color: var(--text-muted); font-weight: 600;
+      background: var(--card-bg); padding: 8px 16px;
+      border-radius: 99px; border: 1px solid #E2E8F0;
+    }
+    .btn-start {
+      width: 100%; max-width: 320px; padding: 18px;
+      font-size: 17px; font-weight: 800;
+      border: none; border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white; cursor: pointer;
+      box-shadow: 0 6px 30px var(--accent-glow);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: transform 0.18s var(--spring), box-shadow 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-start:active { transform: scale(0.96); }
+
+    /* =============================================================
+       CELEBRATION SCREEN
+       ============================================================= */
+    #screen-celebrate {
+      min-height: 85vh; justify-content: center; align-items: center; text-align: center;
+    }
+    .celebrate-ring {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 50px; color: white;
+      box-shadow: 0 8px 40px var(--accent-glow);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .celebrate-ring { animation: celebBounce 0.9s var(--spring) both; }
+    }
+    @keyframes celebBounce {
+      0%   { transform: scale(0) rotate(-18deg); }
+      60%  { transform: scale(1.15) rotate(5deg); }
+      80%  { transform: scale(0.93) rotate(-2deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .celebrate-title { font-size: 30px; font-weight: 900; }
+    .celebrate-sub   { font-size: 15px; color: var(--text-muted); line-height: 1.75; max-width: 300px; }
+
+    /* =============================================================
+       CONFETTI CANVAS (overlaid, pointer-events off)
+       ============================================================= */
+    #confetti-canvas {
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+    }
+
+    /* =============================================================
+       LOADER SPIN (while submitting)
+       ============================================================= */
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+    .spin { animation: spin 0.8s linear infinite; display: inline-block; }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div id="app">
+
+  <!-- ====================================================
+       HUD: progress bar + coins + level badge
+       ==================================================== -->
+  <div id="hud" class="hidden">
+    <div class="hud-progress-wrap">
+      <div class="hud-progress-label">Progress</div>
+      <div class="hud-bar"><div id="hud-fill"></div></div>
+    </div>
+    <div class="hud-badges">
+      <div class="hud-badge" id="coins-display">
+        <i class="ti ti-coin"></i>
+        <span id="coins-val">0</span>
+      </div>
+      <div class="hud-badge" id="level-display">
+        <i class="ti ti-trophy"></i>
+        <span id="level-val">Lv 1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 0: Welcome
+       ==================================================== -->
+  <div class="screen active" id="screen-0">
+    <div class="welcome-wrap">
+      <div class="brand-mark"><i class="ti ti-bolt"></i></div>
+      <div class="welcome-brand">Rhyahn Brock<br>Health &amp; Fitness</div>
+      <p class="welcome-sub">
+        Before we get started, I want to know what makes you tick.
+        This short form helps me build a program that actually works
+        for you, not just anyone.
+      </p>
+      <div class="time-badge">
+        <i class="ti ti-clock"></i> Takes about 3 minutes
+      </div>
+      <button class="btn-start" onclick="startForm()">
+        Let's go <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 1: About You
+       ==================================================== -->
+  <div class="screen" id="screen-1">
+    <div class="section-tag">Step 1 of 12</div>
+    <div class="screen-title">About you</div>
+    <div class="screen-subtitle">Quick and easy - just the basics to get us started.</div>
+    <div class="field-group">
+      <div class="field" id="f-firstname">
+        <label>First name</label>
+        <input type="text" id="firstname" placeholder="Alex" autocomplete="given-name">
+        <span class="err-msg">Please enter your first name</span>
+      </div>
+      <div class="field" id="f-lastname">
+        <label>Last name</label>
+        <input type="text" id="lastname" placeholder="Smith" autocomplete="family-name">
+        <span class="err-msg">Please enter your last name</span>
+      </div>
+      <div class="field" id="f-mobile">
+        <label>Mobile</label>
+        <input type="tel" id="mobile" placeholder="04XX XXX XXX" autocomplete="tel">
+        <span class="err-msg">Please enter your mobile number</span>
+      </div>
+      <div class="field" id="f-email">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@email.com" autocomplete="email">
+        <span class="err-msg">Please enter a valid email address</span>
+      </div>
+      <div class="field" id="f-dob">
+        <label>Date of birth</label>
+        <input type="date" id="dob" autocomplete="bday">
+        <span class="err-msg">Please enter your date of birth</span>
+      </div>
+      <div class="field" id="f-occupation">
+        <label>Occupation</label>
+        <input type="text" id="occupation" placeholder="e.g. Teacher, Nurse, Builder">
+        <span class="err-msg">Please enter your occupation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 2: Goals (MULTI-select)
+       ==================================================== -->
+  <div class="screen" id="screen-2">
+    <div class="section-tag">Step 2 of 12</div>
+    <div class="screen-title">What are you here for?</div>
+    <div class="screen-subtitle">Pick everything that resonates. You can choose more than one.</div>
+    <div class="select-count" id="goals-count">0 goals locked in</div>
+    <div class="cards-grid" id="goals-grid"></div>
+    <div class="other-box" id="goals-other-box">
+      <input type="text" id="goals-other-text" placeholder="Tell me what you're after...">
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 3: Main Goal (SINGLE-select, filtered from screen 2)
+       ==================================================== -->
+  <div class="screen" id="screen-3">
+    <div class="section-tag">Step 3 of 12</div>
+    <div class="screen-title">The one that matters most</div>
+    <div class="screen-subtitle">Of everything you picked, what's the single win you want first?</div>
+    <div class="cards-grid" id="main-goal-grid"></div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 4: Body Map (MULTI-select SVG)
+       ==================================================== -->
+  <div class="screen" id="screen-4">
+    <div class="section-tag">Step 4 of 12</div>
+    <div class="screen-title">Where do you want to see change?</div>
+    <div class="screen-subtitle">Tap the areas you most want to focus on. Select as many as you like.</div>
+    <div class="body-map-wrap">
+      <!-- Front silhouette -->
+      <div class="body-map-col">
+        <div class="body-map-label">Front</div>
+        <svg class="body-svg" viewBox="0 0 110 270" xmlns="http://www.w3.org/2000/svg">
+          <ellipse class="body-part" data-area="Head"          cx="55" cy="22"  rx="19" ry="21"/>
+          <rect    class="body-part" data-area="Neck"          x="48"  y="42"   width="14" height="13" rx="4"/>
+          <ellipse class="body-part" data-area="Left Shoulder" cx="25" cy="63"  rx="14"    ry="11"/>
+          <ellipse class="body-part" data-area="Right Shoulder"cx="85" cy="63"  rx="14"    ry="11"/>
+          <rect    class="body-part" data-area="Chest"         x="34"  y="53"   width="42" height="36" rx="6"/>
+          <rect    class="body-part" data-area="Left Arm"      x="9"   y="70"   width="18" height="54" rx="8"/>
+          <rect    class="body-part" data-area="Right Arm"     x="83"  y="70"   width="18" height="54" rx="8"/>
+          <rect    class="body-part" data-area="Core / Abs"    x="34"  y="88"   width="42" height="38" rx="4"/>
+          <rect    class="body-part" data-area="Hips"          x="31"  y="125"  width="48" height="22" rx="7"/>
+          <rect    class="body-part" data-area="Left Thigh"    x="31"  y="147"  width="21" height="48" rx="9"/>
+          <rect    class="body-part" data-area="Right Thigh"   x="58"  y="147"  width="21" height="48" rx="9"/>
+          <ellipse class="body-part" data-area="Left Knee"     cx="41" cy="202" rx="13"    ry="9"/>
+          <ellipse class="body-part" data-area="Right Knee"    cx="69" cy="202" rx="13"    ry="9"/>
+          <rect    class="body-part" data-area="Left Calf"     x="32"  y="211"  width="18" height="43" rx="8"/>
+          <rect    class="body-part" data-area="Right Calf"    x="60"  y="211"  width="18" height="43" rx="8"/>
+        </svg>
+      </div>
+      <!-- Back silhouette -->
+      <div class="body-map-col">
+        <div class="body-map-label">Back</div>
+        <svg class="body-svg" viewBox="0 0 110 270" xmlns="http://www.w3.org/2000/svg">
+          <ellipse class="body-part" data-area="Head"           cx="55" cy="22"  rx="19" ry="21"/>
+          <ellipse class="body-part" data-area="Left Shoulder"  cx="25" cy="63"  rx="14" ry="11"/>
+          <ellipse class="body-part" data-area="Right Shoulder" cx="85" cy="63"  rx="14" ry="11"/>
+          <rect    class="body-part" data-area="Upper Back"     x="34"  y="53"   width="42" height="36" rx="6"/>
+          <rect    class="body-part" data-area="Left Arm"       x="9"   y="70"   width="18" height="54" rx="8"/>
+          <rect    class="body-part" data-area="Right Arm"      x="83"  y="70"   width="18" height="54" rx="8"/>
+          <rect    class="body-part" data-area="Lower Back"     x="34"  y="88"   width="42" height="38" rx="4"/>
+          <rect    class="body-part" data-area="Glutes"         x="31"  y="125"  width="48" height="22" rx="7"/>
+          <rect    class="body-part" data-area="Left Hamstring" x="31"  y="147"  width="21" height="48" rx="9"/>
+          <rect    class="body-part" data-area="Right Hamstring"x="58"  y="147"  width="21" height="48" rx="9"/>
+          <rect    class="body-part" data-area="Left Calf"      x="32"  y="211"  width="18" height="43" rx="8"/>
+          <rect    class="body-part" data-area="Right Calf"     x="60"  y="211"  width="18" height="43" rx="8"/>
+        </svg>
+      </div>
+    </div>
+    <div class="select-count" id="bodymap-count">No areas selected yet</div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 5: Importance slider
+       ==================================================== -->
+  <div class="screen" id="screen-5">
+    <div class="section-tag">Step 5 of 12</div>
+    <div class="screen-title">How much does this matter?</div>
+    <div class="screen-subtitle">On a scale of 1 to 10, how important is hitting this goal to you right now?</div>
+    <div class="slider-wrap">
+      <div class="slider-number" id="slider-display">7</div>
+      <div class="slider-hint">Drag to set your commitment level</div>
+      <input type="range" id="importance-slider" min="1" max="10" value="7" oninput="updateSlider(this.value)">
+      <div class="slider-labels">
+        <span>Not fussed</span>
+        <span>My whole world</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 6: Why these areas
+       ==================================================== -->
+  <div class="screen" id="screen-6">
+    <div class="section-tag">Step 6 of 12</div>
+    <div class="screen-title">Tell me your why</div>
+    <div class="screen-subtitle">Why do these goals matter to you? The more honest you are, the better I can help.</div>
+    <div class="field" id="f-why">
+      <label>Why these goals?</label>
+      <textarea id="why-text" placeholder="e.g. I want more energy for my kids. I've been carrying this weight for years and I'm done waiting..." rows="5"></textarea>
+      <span class="err-msg">Please share a little about your why</span>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 7: Target date
+       ==================================================== -->
+  <div class="screen" id="screen-7">
+    <div class="microcopy">Nearly there on the goal-setting stuff.</div>
+    <div class="section-tag">Step 7 of 12</div>
+    <div class="screen-title">When do you want to get there?</div>
+    <div class="screen-subtitle">Give me a rough timeframe. An event, a season, a feeling - whatever works for you.</div>
+    <div class="field" id="f-target">
+      <label>Your target timeframe</label>
+      <textarea id="target-text" placeholder="e.g. By Christmas, in 3 months, before my wedding in March..." rows="3"></textarea>
+      <span class="err-msg">Please give a rough timeframe</span>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 8: Biggest obstacle
+       ==================================================== -->
+  <div class="screen" id="screen-8">
+    <div class="section-tag">Step 8 of 12</div>
+    <div class="screen-title">What's going to get in the way?</div>
+    <div class="screen-subtitle">What's the one thing most likely to stop you following through? No judgment - just want to plan around it.</div>
+    <div class="field" id="f-obstacle">
+      <label>Biggest obstacle</label>
+      <textarea id="obstacle-text" placeholder="e.g. Long work hours, lack of motivation, old injury, family commitments..." rows="4"></textarea>
+      <span class="err-msg">Please share what might get in your way</span>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 9: Favourite movement
+       ==================================================== -->
+  <div class="screen" id="screen-9">
+    <div class="section-tag">Step 9 of 12</div>
+    <div class="screen-title">How do you love to move?</div>
+    <div class="screen-subtitle">What do you actually enjoy? This shapes how we train together.</div>
+    <div class="field" id="f-move">
+      <label>Favourite way to move or train</label>
+      <textarea id="move-text" placeholder="e.g. Lifting heavy, hiking, anything outdoors, swimming, hate cardio but love weights..." rows="4"></textarea>
+      <span class="err-msg">Please share how you like to move</span>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 10: Availability (MULTI-select grid)
+       ==================================================== -->
+  <div class="screen" id="screen-10">
+    <div class="microcopy">Last stretch - almost there!</div>
+    <div class="section-tag">Step 10 of 12</div>
+    <div class="screen-title">When can you train?</div>
+    <div class="screen-subtitle">Tap any slots that could realistically work for you.</div>
+    <div class="avail-scroll">
+      <table class="avail-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+          </tr>
+        </thead>
+        <tbody id="avail-body"></tbody>
+      </table>
+    </div>
+    <div class="select-count" id="avail-count">No slots selected yet</div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 11: Experience + quick toggles (SINGLE-select cards)
+       ==================================================== -->
+  <div class="screen" id="screen-11">
+    <div class="section-tag">Step 11 of 12</div>
+    <div class="screen-title">Where are you starting from?</div>
+    <div class="screen-subtitle">Pick the one that fits you best right now.</div>
+    <div class="cards-grid single-col" id="exp-grid"></div>
+    <div class="divider"></div>
+    <div class="toggle-group">
+      <div class="toggle-item">
+        <label>Are you currently exercising?</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'currently-ex','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'currently-ex','no')">No</button>
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-currently-ex">
+        <div class="field">
+          <label>What type?</label>
+          <input type="text" id="currently-ex-type" placeholder="e.g. Yoga, walking, gym sessions...">
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>Have you been a gym member before?</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'gym-member','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'gym-member','no')">No</button>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>Have you trained with a PT before?</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'pt-before','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'pt-before','no')">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 12: Health Check
+       ==================================================== -->
+  <div class="screen" id="screen-12">
+    <div class="section-tag">Step 12 of 12</div>
+    <div class="screen-title">A few health questions</div>
+    <div class="privacy-note">
+      <i class="ti ti-lock"></i>
+      <span>This stays private and just helps me build a safe program for you.</span>
+    </div>
+
+    <div class="toggle-group">
+      <div class="toggle-item">
+        <label>You or a blood relative under 55 had heart disease, stroke, high cholesterol, or sudden death</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'heart-history','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'heart-history','no')">No</button>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>High blood pressure</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'high-bp','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'high-bp','no')">No</button>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>Smoker</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'smoker','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'smoker','no')">No</button>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>High cholesterol</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'high-chol','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'high-chol','no')">No</button>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>Diabetes</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'diabetes','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'diabetes','no')">No</button>
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-diabetes">
+        <div class="field">
+          <label>Type</label>
+          <select id="diabetes-type">
+            <option value="">Select type...</option>
+            <option value="Type 1">Type 1</option>
+            <option value="Type 2">Type 2</option>
+          </select>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>On prescribed medication</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'medication','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'medication','no')">No</button>
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-medication">
+        <div class="field">
+          <label>Will it affect your exercise?</label>
+          <input type="text" id="medication-detail" placeholder="Name and any relevant info...">
+        </div>
+      </div>
+      <div class="toggle-item">
+        <label>Pregnant or given birth in the last 6 weeks</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setYN(this,'pregnant','yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setYN(this,'pregnant','no')">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sub-heading">Any major injuries?</div>
+    <div class="cards-grid" id="injuries-grid"></div>
+    <div class="other-box" id="injuries-other-box">
+      <input type="text" id="injuries-other-text" placeholder="Tell me about it...">
+    </div>
+
+    <div class="divider"></div>
+    <div class="sub-heading">Have you suffered from any of these?</div>
+    <div class="cards-grid" id="conditions-grid"></div>
+    <div class="other-box" id="conditions-other-box">
+      <input type="text" id="conditions-other-text" placeholder="Tell me about it...">
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 13: Celebration
+       ==================================================== -->
+  <div class="screen" id="screen-celebrate">
+    <div class="celebrate-ring"><i class="ti ti-check"></i></div>
+    <div class="celebrate-title">You're all done!</div>
+    <p class="celebrate-sub">Rhyahn will be in touch shortly. Get ready - things are about to change.</p>
+    <div class="alert alert-error" id="email-error">
+      Something went wrong sending your form. Please screenshot this page and send it directly to Rhyahn.
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- ====================================================
+     BOTTOM NAVIGATION
+     ==================================================== -->
+<div id="bottom-nav" class="hidden">
+  <button class="btn btn-back" id="btn-back" onclick="goBack()">
+    <i class="ti ti-arrow-left"></i>
+  </button>
+  <button class="btn btn-next" id="btn-next" onclick="goNext()">
+    <span id="btn-next-label">Next</span>
+    <i class="ti ti-arrow-right"></i>
+  </button>
+</div>
+
+
+<script>
+  /* ==============================================================
+     CONFIG
+     Paste your Web3Forms key below to enable email delivery.
+     Get a free key at https://web3forms.com
+     ============================================================== */
+  const ACCESS_KEY = "PASTE_YOUR_WEB3FORMS_KEY_HERE";
+
+  /* ==============================================================
+     CARD DATA
+     Each card has: value, label, icon (Tabler class), animation,
+     color (hex), colorBg (light hex), glow (rgba string).
+     ============================================================== */
+  const GOALS = [
+    { value:'stress-relief',  label:'Stress relief',      icon:'ti-heart',       anim:'anim-pulse',  color:'#EC4899', colorBg:'#FCE7F3', glow:'rgba(236,72,153,0.18)' },
+    { value:'weight-loss',    label:'Weight loss',        icon:'ti-flame',       anim:'anim-float',  color:'#F97316', colorBg:'#FFEDD5', glow:'rgba(249,115,22,0.18)'  },
+    { value:'weight-gain',    label:'Weight gain',        icon:'ti-trending-up', anim:'anim-bounce', color:'#22C55E', colorBg:'#DCFCE7', glow:'rgba(34,197,94,0.18)'   },
+    { value:'sports-focus',   label:'Sports focus',       icon:'ti-run',         anim:'anim-wiggle', color:'#3B82F6', colorBg:'#DBEAFE', glow:'rgba(59,130,246,0.18)'  },
+    { value:'medical',        label:'Medical reasons',    icon:'ti-stethoscope', anim:'anim-pulse',  color:'#14B8A6', colorBg:'#CCFBF1', glow:'rgba(20,184,166,0.18)'  },
+    { value:'rehabilitation', label:'Rehabilitation',     icon:'ti-bandage',     anim:'anim-float',  color:'#EF4444', colorBg:'#FEE2E2', glow:'rgba(239,68,68,0.18)'   },
+    { value:'general-health', label:'General health',     icon:'ti-activity',    anim:'anim-pulse',  color:'#10B981', colorBg:'#D1FAE5', glow:'rgba(16,185,129,0.18)'  },
+    { value:'body-shape',     label:'Change body shape',  icon:'ti-adjustments', anim:'anim-shake',  color:'#8B5CF6', colorBg:'#EDE9FE', glow:'rgba(139,92,246,0.18)'  },
+    { value:'fitness',        label:'Increase fitness',   icon:'ti-bolt',        anim:'anim-bounce', color:'#F59E0B', colorBg:'#FEF3C7', glow:'rgba(245,158,11,0.18)'  },
+    { value:'other',          label:'Other',              icon:'ti-sparkles',    anim:'anim-spin',   color:'#6366F1', colorBg:'#EEF2FF', glow:'rgba(99,102,241,0.18)'  },
+  ];
+
+  const EXPERIENCE = [
+    { value:'beginner',   label:"I'm new or coming back. I want to start gently and build up.",                     icon:'ti-leaf',    anim:'anim-float',  color:'#22C55E', colorBg:'#DCFCE7', glow:'rgba(34,197,94,0.18)'   },
+    { value:'casual',     label:"I train 1 to 2 days a week, have for 3+ months, and want a new challenge.",        icon:'ti-star',    anim:'anim-bounce', color:'#F59E0B', colorBg:'#FEF3C7', glow:'rgba(245,158,11,0.18)'  },
+    { value:'consistent', label:"I've trained consistently 6+ months and want more variety and intensity.",         icon:'ti-flame',   anim:'anim-wiggle', color:'#F97316', colorBg:'#FFEDD5', glow:'rgba(249,115,22,0.18)'  },
+    { value:'limited',    label:"I have a condition or injury that limits how consistently I can train.",           icon:'ti-bandage', anim:'anim-pulse',  color:'#8B5CF6', colorBg:'#EDE9FE', glow:'rgba(139,92,246,0.18)'  },
+  ];
+
+  const INJURIES = [
+    { value:'neck',      label:'Neck',      icon:'ti-stethoscope', anim:'anim-float',  color:'#EF4444', colorBg:'#FEE2E2', glow:'rgba(239,68,68,0.18)'   },
+    { value:'back',      label:'Back',      icon:'ti-bone',        anim:'anim-wiggle', color:'#F97316', colorBg:'#FFEDD5', glow:'rgba(249,115,22,0.18)'  },
+    { value:'hips',      label:'Hips',      icon:'ti-walk',        anim:'anim-bounce', color:'#F59E0B', colorBg:'#FEF3C7', glow:'rgba(245,158,11,0.18)'  },
+    { value:'knees',     label:'Knees',     icon:'ti-bone',        anim:'anim-float',  color:'#10B981', colorBg:'#D1FAE5', glow:'rgba(16,185,129,0.18)'  },
+    { value:'shoulders', label:'Shoulders', icon:'ti-barbell',     anim:'anim-pulse',  color:'#3B82F6', colorBg:'#DBEAFE', glow:'rgba(59,130,246,0.18)'  },
+    { value:'ankles',    label:'Ankles',    icon:'ti-run',         anim:'anim-wiggle', color:'#8B5CF6', colorBg:'#EDE9FE', glow:'rgba(139,92,246,0.18)'  },
+    { value:'other',     label:'Other',     icon:'ti-help-circle', anim:'anim-shake',  color:'#6366F1', colorBg:'#EEF2FF', glow:'rgba(99,102,241,0.18)'  },
+  ];
+
+  const CONDITIONS = [
+    { value:'epilepsy',  label:'Epilepsy',           icon:'ti-brain',         anim:'anim-pulse',  color:'#8B5CF6', colorBg:'#EDE9FE', glow:'rgba(139,92,246,0.18)' },
+    { value:'arthritis', label:'Arthritis',           icon:'ti-bone',          anim:'anim-wiggle', color:'#F97316', colorBg:'#FFEDD5', glow:'rgba(249,115,22,0.18)' },
+    { value:'hernia',    label:'Hernia',              icon:'ti-circle-dashed', anim:'anim-float',  color:'#EF4444', colorBg:'#FEE2E2', glow:'rgba(239,68,68,0.18)'  },
+    { value:'asthma',    label:'Asthma',              icon:'ti-wind',          anim:'anim-pulse',  color:'#3B82F6', colorBg:'#DBEAFE', glow:'rgba(59,130,246,0.18)' },
+    { value:'dizziness', label:'Dizziness/Fainting',  icon:'ti-refresh',       anim:'anim-spin',   color:'#14B8A6', colorBg:'#CCFBF1', glow:'rgba(20,184,166,0.18)' },
+    { value:'other',     label:'Other',               icon:'ti-help-circle',   anim:'anim-bounce', color:'#6366F1', colorBg:'#EEF2FF', glow:'rgba(99,102,241,0.18)' },
+  ];
+
+  /* ==============================================================
+     STATE
+     ============================================================== */
+  let currentStep = 0;
+  let goingBack   = false;
+  let coins       = 0;
+  let level       = 1;
+  const TOTAL_DATA_STEPS = 12; // steps 1-12
+
+  const formData = {
+    firstname:'', lastname:'', mobile:'', email:'', dob:'', occupation:'',
+    goals:[], goalsOther:'', mainGoal:'',
+    bodyAreas:[],
+    importance: 7,
+    why:'', targetDate:'', obstacle:'', favouriteMove:'',
+    availability:[],
+    experienceLevel:'',
+    currentlyExercising:'', currentlyExType:'', gymMember:'', ptBefore:'',
+    heartHistory:'', highBP:'', smoker:'', highChol:'',
+    diabetes:'', diabetesType:'',
+    medication:'', medicationDetail:'',
+    pregnant:'',
+    injuries:[], injuriesOther:'',
+    conditions:[], conditionsOther:'',
+  };
+
+  /* key -> formData property mapping for Yes/No toggles */
+  const YN_MAP = {
+    'currently-ex':'currentlyExercising', 'gym-member':'gymMember', 'pt-before':'ptBefore',
+    'heart-history':'heartHistory', 'high-bp':'highBP', 'smoker':'smoker',
+    'high-chol':'highChol', 'diabetes':'diabetes',
+    'medication':'medication', 'pregnant':'pregnant',
+  };
+
+  /* ==============================================================
+     INIT: build dynamic grids
+     ============================================================== */
+  document.addEventListener('DOMContentLoaded', () => {
+    buildGrid('goals-grid',      GOALS,      'goals',      true);
+    buildGrid('exp-grid',        EXPERIENCE, 'exp',        false);
+    buildGrid('injuries-grid',   INJURIES,   'injuries',   true);
+    buildGrid('conditions-grid', CONDITIONS, 'conditions', true);
+    buildAvailGrid();
+    attachBodyParts();
+    updateSlider(7);
+  });
+
+  /* Build an icon card grid.
+     groupId: container element id
+     data:    array of card objects
+     group:   string key for data-group attribute
+     multi:   true = multi-select, false = single */
+  function buildGrid(containerId, data, group, multi) {
+    const wrap = document.getElementById(containerId);
+    wrap.innerHTML = '';
+    data.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'option-card';
+      card.dataset.value = item.value;
+      card.dataset.group = group;
+      card.style.setProperty('--card-color',    item.color);
+      card.style.setProperty('--card-color-bg', item.colorBg);
+      card.style.setProperty('--card-glow',     item.glow);
+      card.innerHTML = `
+        <div class="card-check"><i class="ti ti-check"></i></div>
+        <div class="card-icon"><i class="ti ${item.icon} ${item.anim}"></i></div>
+        <div class="card-label">${item.label}</div>`;
+      card.addEventListener('click', () => onCardClick(card, group, multi));
+      wrap.appendChild(card);
+    });
+  }
+
+  function onCardClick(card, group, multi) {
+    if (multi) {
+      card.classList.toggle('selected');
+    } else {
+      document.querySelectorAll(`[data-group="${group}"]`).forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    }
+    syncCards(group);
+    /* "Other" text box reveal */
+    if (card.dataset.value === 'other') {
+      const box = document.getElementById(`${group}-other-box`);
+      if (box) box.classList.toggle('visible', multi ? card.classList.contains('selected') : true);
+    }
+  }
+
+  function syncCards(group) {
+    const sel = [...document.querySelectorAll(`[data-group="${group}"].selected`)].map(c => c.dataset.value);
+    if (group === 'goals') {
+      formData.goals = sel;
+      updateGoalsCount();
+    } else if (group === 'main-goal') {
+      formData.mainGoal = sel[0] || '';
+    } else if (group === 'exp') {
+      formData.experienceLevel = sel[0] || '';
+    } else if (group === 'injuries') {
+      formData.injuries = sel;
+    } else if (group === 'conditions') {
+      formData.conditions = sel;
+    }
+  }
+
+  function updateGoalsCount() {
+    const n = formData.goals.length;
+    const el = document.getElementById('goals-count');
+    el.textContent = n === 0 ? '0 goals locked in' : n === 1 ? '1 goal locked in' : `${n} goals locked in`;
+    el.classList.remove('warn');
+  }
+
+  /* ==============================================================
+     BODY MAP
+     ============================================================== */
+  function attachBodyParts() {
+    document.querySelectorAll('.body-part').forEach(part => {
+      part.addEventListener('click', () => {
+        const area = part.dataset.area;
+        /* toggle all matching parts (front + back may share labels) */
+        const all = document.querySelectorAll(`.body-part[data-area="${CSS.escape(area)}"]`);
+        const nowSelected = !part.classList.contains('selected');
+        all.forEach(p => p.classList.toggle('selected', nowSelected));
+        const unique = new Set([...document.querySelectorAll('.body-part.selected')].map(p => p.dataset.area));
+        formData.bodyAreas = [...unique];
+        const n = formData.bodyAreas.length;
+        document.getElementById('bodymap-count').textContent =
+          n === 0 ? 'No areas selected yet' : n === 1 ? '1 area selected' : `${n} areas selected`;
+      });
+    });
+  }
+
+  /* ==============================================================
+     AVAILABILITY GRID
+     ============================================================== */
+  function buildAvailGrid() {
+    const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const SLOTS = ['AM','PM'];
+    const tbody = document.getElementById('avail-body');
+    SLOTS.forEach(slot => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="avail-row-label">${slot}</td>`;
+      DAYS.forEach(day => {
+        const td   = document.createElement('td');
+        const cell = document.createElement('div');
+        cell.className = 'avail-cell';
+        cell.dataset.day  = day;
+        cell.dataset.slot = slot;
+        cell.addEventListener('click', () => {
+          cell.classList.toggle('selected');
+          formData.availability = [...document.querySelectorAll('.avail-cell.selected')]
+            .map(c => `${c.dataset.day} ${c.dataset.slot}`);
+          const n = formData.availability.length;
+          document.getElementById('avail-count').textContent =
+            n === 0 ? 'No slots selected yet' : n === 1 ? '1 slot selected' : `${n} slots selected`;
+        });
+        td.appendChild(cell);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ==============================================================
+     YES/NO TOGGLES
+     ============================================================== */
+  function setYN(btn, key, val) {
+    btn.closest('.toggle-item').querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (YN_MAP[key]) formData[YN_MAP[key]] = val;
+    const sub = document.getElementById(`sub-${key}`);
+    if (sub) sub.classList.toggle('visible', val === 'yes');
+  }
+
+  /* ==============================================================
+     SLIDER
+     ============================================================== */
+  function updateSlider(val) {
+    document.getElementById('slider-display').textContent = val;
+    formData.importance = Number(val);
+    const pct = ((val - 1) / 9) * 100;
+    document.getElementById('importance-slider').style.background =
+      `linear-gradient(90deg, var(--accent) ${pct}%, #E2E8F0 ${pct}%)`;
+  }
+
+  /* ==============================================================
+     NAVIGATION
+     ============================================================== */
+  function startForm() {
+    document.getElementById('hud').classList.remove('hidden');
+    document.getElementById('bottom-nav').classList.remove('hidden');
+    navigateTo(1, false);
+  }
+
+  function goNext() {
+    if (!validateStep(currentStep)) return;
+    collectStep(currentStep);
+
+    /* Build the main-goal grid from whatever goals were selected */
+    if (currentStep === 2) buildMainGoalGrid();
+
+    if (currentStep === 12) {
+      submitForm();
+      return;
+    }
+    navigateTo(currentStep + 1, false);
+    awardCoins();
+  }
+
+  function goBack() {
+    if (currentStep <= 1) return;
+    navigateTo(currentStep - 1, true);
+  }
+
+  function navigateTo(step, back) {
+    const prevEl = document.getElementById(stepId(currentStep));
+    if (prevEl) {
+      prevEl.classList.remove('active', 'going-back');
+    }
+    currentStep = step;
+    const nextEl = document.getElementById(stepId(step));
+    if (back) nextEl.classList.add('going-back');
+    else      nextEl.classList.remove('going-back');
+    nextEl.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    updateHUD();
+    updateNav();
+  }
+
+  function stepId(s) {
+    return s === 13 ? 'screen-celebrate' : `screen-${s}`;
+  }
+
+  /* ==============================================================
+     HUD UPDATE
+     ============================================================== */
+  function updateHUD() {
+    const pct = currentStep <= 1 ? 0 : Math.min(((currentStep - 1) / TOTAL_DATA_STEPS) * 100, 100);
+    document.getElementById('hud-fill').style.width = `${pct}%`;
+    document.getElementById('coins-val').textContent = coins;
+    document.getElementById('level-val').textContent = `Lv ${level}`;
+  }
+
+  function updateNav() {
+    const nav  = document.getElementById('bottom-nav');
+    const back = document.getElementById('btn-back');
+    const lbl  = document.getElementById('btn-next-label');
+    /* Hide nav on welcome and celebrate */
+    nav.classList.toggle('hidden', currentStep === 0 || currentStep === 13);
+    back.style.visibility = currentStep <= 1 ? 'hidden' : 'visible';
+    lbl.textContent = currentStep === 12 ? 'Submit' : 'Next';
+    /* Show arrow on Next, hide on Submit */
+    document.querySelector('#btn-next .ti-arrow-right').style.display =
+      currentStep === 12 ? 'none' : '';
+  }
+
+  /* ==============================================================
+     COINS + LEVELS
+     ============================================================== */
+  function awardCoins() {
+    coins += 50;
+    bumpBadge('coins-display');
+
+    /* Level thresholds: one per ~2.5 screens */
+    const thresholds = [150, 300, 400, 500];
+    thresholds.forEach((t, i) => {
+      if (coins >= t && level < i + 2) {
+        level = i + 2;
+        bumpBadge('level-display');
+      }
+    });
+    updateHUD();
+  }
+
+  function bumpBadge(id) {
+    const el = document.getElementById(id);
+    el.style.transition = 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1)';
+    el.style.transform  = 'scale(1.3)';
+    setTimeout(() => { el.style.transform = ''; }, 300);
+  }
+
+  /* ==============================================================
+     VALIDATION
+     ============================================================== */
+  function validateStep(step) {
+    let ok = true;
+
+    function req(fieldId, inputId, checkFn) {
+      const fEl = document.getElementById(fieldId);
+      const iEl = document.getElementById(inputId);
+      if (!fEl || !iEl) return;
+      const pass = checkFn ? checkFn(iEl.value) : iEl.value.trim() !== '';
+      fEl.classList.toggle('error', !pass);
+      if (!pass) ok = false;
+    }
+
+    if (step === 1) {
+      req('f-firstname', 'firstname');
+      req('f-lastname',  'lastname');
+      req('f-mobile',    'mobile');
+      req('f-email',     'email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()));
+      req('f-dob',       'dob');
+      req('f-occupation','occupation');
+    }
+
+    if (step === 2) {
+      if (formData.goals.length === 0) {
+        const el = document.getElementById('goals-count');
+        el.textContent = 'Please pick at least one goal';
+        el.classList.add('warn');
+        ok = false;
+      }
+    }
+
+    if (step === 3 && !formData.mainGoal) {
+      flashGrid('main-goal-grid');
+      ok = false;
+    }
+
+    if (step === 6) req('f-why',      'why-text');
+    if (step === 7) req('f-target',   'target-text');
+    if (step === 8) req('f-obstacle', 'obstacle-text');
+    if (step === 9) req('f-move',     'move-text');
+
+    if (step === 11 && !formData.experienceLevel) {
+      flashGrid('exp-grid');
+      ok = false;
+    }
+
+    return ok;
+  }
+
+  function flashGrid(id) {
+    const el = document.getElementById(id);
+    el.style.outline = '2px solid var(--danger)';
+    el.style.borderRadius = '12px';
+    setTimeout(() => { el.style.outline = ''; el.style.borderRadius = ''; }, 1400);
+  }
+
+  /* ==============================================================
+     COLLECT STEP DATA
+     ============================================================== */
+  function collectStep(step) {
+    const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+
+    if (step === 1) {
+      formData.firstname  = v('firstname');
+      formData.lastname   = v('lastname');
+      formData.mobile     = v('mobile');
+      formData.email      = v('email');
+      formData.dob        = v('dob');
+      formData.occupation = v('occupation');
+    }
+    if (step === 2)  formData.goalsOther    = v('goals-other-text');
+    if (step === 5)  formData.importance    = Number(v('importance-slider')) || 7;
+    if (step === 6)  formData.why           = v('why-text');
+    if (step === 7)  formData.targetDate    = v('target-text');
+    if (step === 8)  formData.obstacle      = v('obstacle-text');
+    if (step === 9)  formData.favouriteMove = v('move-text');
+    if (step === 11) {
+      formData.currentlyExType = v('currently-ex-type');
+    }
+    if (step === 12) {
+      formData.diabetesType     = v('diabetes-type');
+      formData.medicationDetail = v('medication-detail');
+      formData.injuriesOther    = v('injuries-other-text');
+      formData.conditionsOther  = v('conditions-other-text');
+    }
+  }
+
+  /* ==============================================================
+     MAIN GOAL GRID (dynamically filtered from screen 2 selections)
+     ============================================================== */
+  function buildMainGoalGrid() {
+    const grid = document.getElementById('main-goal-grid');
+    grid.innerHTML = '';
+    const source = formData.goals.length > 0
+      ? GOALS.filter(g => formData.goals.includes(g.value))
+      : GOALS;
+
+    /* Reset if previously selected a goal that's no longer in the list */
+    if (!source.find(g => g.value === formData.mainGoal)) formData.mainGoal = '';
+
+    source.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'option-card';
+      card.dataset.value = item.value;
+      card.dataset.group = 'main-goal';
+      card.style.setProperty('--card-color',    item.color);
+      card.style.setProperty('--card-color-bg', item.colorBg);
+      card.style.setProperty('--card-glow',     item.glow);
+      if (item.value === formData.mainGoal) card.classList.add('selected');
+      card.innerHTML = `
+        <div class="card-check"><i class="ti ti-check"></i></div>
+        <div class="card-icon"><i class="ti ${item.icon} ${item.anim}"></i></div>
+        <div class="card-label">${item.label}</div>`;
+      card.addEventListener('click', () => onCardClick(card, 'main-goal', false));
+      grid.appendChild(card);
+    });
+  }
+
+  /* ==============================================================
+     SUBMIT
+     ============================================================== */
+  async function submitForm() {
+    /* Collect final screens */
+    collectStep(11);
+    collectStep(12);
+
+    const btn = document.getElementById('btn-next');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Sending...';
+
+    /* Helper: look up a label from a data array by value */
+    const label = (arr, val) => arr.find(x => x.value === val)?.label || val;
+
+    const goalLabels  = GOALS.filter(g => formData.goals.includes(g.value)).map(g => g.label).join(', ');
+    const injLabels   = INJURIES.filter(i => formData.injuries.includes(i.value)).map(i => i.label).join(', ');
+    const condLabels  = CONDITIONS.filter(c => formData.conditions.includes(c.value)).map(c => c.label).join(', ');
+    const expLabel    = label(EXPERIENCE, formData.experienceLevel);
+    const mainLabel   = label(GOALS, formData.mainGoal);
+    const availStr    = formData.availability.length ? formData.availability.join(', ') : 'None selected';
+    const areasStr    = formData.bodyAreas.length    ? formData.bodyAreas.join(', ')    : 'None selected';
+
+    const message = [
+      'NEW CLIENT INTAKE - Rhyahn Brock Health & Fitness',
+      '===================================================',
+      '',
+      '--- ABOUT ---',
+      `Name:              ${formData.firstname} ${formData.lastname}`,
+      `Mobile:            ${formData.mobile}`,
+      `Email:             ${formData.email}`,
+      `Date of birth:     ${formData.dob}`,
+      `Occupation:        ${formData.occupation}`,
+      '',
+      '--- GOALS ---',
+      `Goals selected:    ${goalLabels}${formData.goalsOther ? ` (Other: ${formData.goalsOther})` : ''}`,
+      `Top priority goal: ${mainLabel}`,
+      '',
+      '--- BODY MAP ---',
+      `Focus areas:       ${areasStr}`,
+      '',
+      '--- MOTIVATION ---',
+      `Importance (1-10): ${formData.importance}`,
+      `Why:               ${formData.why}`,
+      `Target timeframe:  ${formData.targetDate}`,
+      `Biggest obstacle:  ${formData.obstacle}`,
+      `Favourite movement:${formData.favouriteMove}`,
+      '',
+      '--- AVAILABILITY ---',
+      availStr,
+      '',
+      '--- EXPERIENCE ---',
+      `Level:             ${expLabel}`,
+      `Currently exercising: ${formData.currentlyExercising || 'Not answered'}${formData.currentlyExType ? ` (${formData.currentlyExType})` : ''}`,
+      `Gym member before: ${formData.gymMember || 'Not answered'}`,
+      `Trained with PT:   ${formData.ptBefore  || 'Not answered'}`,
+      '',
+      '--- HEALTH ---',
+      `Heart disease / family history: ${formData.heartHistory  || 'Not answered'}`,
+      `High blood pressure:            ${formData.highBP        || 'Not answered'}`,
+      `Smoker:                         ${formData.smoker        || 'Not answered'}`,
+      `High cholesterol:               ${formData.highChol      || 'Not answered'}`,
+      `Diabetes:                       ${formData.diabetes      || 'Not answered'}${formData.diabetesType ? ` (${formData.diabetesType})` : ''}`,
+      `On medication:                  ${formData.medication    || 'Not answered'}${formData.medicationDetail ? ` - ${formData.medicationDetail}` : ''}`,
+      `Pregnant / recently given birth:${formData.pregnant      || 'Not answered'}`,
+      `Injuries:   ${injLabels  || 'None'}${formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''}`,
+      `Conditions: ${condLabels || 'None'}${formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''}`,
+    ].join('\n');
+
+    const payload = {
+      access_key: ACCESS_KEY,
+      subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
+      from_name:  `${formData.firstname} ${formData.lastname}`,
+      replyto:    formData.email,
+      message,
+    };
+
+    let failed = false;
+    try {
+      const res  = await fetch('https://api.web3forms.com/submit', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!data.success) failed = true;
+    } catch {
+      failed = true;
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<span>Submit</span>';
+    showCelebration(failed);
+  }
+
+  /* ==============================================================
+     CELEBRATION
+     ============================================================== */
+  function showCelebration(failed = false) {
+    navigateTo(13, false);
+    if (failed) document.getElementById('email-error').classList.add('visible');
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) launchConfetti();
+  }
+
+  /* ==============================================================
+     CONFETTI
+     ============================================================== */
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx    = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const COLORS = ['#10B981','#34D399','#059669','#FCD34D','#F59E0B','#EC4899','#8B5CF6','#3B82F6','#F97316'];
+    const pieces = Array.from({ length: 130 }, () => ({
+      x:    Math.random() * canvas.width,
+      y:    -16 - Math.random() * 60,
+      r:    Math.random() * 7 + 3,
+      vx:   (Math.random() - 0.5) * 4.5,
+      vy:   Math.random() * 3.5 + 1.5,
+      rot:  Math.random() * 360,
+      rotV: (Math.random() - 0.5) * 9,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      rect: Math.random() > 0.45,
+    }));
+
+    let frame = 0;
+    const MAX  = 210;
+
+    (function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const alpha = Math.max(0, 1 - frame / MAX);
+      pieces.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        if (p.rect) ctx.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r);
+        else { ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI * 2); ctx.fill(); }
+        ctx.restore();
+        p.x  += p.vx;
+        p.y  += p.vy;
+        p.vy += 0.07; /* gravity */
+        p.rot += p.rotV;
+      });
+      frame++;
+      if (frame < MAX) requestAnimationFrame(draw);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    })();
+  }
+</script>
+</body>
+</html>
