@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="The Unofficial Gym Member Assessment by Rhyahn Brock Health and Fitness">
+<title>The Unofficial Gym Member Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #E8251A;
+  --red-dark: #C01E14;
+  --red-glow: rgba(232,37,26,0.18);
+  --red-subtle: rgba(232,37,26,0.07);
+  --green: #1A9E6E;
+  --green-light: #E6F7F1;
+  --black: #111111;
+  --near-black: #1C1C1C;
+  --grey-800: #2E2E2E;
+  --grey-600: #5A5A5A;
+  --grey-400: #9A9A9A;
+  --grey-200: #E8E6E1;
+  --grey-100: #F4F2EE;
+  --white: #FDFBF8;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.12), 0 16px 40px rgba(0,0,0,0.10);
+  --shadow-btn: 0 2px 0 rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+  --shadow-btn-press: 0 0px 0 rgba(0,0,0,0.25), inset 0 2px 4px rgba(0,0,0,0.2);
+  --transition-fast: 160ms cubic-bezier(0.4,0,0.2,1);
+  --transition-med: 280ms cubic-bezier(0.4,0,0.2,1);
+  --transition-slow: 480ms cubic-bezier(0.4,0,0.2,1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--white);
+  color: var(--black);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(232,37,26,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 90%, rgba(26,158,110,0.04) 0%, transparent 45%),
+    radial-gradient(circle at 60% 40%, rgba(232,37,26,0.03) 0%, transparent 35%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='0.8' fill='%23111111' fill-opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+#app {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: 0 20px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--transition-med), transform var(--transition-med);
+}
+
+.screen.active {
+  display: flex;
+}
+
+.screen.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress-bar-wrap {
+  padding: 20px 0 8px;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(to bottom, var(--white) 80%, transparent);
+  z-index: 10;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label-text {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey-600);
+}
+
+.progress-level {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--grey-200);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red-dark), var(--red));
+  border-radius: 100px;
+  width: 0%;
+  transition: width 600ms cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: shimmer 2.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(200%); }
+}
+
+/* ============================================================
+   NARRATOR MASCOT - THE GUIDE
+   Geometric little creature with attitude
+   ============================================================ */
+.mascot-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0 4px;
+}
+
+.mascot-guide {
+  animation: float 3.2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+.guide-eyes {
+  animation: blink 4s ease-in-out infinite;
+  transform-origin: center 38px;
+}
+
+/* ============================================================
+   WELCOME SCREEN
+   ============================================================ */
+#screen-welcome {
+  justify-content: flex-start;
+  padding-top: 40px;
+}
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.brand-tag {
+  display: inline-block;
+  background: var(--near-black);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 100px;
+  margin-bottom: 24px;
+}
+
+.welcome-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  margin-bottom: 6px;
+}
+
+.welcome-title span {
+  color: var(--red);
+}
+
+.welcome-subtitle {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey-400);
+}
+
+.welcome-card {
+  background: var(--white);
+  border: 1.5px solid var(--grey-200);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 28px 24px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--red-dark));
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.welcome-copy {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--grey-800);
+}
+
+.welcome-copy .hook-line {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--black);
+  line-height: 1.25;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.welcome-copy .pause-line {
+  color: var(--grey-400);
+  font-style: italic;
+}
+
+.welcome-badges {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--grey-100);
+  border-radius: 100px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--grey-600);
+}
+
+.badge svg {
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 17px 24px;
+  background: var(--red);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  min-height: 56px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: var(--red-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-btn-press);
+}
+
+.btn-primary:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+
+.btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 15px 24px;
+  background: transparent;
+  color: var(--grey-800);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  border: 1.5px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 52px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn-secondary:hover {
+  border-color: var(--grey-600);
+  background: var(--grey-100);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid var(--black);
+  outline-offset: 3px;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--grey-600);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  min-height: 44px;
+  transition: color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-ghost:hover { color: var(--black); }
+
+/* ============================================================
+   QUESTION SCREEN
+   ============================================================ */
+#screen-question {
+  padding-top: 0;
+}
+
+.question-header {
+  padding-top: 16px;
+  margin-bottom: 20px;
+}
+
+.question-text {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.micro-response {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--near-black);
+  color: var(--white);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  pointer-events: none;
+}
+
+.micro-response.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================================
+   ANSWER CARDS
+   ============================================================ */
+.answers-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.answer-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--white);
+  border: 1.5px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 60px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  opacity: 0;
+  transform: translateY(16px);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+}
+
+.answer-card.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease, border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.answer-card:hover {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow), var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.answer-card:active {
+  transform: scale(0.98) translateY(0px);
+}
+
+.answer-card:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 2px;
+}
+
+.answer-card.selected {
+  border-color: var(--red);
+  background: var(--red-subtle);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+
+.answer-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--grey-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.answer-card:hover .answer-icon-wrap {
+  background: var(--red-subtle);
+  transform: scale(1.08);
+}
+
+.answer-card.selected .answer-icon-wrap {
+  background: var(--red-subtle);
+}
+
+.answer-text {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--grey-800);
+  line-height: 1.35;
+  flex: 1;
+}
+
+.answer-card.selected .answer-text {
+  color: var(--near-black);
+  font-weight: 600;
+}
+
+.answer-check {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.answer-card.selected .answer-check {
+  opacity: 1;
+}
+
+/* ============================================================
+   RESULT SCREEN
+   ============================================================ */
+#screen-result {
+  padding-top: 28px;
+}
+
+.result-eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--grey-400);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.result-card {
+  border-radius: var(--radius-xl);
+  padding: 28px 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.96) translateY(16px);
+  transition: opacity 500ms ease, transform 500ms cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.result-card.revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.result-card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.result-mascot-area {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.result-mascot-svg {
+  flex-shrink: 0;
+}
+
+.result-title-group {
+  flex: 1;
+}
+
+.result-card-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 100px;
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.result-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+  margin: 16px 0;
+}
+
+.result-description {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--grey-800);
+  margin-bottom: 16px;
+}
+
+.result-description p {
+  margin-bottom: 6px;
+}
+
+.result-icons-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.result-icon-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 100px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+.result-benefits {
+  background: rgba(0,0,0,0.04);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 0;
+}
+
+.result-benefits-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--grey-600);
+  margin-bottom: 8px;
+}
+
+.result-benefits-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.result-benefit-tag {
+  background: rgba(255,255,255,0.7);
+  border-radius: 100px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--grey-800);
+  font-family: var(--font-body);
+}
+
+/* Next move section */
+.next-move-card {
+  background: var(--near-black);
+  color: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 28px 24px;
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms ease 200ms, transform 500ms ease 200ms;
+}
+
+.next-move-card.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.next-move-card::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 3px;
+  background: var(--red);
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+
+.next-move-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.next-move-copy {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 24px;
+}
+
+.next-move-copy p { margin-bottom: 4px; }
+
+.btn-cta-primary {
+  display: block;
+  width: 100%;
+  padding: 17px 24px;
+  background: var(--red);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: all var(--transition-fast);
+  min-height: 56px;
+  text-decoration: none;
+  margin-bottom: 12px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn-cta-primary:hover {
+  background: #f02d20;
+  transform: translateY(-1px);
+}
+
+.btn-cta-primary:active { transform: translateY(1px); box-shadow: var(--shadow-btn-press); }
+.btn-cta-primary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+.btn-cta-secondary {
+  display: block;
+  width: 100%;
+  padding: 15px 24px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.9);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 52px;
+  margin-bottom: 16px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn-cta-secondary:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.btn-cta-secondary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+.find-me-copy {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+
+.find-me-copy .signature {
+  display: block;
+  margin-top: 6px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  font-family: var(--font-display);
+}
+
+/* Share + Restart row */
+.result-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
+}
+
+.result-actions.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-share, .btn-restart {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 13px 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 48px;
+  border: none;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-share {
+  background: var(--grey-100);
+  color: var(--grey-800);
+}
+
+.btn-share:hover { background: var(--grey-200); }
+
+.btn-restart {
+  background: var(--grey-100);
+  color: var(--grey-800);
+}
+
+.btn-restart:hover { background: var(--grey-200); }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--near-black);
+  color: var(--white);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  transition: transform 300ms cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 100;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   RESULT COLOUR THEMES
+   ============================================================ */
+.theme-ua {
+  background: linear-gradient(145deg, #0F0F1A 0%, #1A1A2E 100%);
+  color: #E8E8FF;
+}
+.theme-ua .result-card-title { color: #B8B8FF; }
+.theme-ua .result-badge { background: rgba(184,184,255,0.15); color: #B8B8FF; }
+.theme-ua .result-card-accent { background: linear-gradient(90deg, #6B6BFF, #B8B8FF); }
+
+.theme-sc {
+  background: linear-gradient(145deg, #0D1F18 0%, #122B20 100%);
+  color: #E0F5EC;
+}
+.theme-sc .result-card-title { color: #6FD4A8; }
+.theme-sc .result-badge { background: rgba(111,212,168,0.15); color: #6FD4A8; }
+.theme-sc .result-card-accent { background: linear-gradient(90deg, #1A9E6E, #6FD4A8); }
+
+.theme-cb {
+  background: linear-gradient(145deg, #1A1000 0%, #2A1C00 100%);
+  color: #FFF3D6;
+}
+.theme-cb .result-card-title { color: #FFD166; }
+.theme-cb .result-badge { background: rgba(255,209,102,0.15); color: #FFD166; }
+.theme-cb .result-card-accent { background: linear-gradient(90deg, #E09800, #FFD166); }
+
+.theme-pc {
+  background: linear-gradient(145deg, #160A00 0%, #231200 100%);
+  color: #FFEEDD;
+}
+.theme-pc .result-card-title { color: #FF9958; }
+.theme-pc .result-badge { background: rgba(255,153,88,0.15); color: #FF9958; }
+.theme-pc .result-card-accent { background: linear-gradient(90deg, #E05800, #FF9958); }
+
+.theme-fa {
+  background: linear-gradient(145deg, #1A0A00 0%, #2A1000 100%);
+  color: #FFECE0;
+}
+.theme-fa .result-card-title { color: #FF7A3D; }
+.theme-fa .result-badge { background: rgba(255,122,61,0.15); color: #FF7A3D; }
+.theme-fa .result-card-accent { background: linear-gradient(90deg, #D64F00, #FF7A3D); }
+
+.theme-am {
+  background: linear-gradient(145deg, #1A0A14 0%, #2A1020 100%);
+  color: #FFE8F5;
+}
+.theme-am .result-card-title { color: #FF7EC4; }
+.theme-am .result-badge { background: rgba(255,126,196,0.15); color: #FF7EC4; }
+.theme-am .result-card-accent { background: linear-gradient(90deg, #C8006E, #FF7EC4); }
+
+.result-card .result-description { color: rgba(255,255,255,0.75); }
+.result-card .result-benefits { background: rgba(255,255,255,0.08); }
+.result-card .result-benefits-title { color: rgba(255,255,255,0.5); }
+.result-card .result-benefit-tag { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); }
+.result-card .result-divider { background: rgba(255,255,255,0.1); }
+.result-card .result-icon-chip { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); }
+
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============================================================
+       WELCOME SCREEN
+       ============================================================ -->
+  <div id="screen-welcome" class="screen" role="main">
+    <div class="welcome-header">
+      <div class="brand-tag">Rhyahn Brock Health &amp; Fitness</div>
+
+      <!-- GUIDE MASCOT - default expression -->
+      <div class="mascot-wrap">
+        <svg class="mascot-guide" id="guide-welcome" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Body: rounded square -->
+          <rect x="28" y="38" width="64" height="62" rx="20" fill="#1C1C1C"/>
+          <!-- Ear-like antenna nubs -->
+          <circle cx="40" cy="34" r="6" fill="#1C1C1C"/>
+          <circle cx="80" cy="34" r="6" fill="#1C1C1C"/>
+          <!-- Antenna tips -->
+          <circle cx="40" cy="26" r="3" fill="#E8251A"/>
+          <circle cx="80" cy="26" r="3" fill="#E8251A"/>
+          <!-- Face plate -->
+          <rect x="36" y="48" width="48" height="34" rx="12" fill="#2E2E2E"/>
+          <!-- Eyes group (animated blink) -->
+          <g class="guide-eyes">
+            <!-- Left eye -->
+            <ellipse cx="48" cy="63" rx="6" ry="7" fill="#FDFBF8"/>
+            <circle cx="49.5" cy="62" r="3.5" fill="#1C1C1C"/>
+            <circle cx="50.5" cy="60.5" r="1.2" fill="white" opacity="0.8"/>
+            <!-- Right eye -->
+            <ellipse cx="72" cy="63" rx="6" ry="7" fill="#FDFBF8"/>
+            <circle cx="73.5" cy="62" r="3.5" fill="#1C1C1C"/>
+            <circle cx="74.5" cy="60.5" r="1.2" fill="white" opacity="0.8"/>
+          </g>
+          <!-- Mouth: small smirk -->
+          <path d="M50 74 Q60 79 70 74" stroke="#E8251A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Small arms -->
+          <rect x="14" y="64" width="16" height="10" rx="5" fill="#1C1C1C"/>
+          <rect x="90" y="64" width="16" height="10" rx="5" fill="#1C1C1C"/>
+          <!-- Feet -->
+          <ellipse cx="48" cy="100" rx="10" ry="5" fill="#1C1C1C"/>
+          <ellipse cx="72" cy="100" rx="10" ry="5" fill="#1C1C1C"/>
+          <!-- Red chest mark -->
+          <circle cx="60" cy="86" r="5" fill="#E8251A"/>
+        </svg>
+      </div>
+
+      <h1 class="welcome-title">The <span>Unofficial</span><br>Gym Member<br>Assessment.</h1>
+      <p class="welcome-subtitle">By Rhyahn Brock</p>
+    </div>
+
+    <div class="welcome-card">
+      <div class="welcome-copy">
+        <span class="hook-line">You scanned the thing I specifically told you not to scan.</span>
+        That's either curiosity...<br>
+        <span class="pause-line">...or a complete inability to follow instructions.</span><br><br>
+        Either way, I like it.<br><br>
+        This will take less than 60 seconds.<br><br>
+        At the end, you'll discover what kind of gym member you really are.<br><br>
+        <strong>No email. No spam. No weird sales pitch.</strong><br>
+        Just brutal honesty.
+      </div>
+      <div class="welcome-badges">
+        <span class="badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#1A9E6E" stroke-width="1.5"/><path d="M3.5 6l2 2 3-3" stroke="#1A9E6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          No email
+        </span>
+        <span class="badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#1A9E6E" stroke-width="1.5"/><path d="M3.5 6l2 2 3-3" stroke="#1A9E6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Under 60 seconds
+        </span>
+        <span class="badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#1A9E6E" stroke-width="1.5"/><path d="M3.5 6l2 2 3-3" stroke="#1A9E6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          9 questions
+        </span>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="startQuiz()" id="btn-start">Let's find out</button>
+  </div>
+
+  <!-- ============================================================
+       QUESTION SCREEN
+       ============================================================ -->
+  <div id="screen-question" class="screen" role="main">
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span class="progress-label-text">Level Progress</span>
+        <span class="progress-level" id="progress-level-text">Level 1 of 9</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Micro-response toast (inside screen) -->
+    <div class="micro-response" id="micro-response" role="status" aria-live="polite">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#E8251A"/><path d="M5.5 9l2.5 2.5 4.5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="micro-text">Noted.</span>
+    </div>
+
+    <!-- Guide mascot (swappable expression) -->
+    <div class="mascot-wrap" id="guide-q-wrap">
+      <!-- JS will inject appropriate SVG here -->
+    </div>
+
+    <div class="question-header">
+      <p class="question-text" id="question-text"></p>
+    </div>
+
+    <div class="answers-grid" id="answers-grid" role="radiogroup" aria-label="Answer options"></div>
+
+  </div>
+
+  <!-- ============================================================
+       RESULT SCREEN
+       ============================================================ -->
+  <div id="screen-result" class="screen" role="main">
+
+    <p class="result-eyebrow" id="result-eyebrow">Your Training Type</p>
+
+    <div class="result-card" id="result-card" aria-live="polite">
+      <div class="result-card-accent"></div>
+      <div class="result-mascot-area">
+        <div class="result-mascot-svg" id="result-mascot-svg" aria-hidden="true"></div>
+        <div class="result-title-group">
+          <h2 class="result-card-title" id="result-title"></h2>
+          <span class="result-badge" id="result-badge"></span>
+        </div>
+      </div>
+      <div class="result-divider"></div>
+      <div class="result-icons-row" id="result-icons-row"></div>
+      <div class="result-description" id="result-description"></div>
+      <div class="result-benefits" id="result-benefits">
+        <div class="result-benefits-title">You may benefit from</div>
+        <div class="result-benefits-list" id="result-benefits-list"></div>
+      </div>
+    </div>
+
+    <div class="next-move-card" id="next-move-card">
+      <h3 class="next-move-title">Your next move.</h3>
+      <div class="next-move-copy">
+        <p>Want to know what your next 90 days could look like?</p>
+        <p>Let's have a quick chat.</p>
+        <p>No pressure.</p>
+        <p>No awkward sales pitch.</p>
+        <p>Just a conversation.</p>
+      </div>
+      <button class="btn-cta-primary" id="btn-calendly">Book a Free Consultation</button>
+      <button class="btn-cta-secondary" id="btn-find-me">Come Find Me at the Gym</button>
+      <div class="find-me-copy">
+        Curious whether I got it right?<br>
+        Come say hello.<br>
+        I'm usually somewhere around the gym pretending I know what I'm doing.
+        <span class="signature">Rhyahn Brock</span>
+      </div>
+    </div>
+
+    <div class="result-actions" id="result-actions">
+      <button class="btn-share" id="btn-share" aria-label="Share your result">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="13" cy="3" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="3" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="13" cy="13" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7l6-3M5 9l6 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Share
+      </button>
+      <button class="btn-restart" id="btn-restart" aria-label="Restart the quiz">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8A5.5 5.5 0 0114 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2.5 8L5 5.5M2.5 8L5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Restart
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+<script>
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const CALENDLY_URL = "INSERT_CALENDLY_LINK_HERE";
+
+// ============================================================
+// DATA: QUESTIONS
+// ============================================================
+const QUESTIONS = [
+  {
+    text: "You've just walked into the gym. What's the first thing you do?",
+    answers: [
+      { text: "Start my workout.", scores: { UA: 2 }, icon: "lightning" },
+      { text: "Quick water bottle refill and get moving.", scores: { SC: 2 }, icon: "bottle" },
+      { text: "Wander around deciding what to do.", scores: { CB: 2 }, icon: "compass" },
+      { text: "Check three fitness videos before starting.", scores: { PC: 2 }, icon: "brain" },
+      { text: "Realise I forgot why I came.", scores: { FA: 2 }, icon: "question" }
+    ]
+  },
+  {
+    text: "How long have you been \"getting serious\" about fitness?",
+    answers: [
+      { text: "Years.", scores: { UA: 2 }, icon: "trophy" },
+      { text: "Long enough to know better.", scores: { SC: 2 }, icon: "compass" },
+      { text: "On and off for a while.", scores: { CB: 2 }, icon: "calendar" },
+      { text: "Every Monday since 2019.", scores: { CB: 3 }, icon: "footsteps" },
+      { text: "We still doing this?", scores: { FA: 3 }, icon: "question" }
+    ]
+  },
+  {
+    text: "A fitness influencer promises: \"THIS changes everything.\" You:",
+    answers: [
+      { text: "Ignore it.", scores: { UA: 2 }, icon: "shield" },
+      { text: "Look at it but stay with my plan.", scores: { SC: 2 }, icon: "target" },
+      { text: "Save it for later.", scores: { PC: 2 }, icon: "scroll" },
+      { text: "Immediately question my entire training approach.", scores: { PC: 3 }, icon: "brain" },
+      { text: "Hope it works without me exercising.", scores: { FA: 3 }, icon: "seedling" }
+    ]
+  },
+  {
+    text: "Be honest. How many workout programs are saved on your phone?",
+    answers: [
+      { text: "None.", scores: { UA: 1 }, icon: "shield" },
+      { text: "A few.", scores: { SC: 2 }, icon: "checklist" },
+      { text: "Around 10.", scores: { PC: 2 }, icon: "scroll" },
+      { text: "Enough to open my own gym.", scores: { PC: 4 }, icon: "magnifying" },
+      { text: "Bold of you to assume I save workouts.", scores: { FA: 3 }, icon: "question" }
+    ]
+  },
+  {
+    text: "You miss one workout. What happens?",
+    answers: [
+      { text: "I train the next day.", scores: { UA: 2 }, icon: "lightning" },
+      { text: "I adjust my schedule.", scores: { SC: 2 }, icon: "calendar" },
+      { text: "I promise I'll make it up later.", scores: { CB: 2 }, icon: "stopwatch" },
+      { text: "See you next Monday.", scores: { CB: 4 }, icon: "footsteps" },
+      { text: "That workout was three weeks ago.", scores: { FA: 4 }, icon: "question" }
+    ]
+  },
+  {
+    text: "Which statement sounds most like you?",
+    answers: [
+      { text: "I want to perform better.", scores: { UA: 3 }, icon: "trophy" },
+      { text: "I want expert feedback.", scores: { SC: 3 }, icon: "target" },
+      { text: "I want more consistency.", scores: { CB: 3 }, icon: "flame" },
+      { text: "I want to stop overthinking everything.", scores: { PC: 3 }, icon: "brain" },
+      { text: "I want to finally get started properly.", scores: { FA: 3 }, icon: "seedling" }
+    ]
+  },
+  {
+    text: "If I secretly watched your last 30 days in the gym, I'd probably see:",
+    answers: [
+      { text: "Good effort and consistency.", scores: { UA: 3 }, icon: "dumbbell" },
+      { text: "Solid training but room for improvement.", scores: { SC: 3 }, icon: "target" },
+      { text: "Great weeks and missing weeks.", scores: { CB: 3 }, icon: "calendar" },
+      { text: "A different strategy every week.", scores: { PC: 3 }, icon: "compass" },
+      { text: "Mostly me walking past the gym.", scores: { FA: 4 }, icon: "sneaker" }
+    ]
+  },
+  {
+    text: "If you could instantly improve ONE thing:",
+    answers: [
+      { text: "Strength.", scores: { UA: 2 }, icon: "dumbbell" },
+      { text: "Results per hour spent.", scores: { SC: 2 }, icon: "stopwatch" },
+      { text: "Consistency.", scores: { CB: 3 }, icon: "flame" },
+      { text: "Knowing exactly what works.", scores: { PC: 3 }, icon: "scroll" },
+      { text: "Actually showing up regularly.", scores: { FA: 4 }, icon: "sneaker" }
+    ]
+  },
+  {
+    text: "What's your relationship with motivation?",
+    answers: [
+      { text: "I don't rely on it.", scores: { UA: 3 }, icon: "shield" },
+      { text: "It's helpful but not required.", scores: { SC: 3 }, icon: "compass" },
+      { text: "I wish I had more of it.", scores: { CB: 3 }, icon: "flame" },
+      { text: "I'm constantly searching for it.", scores: { PC: 3 }, icon: "magnifying" },
+      { text: "We're currently not speaking.", scores: { FA: 4 }, icon: "question" }
+    ]
+  }
+];
+
+// ============================================================
+// DATA: RESULTS
+// ============================================================
+const RESULTS = {
+  UA: {
+    id: "UA",
+    title: "The Undercover Athlete",
+    badge: "Hidden Strength",
+    theme: "theme-ua",
+    icons: ["lightning", "shield", "trophy"],
+    iconLabels: ["Lightning bolt", "Shield", "Trophy"],
+    description: `<p>You're capable of more than you're currently showing.</p>
+<p>You've already built many of the habits most people struggle with.</p>
+<p>Your biggest opportunity isn't motivation.</p>
+<p>It's direction.</p>`,
+    benefits: ["Smarter programming", "Better progression", "Objective feedback", "Performance-focused coaching"],
+    mascotType: "panther"
+  },
+  SC: {
+    id: "SC",
+    title: "The Self-Coach",
+    badge: "Independent Thinker",
+    theme: "theme-sc",
+    icons: ["compass", "map", "target"],
+    iconLabels: ["Compass", "Map", "Target"],
+    description: `<p>You're capable.</p>
+<p>Independent.</p>
+<p>And probably pretty good at figuring things out yourself.</p>
+<p>The question isn't whether you can get results.</p>
+<p>The question is whether you're reaching your full potential.</p>
+<p>People like you often benefit from:</p>`,
+    benefits: ["Expert oversight", "Efficiency", "Breaking plateaus", "Fine-tuning"],
+    mascotType: "owl"
+  },
+  CB: {
+    id: "CB",
+    title: "The Consistency Builder",
+    badge: "Built for the Long Game",
+    theme: "theme-cb",
+    icons: ["calendar", "footsteps", "flame"],
+    iconLabels: ["Calendar", "Footsteps", "Flame"],
+    description: `<p>You know more than enough to succeed.</p>
+<p>The challenge isn't knowledge.</p>
+<p>It's repeatability.</p>
+<p>When you're on, you're on.</p>
+<p>The goal now is making that version of you show up more often.</p>
+<p>People like you often benefit from:</p>`,
+    benefits: ["Accountability", "Structure", "Realistic planning", "Sustainable habits"],
+    mascotType: "wolf"
+  },
+  PC: {
+    id: "PC",
+    title: "The Program Collector",
+    badge: "Knows Everything, Does Less",
+    theme: "theme-pc",
+    icons: ["scroll", "brain", "magnifying"],
+    iconLabels: ["Scroll", "Brain", "Magnifying glass"],
+    description: `<p>You've watched the videos.</p>
+<p>Saved the reels.</p>
+<p>Read the articles.</p>
+<p>Downloaded the programs.</p>
+<p>The problem isn't information.</p>
+<p>The problem is choosing one path and sticking with it long enough to see results.</p>
+<p>People like you often benefit from:</p>`,
+    benefits: ["Simplification", "Clear direction", "Less noise", "A proven roadmap"],
+    mascotType: "fox"
+  },
+  FA: {
+    id: "FA",
+    title: "The Future Athlete",
+    badge: "Full of Untapped Potential",
+    theme: "theme-fa",
+    icons: ["seedling", "star", "mountain"],
+    iconLabels: ["Seedling", "Rising star", "Mountain path"],
+    description: `<p>You've got goals.</p>
+<p>You've got intentions.</p>
+<p>You've probably even got gym clothes specifically purchased for those goals.</p>
+<p>The challenge isn't potential.</p>
+<p>It's momentum.</p>
+<p>The good news? Momentum is easier to build than most people think.</p>
+<p>People like you often benefit from:</p>`,
+    benefits: ["A clear starting point", "Accountability", "Simplicity", "Small wins that build confidence"],
+    mascotType: "phoenix"
+  },
+  AM: {
+    id: "AM",
+    title: "The Almost There Member",
+    badge: "Frustratingly Close",
+    theme: "theme-am",
+    icons: ["target", "trophy", "flag"],
+    iconLabels: ["Target", "Trophy", "Finish flag"],
+    description: `<p>You're frustratingly close.</p>
+<p>You don't need a complete overhaul.</p>
+<p>You need a few strategic adjustments.</p>
+<p>You're nearer to your goals than you think.</p>
+<p>People like you often benefit from:</p>`,
+    benefits: ["Accountability", "Refinement", "Consistency", "A second set of eyes"],
+    mascotType: "eagle"
+  }
+};
+
+// ============================================================
+// SVG ICON LIBRARY
+// ============================================================
+function getIcon(name, size = 22, color = "#E8251A") {
+  const s = size;
+  const icons = {
+    dumbbell: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="2" y="9" width="4" height="4" rx="1.5" fill="${color}" opacity="0.8"/>
+      <rect x="16" y="9" width="4" height="4" rx="1.5" fill="${color}" opacity="0.8"/>
+      <rect x="1" y="8" width="3" height="6" rx="1.5" fill="${color}"/>
+      <rect x="18" y="8" width="3" height="6" rx="1.5" fill="${color}"/>
+      <rect x="6" y="10" width="10" height="2" rx="1" fill="${color}" opacity="0.6"/>
+    </svg>`,
+
+    lightning: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M13 2L4 13h7l-2 7 9-11h-7l2-7z" fill="${color}" stroke="${color}" stroke-width="1" stroke-linejoin="round"/>
+    </svg>`,
+
+    bottle: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="8" y="2" width="6" height="3" rx="1.5" fill="${color}" opacity="0.6"/>
+      <path d="M7 5h8l1.5 3v10a2 2 0 01-2 2H7.5a2 2 0 01-2-2V8L7 5z" fill="${color}" opacity="0.15" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="6" y="11" width="10" height="2" rx="1" fill="${color}" opacity="0.4"/>
+    </svg>`,
+
+    sneaker: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M2 14l3-8 2 2 2-2h5l4 5-1 3H2z" fill="${color}" opacity="0.15" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M2 14h16" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M9 8l2 3" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    stopwatch: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="11" cy="13" r="7" fill="${color}" opacity="0.12" stroke="${color}" stroke-width="1.5"/>
+      <path d="M11 9v4l2.5 2.5" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 2h4M11 2v3" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M18 6l1.5-1.5" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    checklist: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="3" y="3" width="16" height="16" rx="3" fill="${color}" opacity="0.1" stroke="${color}" stroke-width="1.5"/>
+      <path d="M6 8l2 2 4-4" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 13l2 2 4-4" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+
+    map: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M8 3L2 5v14l6-2 6 2 6-2V3l-6 2-6-2z" fill="${color}" opacity="0.12" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M8 3v14M14 5v14" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    trophy: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M7 3h8v7a4 4 0 01-8 0V3z" fill="${color}" opacity="0.15" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M4 4H7M15 4h3" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M4 4c0 3 1.5 5 3 6M18 4c0 3-1.5 5-3 6" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M11 14v4M8 18h6" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    flame: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M11 20c-4 0-7-3-7-7 0-5 4-8 5-11 1 2 1 4 3 5 0-2 1-4 2-5 2 3 4 5 4 8 0 5-3 10-7 10z" fill="${color}" opacity="0.2" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M11 20c-2 0-4-2-4-4 0-2 1-4 2-5 0 1 1 2 2 2s2-2 1-3c2 1 3 3 3 5 0 2-2 5-4 5z" fill="${color}" opacity="0.5"/>
+    </svg>`,
+
+    compass: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" fill="${color}" opacity="0.1" stroke="${color}" stroke-width="1.5"/>
+      <path d="M11 3v2M11 17v2M3 11h2M17 11h2" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M9 9l-2 6 6-2 2-6-6 2z" fill="${color}" opacity="0.8"/>
+      <circle cx="11" cy="11" r="1.5" fill="${color}"/>
+    </svg>`,
+
+    brain: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M7 12c-2 0-4-1.5-4-4s2-4 4-4c0-1 1-2 2-2h2c1 0 2 1 2 2 2 0 4 2 4 4s-2 4-4 4" fill="${color}" opacity="0.1" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M11 12v8M8 17h6" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M8 8c0 1 1 2 2 2s2-1 2-2" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    calendar: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="3" y="5" width="16" height="14" rx="3" fill="${color}" opacity="0.1" stroke="${color}" stroke-width="1.5"/>
+      <path d="M3 10h16" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M7 3v4M15 3v4" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="8" cy="14" r="1" fill="${color}"/>
+      <circle cx="11" cy="14" r="1" fill="${color}"/>
+      <circle cx="14" cy="14" r="1" fill="${color}"/>
+    </svg>`,
+
+    shield: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M11 3l8 3v5c0 5-4 8-8 10C7 19 3 16 3 11V6l8-3z" fill="${color}" opacity="0.12" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M8 11l2 2 4-4" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+
+    target: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" fill="${color}" opacity="0.08" stroke="${color}" stroke-width="1.5"/>
+      <circle cx="11" cy="11" r="5" fill="${color}" opacity="0.12" stroke="${color}" stroke-width="1.5"/>
+      <circle cx="11" cy="11" r="2" fill="${color}"/>
+      <path d="M11 3v3M11 16v3M3 11h3M16 11h3" stroke="${color}" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    </svg>`,
+
+    seedling: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M11 20V10" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M11 14c0 0-1-4-5-5 0 4 2 6 5 5z" fill="${color}" opacity="0.3" stroke="${color}" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M11 10c0 0 1-4 5-5 0 4-2 6-5 5z" fill="${color}" opacity="0.5" stroke="${color}" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="11" cy="20" r="1.5" fill="${color}" opacity="0.4"/>
+    </svg>`,
+
+    star: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M11 2l2.4 6.5H20l-5.5 4 2.1 6.5L11 15l-5.6 4 2.1-6.5L2 8.5h6.6L11 2z" fill="${color}" opacity="0.25" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M11 6l1.4 3.8H16l-3.2 2.3 1.2 3.7L11 13.5l-3 2.3 1.2-3.7L6 9.8h3.6L11 6z" fill="${color}"/>
+    </svg>`,
+
+    mountain: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M2 19l6-10 4 6 3-4 5 8H2z" fill="${color}" opacity="0.15" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M14 5l2 3" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="14" cy="4" r="1.5" fill="${color}" opacity="0.6"/>
+    </svg>`,
+
+    scroll: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M6 3h10a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z" fill="${color}" opacity="0.1" stroke="${color}" stroke-width="1.5"/>
+      <path d="M8 8h6M8 11h6M8 14h4" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M4 5c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="${color}" opacity="0.3"/>
+    </svg>`,
+
+    magnifying: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="10" cy="10" r="6" fill="${color}" opacity="0.1" stroke="${color}" stroke-width="1.5"/>
+      <path d="M14.5 14.5l4 4" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`,
+
+    footsteps: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <ellipse cx="8" cy="8" rx="3" ry="4" transform="rotate(-10 8 8)" fill="${color}" opacity="0.3" stroke="${color}" stroke-width="1.2"/>
+      <ellipse cx="14" cy="14" rx="3" ry="4" transform="rotate(10 14 14)" fill="${color}" opacity="0.5" stroke="${color}" stroke-width="1.2"/>
+      <ellipse cx="7.5" cy="7" rx="1.2" ry="0.8" fill="${color}" opacity="0.5" transform="rotate(-10 7.5 7)"/>
+      <ellipse cx="13.5" cy="13" rx="1.2" ry="0.8" fill="${color}" opacity="0.5" transform="rotate(10 13.5 13)"/>
+    </svg>`,
+
+    flag: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M5 20V4" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M5 4l12 4-12 4V4z" fill="${color}" opacity="0.3" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M5 12l8 2" stroke="${color}" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+    </svg>`,
+
+    question: `<svg width="${s}" height="${s}" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" fill="${color}" opacity="0.1" stroke="${color}" stroke-width="1.5"/>
+      <path d="M9 8.5A2 2 0 0113 10c0 1.5-2 2-2 3.5" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="11" cy="16" r="1" fill="${color}"/>
+    </svg>`
+  };
+  return icons[name] || icons["question"];
+}
+
+// ============================================================
+// SVG MASCOT LIBRARY
+// ============================================================
+
+// Guide mascot expressions
+function getGuideMascot(expression = "default") {
+  const expressions = {
+    default: { eyeRx: 6, eyeRy: 7, mouthPath: "M50 74 Q60 79 70 74", eyeOffsetX: 1.5 },
+    amused: { eyeRx: 6, eyeRy: 5, mouthPath: "M48 73 Q60 81 72 73", eyeOffsetX: 2 },
+    impressed: { eyeRx: 7, eyeRy: 8, mouthPath: "M50 75 Q60 80 70 75", eyeOffsetX: 1.5 },
+    suspicious: { eyeRx: 6, eyeRy: 4, mouthPath: "M52 74 Q60 77 68 74", eyeOffsetX: 1 },
+    smug: { eyeRx: 5, eyeRy: 3.5, mouthPath: "M49 74 Q62 80 71 72", eyeOffsetX: 2 }
+  };
+  const e = expressions[expression] || expressions.default;
+  return `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="28" y="38" width="64" height="62" rx="20" fill="#1C1C1C"/>
+    <circle cx="40" cy="34" r="6" fill="#1C1C1C"/>
+    <circle cx="80" cy="34" r="6" fill="#1C1C1C"/>
+    <circle cx="40" cy="26" r="3" fill="#E8251A"/>
+    <circle cx="80" cy="26" r="3" fill="#E8251A"/>
+    <rect x="36" y="48" width="48" height="34" rx="12" fill="#2E2E2E"/>
+    <g class="guide-eyes">
+      <ellipse cx="48" cy="63" rx="${e.eyeRx}" ry="${e.eyeRy}" fill="#FDFBF8"/>
+      <circle cx="${48 + e.eyeOffsetX}" cy="${63 - 1}" r="3.5" fill="#1C1C1C"/>
+      <circle cx="${49 + e.eyeOffsetX}" cy="${60.5}" r="1.2" fill="white" opacity="0.8"/>
+      <ellipse cx="72" cy="63" rx="${e.eyeRx}" ry="${e.eyeRy}" fill="#FDFBF8"/>
+      <circle cx="${72 + e.eyeOffsetX}" cy="${63 - 1}" r="3.5" fill="#1C1C1C"/>
+      <circle cx="${73 + e.eyeOffsetX}" cy="${60.5}" r="1.2" fill="white" opacity="0.8"/>
+    </g>
+    <path d="${e.mouthPath}" stroke="#E8251A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <rect x="14" y="64" width="16" height="10" rx="5" fill="#1C1C1C"/>
+    <rect x="90" y="64" width="16" height="10" rx="5" fill="#1C1C1C"/>
+    <ellipse cx="48" cy="100" rx="10" ry="5" fill="#1C1C1C"/>
+    <ellipse cx="72" cy="100" rx="10" ry="5" fill="#1C1C1C"/>
+    <circle cx="60" cy="86" r="5" fill="#E8251A"/>
+  </svg>`;
+}
+
+// Result mascots - each unique creature
+function getResultMascot(type) {
+  const mascots = {
+    panther: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Panther: sleek, dark, coiled and calm -->
+      <ellipse cx="44" cy="52" rx="26" ry="28" fill="#1A1A3E"/>
+      <!-- Ears -->
+      <path d="M24 30 L18 16 L30 24z" fill="#1A1A3E"/>
+      <path d="M64 30 L70 16 L58 24z" fill="#1A1A3E"/>
+      <path d="M24 29 L20 19 L29 25z" fill="#6B6BFF" opacity="0.5"/>
+      <path d="M64 29 L68 19 L59 25z" fill="#6B6BFF" opacity="0.5"/>
+      <!-- Face -->
+      <ellipse cx="44" cy="42" rx="20" ry="18" fill="#22224A"/>
+      <!-- Eyes: sharp and knowing -->
+      <ellipse cx="37" cy="40" rx="5" ry="4" fill="#FDFBF8"/>
+      <ellipse cx="37" cy="40" rx="2.5" ry="3.5" fill="#6B6BFF"/>
+      <circle cx="37.8" cy="38.8" r="1" fill="white" opacity="0.7"/>
+      <ellipse cx="51" cy="40" rx="5" ry="4" fill="#FDFBF8"/>
+      <ellipse cx="51" cy="40" rx="2.5" ry="3.5" fill="#6B6BFF"/>
+      <circle cx="51.8" cy="38.8" r="1" fill="white" opacity="0.7"/>
+      <!-- Nose -->
+      <path d="M42 46 Q44 49 46 46" stroke="#B8B8FF" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="44" cy="44.5" r="2" fill="#1A1A3E"/>
+      <!-- Whisker lines -->
+      <path d="M24 43 L36 45M24 47 L36 46" stroke="#B8B8FF" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
+      <path d="M64 43 L52 45M64 47 L52 46" stroke="#B8B8FF" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
+      <!-- Chest marking -->
+      <ellipse cx="44" cy="62" rx="10" ry="12" fill="#2A2A56"/>
+      <path d="M40 57 L44 70 L48 57" fill="#6B6BFF" opacity="0.4"/>
+      <!-- Paws -->
+      <ellipse cx="32" cy="76" rx="8" ry="5" fill="#1A1A3E"/>
+      <ellipse cx="56" cy="76" rx="8" ry="5" fill="#1A1A3E"/>
+      <!-- Tail -->
+      <path d="M70 60 Q80 50 75 38 Q72 30 68 35" stroke="#1A1A3E" stroke-width="4" stroke-linecap="round" fill="none"/>
+    </svg>`,
+
+    owl: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Owl: wise, round, thoughtful -->
+      <ellipse cx="44" cy="50" rx="26" ry="30" fill="#0D2E1F"/>
+      <!-- Ear tufts -->
+      <path d="M30 26 L26 14 L36 22z" fill="#0D2E1F"/>
+      <path d="M58 26 L62 14 L52 22z" fill="#0D2E1F"/>
+      <path d="M30 25 L27 16 L35 21z" fill="#1A9E6E" opacity="0.5"/>
+      <path d="M58 25 L61 16 L53 21z" fill="#1A9E6E" opacity="0.5"/>
+      <!-- Facial disc -->
+      <ellipse cx="44" cy="44" rx="22" ry="22" fill="#163D27"/>
+      <ellipse cx="44" cy="44" rx="18" ry="18" fill="#0D2E1F" opacity="0.4"/>
+      <!-- Big eyes -->
+      <circle cx="36" cy="42" r="9" fill="#FDFBF8"/>
+      <circle cx="36" cy="42" r="6" fill="#1A9E6E"/>
+      <circle cx="36" cy="42" r="3" fill="#0A1F12"/>
+      <circle cx="34.5" cy="40.5" r="1.5" fill="white" opacity="0.8"/>
+      <circle cx="52" cy="42" r="9" fill="#FDFBF8"/>
+      <circle cx="52" cy="42" r="6" fill="#1A9E6E"/>
+      <circle cx="52" cy="42" r="3" fill="#0A1F12"/>
+      <circle cx="50.5" cy="40.5" r="1.5" fill="white" opacity="0.8"/>
+      <!-- Beak -->
+      <path d="M41 51 L44 55 L47 51z" fill="#6FD4A8" opacity="0.8"/>
+      <!-- Wing hints -->
+      <path d="M18 54 Q22 44 28 50 Q20 60 18 54z" fill="#0D2E1F" stroke="#1A9E6E" stroke-width="0.8" opacity="0.6"/>
+      <path d="M70 54 Q66 44 60 50 Q68 60 70 54z" fill="#0D2E1F" stroke="#1A9E6E" stroke-width="0.8" opacity="0.6"/>
+      <!-- Feet perch -->
+      <path d="M36 78 L40 70 L44 78M44 78 L48 70 L52 78" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    </svg>`,
+
+    wolf: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Wolf: strong, dependable, pack animal -->
+      <ellipse cx="44" cy="52" rx="24" ry="26" fill="#2A1C00"/>
+      <!-- Pointed ears -->
+      <path d="M26 32 L20 16 L34 28z" fill="#2A1C00"/>
+      <path d="M62 32 L68 16 L54 28z" fill="#2A1C00"/>
+      <path d="M27 31 L22 18 L33 27z" fill="#FFD166" opacity="0.4"/>
+      <path d="M61 31 L66 18 L55 27z" fill="#FFD166" opacity="0.4"/>
+      <!-- Face -->
+      <ellipse cx="44" cy="44" rx="20" ry="19" fill="#3A2800"/>
+      <!-- Snout area -->
+      <ellipse cx="44" cy="52" rx="10" ry="7" fill="#4A3500"/>
+      <!-- Eyes: steady and focused -->
+      <ellipse cx="37" cy="40" rx="5" ry="5" fill="#FFD166"/>
+      <circle cx="37" cy="40" r="3" fill="#1A1000"/>
+      <circle cx="35.8" cy="38.8" r="1" fill="white" opacity="0.7"/>
+      <ellipse cx="51" cy="40" rx="5" ry="5" fill="#FFD166"/>
+      <circle cx="51" cy="40" r="3" fill="#1A1000"/>
+      <circle cx="49.8" cy="38.8" r="1" fill="white" opacity="0.7"/>
+      <!-- Nose -->
+      <ellipse cx="44" cy="49" rx="3.5" ry="2.5" fill="#2A1C00"/>
+      <!-- Mouth: confident slight smile -->
+      <path d="M41 52 Q44 55 47 52" stroke="#FFD166" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+      <!-- Chest fur -->
+      <ellipse cx="44" cy="64" rx="12" ry="10" fill="#4A3500"/>
+      <path d="M38 60 Q44 68 50 60" fill="#FFD166" opacity="0.15"/>
+      <!-- Paws -->
+      <ellipse cx="34" cy="76" rx="8" ry="5" fill="#2A1C00"/>
+      <ellipse cx="54" cy="76" rx="8" ry="5" fill="#2A1C00"/>
+    </svg>`,
+
+    fox: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Fox: curious, bright-eyed, agile -->
+      <ellipse cx="44" cy="52" rx="22" ry="24" fill="#231200"/>
+      <!-- Big triangular ears -->
+      <path d="M24 34 L16 14 L36 30z" fill="#231200"/>
+      <path d="M64 34 L72 14 L52 30z" fill="#231200"/>
+      <path d="M25 33 L19 17 L34 29z" fill="#E05800" opacity="0.7"/>
+      <path d="M63 33 L69 17 L54 29z" fill="#E05800" opacity="0.7"/>
+      <!-- Fox face: pointed muzzle -->
+      <ellipse cx="44" cy="44" rx="20" ry="18" fill="#E05800" opacity="0.85"/>
+      <!-- White cheeks -->
+      <ellipse cx="36" cy="48" rx="6" ry="5" fill="#FFF0E0"/>
+      <ellipse cx="52" cy="48" rx="6" ry="5" fill="#FFF0E0"/>
+      <!-- White forehead blaze -->
+      <path d="M40 30 Q44 36 48 30 Q44 26 40 30z" fill="#FFF0E0" opacity="0.8"/>
+      <!-- Eyes: bright and curious -->
+      <ellipse cx="37" cy="40" rx="5.5" ry="5.5" fill="#FDFBF8"/>
+      <ellipse cx="37" cy="40" rx="3.5" ry="4" fill="#FF9958"/>
+      <circle cx="37" cy="40" r="2" fill="#1A0800"/>
+      <circle cx="35.8" cy="38.8" r="1.2" fill="white" opacity="0.9"/>
+      <ellipse cx="51" cy="40" rx="5.5" ry="5.5" fill="#FDFBF8"/>
+      <ellipse cx="51" cy="40" rx="3.5" ry="4" fill="#FF9958"/>
+      <circle cx="51" cy="40" r="2" fill="#1A0800"/>
+      <circle cx="49.8" cy="38.8" r="1.2" fill="white" opacity="0.9"/>
+      <!-- Nose -->
+      <ellipse cx="44" cy="49" rx="3" ry="2" fill="#231200"/>
+      <!-- Mouth: curious grin -->
+      <path d="M41 52 Q44 56 47 52" stroke="#231200" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <!-- Tail suggestion -->
+      <path d="M66 60 Q76 52 72 40 Q69 32 64 38" stroke="#E05800" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.8"/>
+      <path d="M66 60 Q76 52 72 40 Q69 32 64 38" stroke="#FFF0E0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.4"/>
+    </svg>`,
+
+    phoenix: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Phoenix hatchling: eager, barely emerged, glowing with potential -->
+      <!-- Cracked egg shell bits -->
+      <path d="M26 68 L20 80 L32 76z" fill="#D64F00" opacity="0.4"/>
+      <path d="M62 68 L68 80 L56 76z" fill="#D64F00" opacity="0.4"/>
+      <!-- Glow aura -->
+      <circle cx="44" cy="48" r="28" fill="#FF7A3D" opacity="0.08"/>
+      <circle cx="44" cy="48" r="20" fill="#FF7A3D" opacity="0.06"/>
+      <!-- Body: small hatchling, fluffy -->
+      <ellipse cx="44" cy="58" rx="18" ry="18" fill="#D64F00"/>
+      <ellipse cx="44" cy="56" rx="14" ry="14" fill="#FF7A3D"/>
+      <!-- Wing stubs (just emerging) -->
+      <path d="M26 52 Q18 44 22 36 Q30 42 28 52z" fill="#D64F00" stroke="#FF7A3D" stroke-width="1" opacity="0.9"/>
+      <path d="M62 52 Q70 44 66 36 Q58 42 60 52z" fill="#D64F00" stroke="#FF7A3D" stroke-width="1" opacity="0.9"/>
+      <!-- Flame crest on head -->
+      <path d="M38 38 Q40 28 44 24 Q48 28 50 38" fill="#FF7A3D" opacity="0.7"/>
+      <path d="M40 38 Q42 30 44 26 Q46 30 48 38" fill="#FFD166" opacity="0.8"/>
+      <path d="M42 38 Q43 32 44 29 Q45 32 46 38" fill="white" opacity="0.6"/>
+      <!-- Head -->
+      <circle cx="44" cy="42" r="12" fill="#FF7A3D"/>
+      <!-- Eyes: wide and eager -->
+      <circle cx="39" cy="41" r="5" fill="#FDFBF8"/>
+      <circle cx="39" cy="41" r="3" fill="#D64F00"/>
+      <circle cx="39" cy="41" r="1.5" fill="#1A0800"/>
+      <circle cx="37.8" cy="39.8" r="1" fill="white" opacity="0.9"/>
+      <circle cx="49" cy="41" r="5" fill="#FDFBF8"/>
+      <circle cx="49" cy="41" r="3" fill="#D64F00"/>
+      <circle cx="49" cy="41" r="1.5" fill="#1A0800"/>
+      <circle cx="47.8" cy="39.8" r="1" fill="white" opacity="0.9"/>
+      <!-- Beak: small but determined -->
+      <path d="M42 46 L44 50 L46 46z" fill="#FFD166"/>
+      <!-- Tiny feet -->
+      <path d="M38 74 L34 80 L38 78 L40 82 L42 78" stroke="#D64F00" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M50 74 L54 80 L50 78 L48 82 L46 78" stroke="#D64F00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    eagle: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Eagle: precise, focused, almost ready to dive -->
+      <circle cx="44" cy="44" r="30" fill="#1A0A14" opacity="0.08"/>
+      <!-- Body -->
+      <ellipse cx="44" cy="54" rx="20" ry="22" fill="#1A0A14"/>
+      <!-- Wings spread -->
+      <path d="M24 48 Q10 38 8 26 Q20 30 24 44z" fill="#1A0A14"/>
+      <path d="M64 48 Q78 38 80 26 Q68 30 64 44z" fill="#1A0A14"/>
+      <!-- Wing highlights -->
+      <path d="M24 48 Q12 40 10 30 Q18 34 22 44z" fill="#FF7EC4" opacity="0.2"/>
+      <path d="M64 48 Q76 40 78 30 Q70 34 66 44z" fill="#FF7EC4" opacity="0.2"/>
+      <!-- Chest pattern -->
+      <ellipse cx="44" cy="56" rx="12" ry="14" fill="#2A1020"/>
+      <!-- Feather texture -->
+      <path d="M38 48 Q44 44 50 48 Q44 52 38 48z" fill="#FF7EC4" opacity="0.25"/>
+      <!-- Head: white-ish with dark cap -->
+      <circle cx="44" cy="36" r="14" fill="#F5E8F0"/>
+      <path d="M36 30 Q44 24 52 30 Q50 36 44 34 Q38 36 36 30z" fill="#1A0A14"/>
+      <!-- Piercing eyes -->
+      <circle cx="38.5" cy="37" r="4.5" fill="#FDFBF8"/>
+      <circle cx="38.5" cy="37" r="2.8" fill="#C8006E"/>
+      <circle cx="38.5" cy="37" r="1.5" fill="#0A0014"/>
+      <circle cx="37.3" cy="35.8" r="0.8" fill="white" opacity="0.9"/>
+      <circle cx="49.5" cy="37" r="4.5" fill="#FDFBF8"/>
+      <circle cx="49.5" cy="37" r="2.8" fill="#C8006E"/>
+      <circle cx="49.5" cy="37" r="1.5" fill="#0A0014"/>
+      <circle cx="48.3" cy="35.8" r="0.8" fill="white" opacity="0.9"/>
+      <!-- Hooked beak -->
+      <path d="M42 42 L44 46 Q46 47 47 44 L44 42z" fill="#FFD166"/>
+      <!-- Talons -->
+      <path d="M36 74 L32 80 L36 78 L34 83" stroke="#1A0A14" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M52 74 L56 80 L52 78 L54 83" stroke="#1A0A14" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M44 76 L44 83" stroke="#1A0A14" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`
+  };
+  return mascots[type] || mascots.eagle;
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let currentQuestion = 0;
+let scores = { UA: 0, SC: 0, CB: 0, PC: 0, FA: 0 };
+let answered = false;
+const MICRO_RESPONSES = [
+  "Noted.", "Interesting choice.", "Bold.",
+  "Respectfully... fascinating.", "Okay, main character energy.",
+  "Data collected.", "Well, well, well.", "Telling."
+];
+let microIdx = 0;
+
+// ============================================================
+// SCREEN TRANSITIONS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active', 'visible');
+  });
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { el.classList.add('visible'); });
+  });
+}
+
+// ============================================================
+// QUIZ LOGIC
+// ============================================================
+function startQuiz() {
+  currentQuestion = 0;
+  scores = { UA: 0, SC: 0, CB: 0, PC: 0, FA: 0 };
+  microIdx = 0;
+  loadQuestion();
+  showScreen('screen-question');
+}
+
+function loadQuestion() {
+  answered = false;
+  const q = QUESTIONS[currentQuestion];
+  const total = QUESTIONS.length;
+  const pct = (currentQuestion / total) * 100;
+
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-level-text').textContent = `Level ${currentQuestion + 1} of ${total}`;
+  document.getElementById('question-text').textContent = q.text;
+
+  // Guide expression changes
+  const guideWrap = document.getElementById('guide-q-wrap');
+  const expressions = ['default', 'amused', 'impressed', 'suspicious', 'smug'];
+  const expr = expressions[currentQuestion % expressions.length];
+  guideWrap.innerHTML = getGuideMascot(expr);
+
+  // Hide micro-response
+  const mr = document.getElementById('micro-response');
+  mr.classList.remove('show');
+
+  // Build answer cards
+  const grid = document.getElementById('answers-grid');
+  grid.innerHTML = '';
+  q.answers.forEach((a, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-card';
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', 'false');
+    btn.setAttribute('aria-label', a.text);
+
+    btn.innerHTML = `
+      <div class="answer-icon-wrap">${getIcon(a.icon, 22, '#E8251A')}</div>
+      <span class="answer-text">${a.text}</span>
+      <svg class="answer-check" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <circle cx="10" cy="10" r="9" fill="#1A9E6E"/>
+        <path d="M6 10l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+
+    btn.addEventListener('click', () => selectAnswer(btn, a, i));
+
+    grid.appendChild(btn);
+    setTimeout(() => { btn.classList.add('revealed'); }, 60 + i * 70);
+  });
+}
+
+function selectAnswer(btn, answer, idx) {
+  if (answered) return;
+  answered = true;
+
+  // Mark selected
+  document.querySelectorAll('.answer-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-checked', 'false');
+  });
+  btn.classList.add('selected');
+  btn.setAttribute('aria-checked', 'true');
+
+  // Apply scores
+  Object.entries(answer.scores).forEach(([cat, pts]) => { scores[cat] += pts; });
+
+  // Show micro-response with guide reaction
+  const mr = document.getElementById('micro-response');
+  const mt = document.getElementById('micro-text');
+  mt.textContent = MICRO_RESPONSES[microIdx % MICRO_RESPONSES.length];
+  microIdx++;
+  mr.classList.add('show');
+
+  // Update guide expression to reacting
+  const guideWrap = document.getElementById('guide-q-wrap');
+  guideWrap.innerHTML = getGuideMascot('smug');
+
+  // Advance after delay
+  setTimeout(() => {
+    mr.classList.remove('show');
+    currentQuestion++;
+    if (currentQuestion < QUESTIONS.length) {
+      // Slide out answers, then load next
+      document.querySelectorAll('.answer-card').forEach((c, i) => {
+        setTimeout(() => { c.style.opacity = '0'; c.style.transform = 'translateY(-10px)'; }, i * 30);
+      });
+      setTimeout(loadQuestion, 250);
+    } else {
+      // Complete progress bar
+      document.getElementById('progress-fill').style.width = '100%';
+      setTimeout(showResult, 400);
+    }
+  }, 1100);
+}
+
+// ============================================================
+// SCORING & RESULT
+// ============================================================
+function calculateResult() {
+  const cats = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const top = cats[0];
+  const second = cats[1];
+
+  // Tie or win-by-less-than-3 -> Almost There Member
+  if (top[1] === second[1] || (top[1] - second[1]) < 3) {
+    return RESULTS.AM;
+  }
+  return RESULTS[top[0]];
+}
+
+function showResult() {
+  const result = calculateResult();
+  localStorage.setItem('gymQuizResult', result.id);
+
+  const card = document.getElementById('result-card');
+  card.className = `result-card ${result.theme}`;
+
+  document.getElementById('result-title').textContent = result.title;
+  document.getElementById('result-badge').textContent = result.badge;
+  document.getElementById('result-mascot-svg').innerHTML = getResultMascot(result.mascotType);
+  document.getElementById('result-description').innerHTML = result.description;
+
+  // Icons row
+  const iconsRow = document.getElementById('result-icons-row');
+  iconsRow.innerHTML = result.icons.map((icon, i) =>
+    `<span class="result-icon-chip">${getIcon(icon, 16, 'currentColor')}<span>${result.iconLabels[i]}</span></span>`
+  ).join('');
+
+  // Benefits
+  const bList = document.getElementById('result-benefits-list');
+  bList.innerHTML = result.benefits.map(b => `<span class="result-benefit-tag">${b}</span>`).join('');
+
+  showScreen('screen-result');
+
+  // Staggered reveals
+  setTimeout(() => { card.classList.add('revealed'); }, 100);
+  setTimeout(() => { document.getElementById('next-move-card').classList.add('revealed'); }, 300);
+  setTimeout(() => { document.getElementById('result-actions').classList.add('revealed'); }, 500);
+}
+
+// ============================================================
+// SHARE
+// ============================================================
+function shareResult() {
+  const result = calculateResult();
+  const shareText = `I just took The Unofficial Gym Member Assessment and I'm "${result.title}". Find out your type at Rhyahn Brock Health and Fitness.`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'The Unofficial Gym Member Assessment', text: shareText })
+      .catch(() => {});
+  } else {
+    navigator.clipboard.writeText(shareText).then(() => {
+      showToast('Result copied to clipboard.');
+    }).catch(() => {
+      showToast('Copy this: ' + result.title);
+    });
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => { t.classList.remove('show'); }, 2800);
+}
+
+// ============================================================
+// CALENDLY / FIND ME
+// ============================================================
+document.getElementById('btn-calendly').addEventListener('click', () => {
+  if (CALENDLY_URL === "INSERT_CALENDLY_LINK_HERE" || !CALENDLY_URL) {
+    showToast('Calendly link not set up yet. Add it to CALENDLY_URL in the script.');
+  } else {
+    window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
+  }
+});
+
+document.getElementById('btn-find-me').addEventListener('click', () => {
+  showToast('Come say hello at the gym.');
+});
+
+// ============================================================
+// SHARE + RESTART BUTTONS
+// ============================================================
+document.getElementById('btn-share').addEventListener('click', shareResult);
+
+document.getElementById('btn-restart').addEventListener('click', () => {
+  localStorage.removeItem('gymQuizResult');
+  // Reset result card animation state
+  const card = document.getElementById('result-card');
+  const nm = document.getElementById('next-move-card');
+  const ra = document.getElementById('result-actions');
+  card.classList.remove('revealed');
+  nm.classList.remove('revealed');
+  ra.classList.remove('revealed');
+  showScreen('screen-welcome');
+});
+
+// ============================================================
+// INIT
+// ============================================================
+(function init() {
+  showScreen('screen-welcome');
+
+  // Check for stored result (show option to view again or retake)
+  const stored = localStorage.getItem('gymQuizResult');
+  if (stored && RESULTS[stored]) {
+    const startBtn = document.getElementById('btn-start');
+    startBtn.textContent = "Let's find out again";
+  }
+})();
+</script>
+</body>
+</html>
