@@ -798,33 +798,6 @@ body::after {
 .btn-cta-primary:active { transform: translateY(1px); box-shadow: var(--shadow-btn-press); }
 .btn-cta-primary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
-.btn-cta-secondary {
-  display: block;
-  width: 100%;
-  padding: 15px 24px;
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.9);
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 600;
-  text-align: center;
-  border: 1.5px solid rgba(255,255,255,0.2);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  min-height: 52px;
-  margin-bottom: 16px;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-}
-
-.btn-cta-secondary:hover {
-  background: rgba(255,255,255,0.18);
-  border-color: rgba(255,255,255,0.4);
-}
-
-.btn-cta-secondary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-
 .find-me-copy {
   font-family: var(--font-body);
   font-size: 13px;
@@ -839,6 +812,16 @@ body::after {
   font-weight: 600;
   color: rgba(255,255,255,0.75);
   font-family: var(--font-display);
+}
+
+.find-me-photo {
+  display: block;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  object-fit: cover;
+  margin: 16px auto 4px;
 }
 
 /* Share + Restart row */
@@ -1135,11 +1118,12 @@ body::after {
         <p>Just a conversation.</p>
       </div>
       <button class="btn-cta-primary" id="btn-calendly">Book a Free Consultation</button>
-      <button class="btn-cta-secondary" id="btn-find-me">Come Find Me at the Gym</button>
       <div class="find-me-copy">
+        Come find me at the gym.<br><br>
         Curious whether I got it right?<br>
         Come say hello.<br>
         I'm usually somewhere around the gym pretending I know what I'm doing.
+        <img class="find-me-photo" src="PHOTO_PLACEHOLDER" alt="Rhyahn Brock">
         <span class="signature">Rhyahn Brock</span>
       </div>
     </div>
@@ -2175,9 +2159,6 @@ document.getElementById('btn-calendly').addEventListener('click', () => {
   }
 });
 
-document.getElementById('btn-find-me').addEventListener('click', () => {
-  showToast('Come say hello at the gym.');
-});
 
 // ============================================================
 // SHARE + RESTART BUTTONS
