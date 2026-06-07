@@ -1551,167 +1551,209 @@ function getGuideMascot(expression = "default") {
 // Question mascots - one unique character per question screen
 function getQuestionMascot(index) {
   const mascots = [
-    // Q1: Dog - just walked in, eager and happy, tongue out, panting
+    // Q1: Dog - golden honey, floppy ears, big grin, pink tongue out
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <ellipse cx="22" cy="46" rx="12" ry="22" fill="#2E2E2E"/>
-      <ellipse cx="78" cy="46" rx="12" ry="22" fill="#2E2E2E"/>
-      <rect x="22" y="22" width="56" height="56" rx="26" fill="#1C1C1C"/>
-      <ellipse cx="50" cy="60" rx="20" ry="16" fill="#2E2E2E"/>
-      <ellipse cx="38" cy="42" rx="8" ry="9" fill="#FDFBF8"/>
-      <circle cx="39.5" cy="42" r="4.5" fill="#1C1C1C"/>
-      <circle cx="41" cy="40" r="1.6" fill="white" opacity="0.85"/>
-      <ellipse cx="62" cy="42" rx="8" ry="9" fill="#FDFBF8"/>
-      <circle cx="63.5" cy="42" r="4.5" fill="#1C1C1C"/>
-      <circle cx="65" cy="40" r="1.6" fill="white" opacity="0.85"/>
-      <ellipse cx="50" cy="54" rx="5" ry="3.5" fill="#1C1C1C"/>
-      <path d="M50 57 Q50 63 43 65 M50 57 Q50 63 57 65" stroke="#1C1C1C" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M46 63 Q46 78 50 78 Q54 78 54 63z" fill="#E8251A"/>
-      <path d="M50 66 L50 75" stroke="#C01E14" stroke-width="1.2" stroke-linecap="round"/>
+      <ellipse cx="24" cy="56" rx="13" ry="22" fill="#C86A14"/>
+      <ellipse cx="76" cy="56" rx="13" ry="22" fill="#C86A14"/>
+      <ellipse cx="24" cy="58" rx="8" ry="15" fill="#A85010"/>
+      <ellipse cx="76" cy="58" rx="8" ry="15" fill="#A85010"/>
+      <circle cx="50" cy="46" r="30" fill="#F4A742"/>
+      <ellipse cx="50" cy="59" rx="17" ry="12" fill="#FFD090"/>
+      <circle cx="38" cy="38" r="8" fill="white"/>
+      <circle cx="39.5" cy="38" r="5" fill="#3D2000"/>
+      <circle cx="41" cy="36" r="2" fill="white"/>
+      <circle cx="62" cy="38" r="8" fill="white"/>
+      <circle cx="63.5" cy="38" r="5" fill="#3D2000"/>
+      <circle cx="65" cy="36" r="2" fill="white"/>
+      <ellipse cx="50" cy="55" rx="5" ry="3.5" fill="#3D2000"/>
+      <path d="M37 62 Q50 74 63 62" stroke="#3D2000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M44 66 Q43 78 50 80 Q57 78 56 66" fill="#E8507A"/>
+      <path d="M50 66 L50 79" stroke="#C03060" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="28" cy="54" r="7" fill="#FF8050" opacity="0.28"/>
+      <circle cx="72" cy="54" r="7" fill="#FF8050" opacity="0.28"/>
     </svg>`,
 
-    // Q2: Cat - how long getting serious, aloof and knowing, smug half-closed eyes
+    // Q2: Cat - soft lavender, pointed ears with pink inside, smug half-lidded eyes, whiskers
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M24 42 L20 14 L42 30z" fill="#1C1C1C"/>
-      <path d="M76 42 L80 14 L58 30z" fill="#1C1C1C"/>
-      <path d="M27 36 L25 21 L37 30z" fill="#E8251A" opacity="0.55"/>
-      <path d="M73 36 L75 21 L63 30z" fill="#E8251A" opacity="0.55"/>
-      <ellipse cx="50" cy="52" rx="30" ry="28" fill="#1C1C1C"/>
-      <ellipse cx="50" cy="60" rx="22" ry="16" fill="#2E2E2E"/>
-      <path d="M30 47 Q38 42 46 47" stroke="#FDFBF8" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M54 47 Q62 42 70 47" stroke="#FDFBF8" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <circle cx="38" cy="48" r="2" fill="#FDFBF8"/>
-      <circle cx="62" cy="48" r="2" fill="#FDFBF8"/>
-      <path d="M47 57 L53 57 L50 61z" fill="#E8251A"/>
-      <path d="M50 61 Q50 65 44 65 M50 61 Q50 65 56 65" stroke="#FDFBF8" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.55"/>
-      <path d="M20 56 L40 58 M20 63 L40 62" stroke="#FDFBF8" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
-      <path d="M80 56 L60 58 M80 63 L60 62" stroke="#FDFBF8" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+      <path d="M28 40 L20 14 L42 32z" fill="#9B7EC4"/>
+      <path d="M72 40 L80 14 L58 32z" fill="#9B7EC4"/>
+      <path d="M30 38 L24 18 L38 30z" fill="#F0B0D8"/>
+      <path d="M70 38 L76 18 L62 30z" fill="#F0B0D8"/>
+      <circle cx="50" cy="52" r="30" fill="#C4A8E8"/>
+      <ellipse cx="42" cy="60" rx="10" ry="8" fill="#D8CCF4"/>
+      <ellipse cx="58" cy="60" rx="10" ry="8" fill="#D8CCF4"/>
+      <ellipse cx="38" cy="44" rx="8" ry="9" fill="white"/>
+      <ellipse cx="38" cy="44" rx="5" ry="7" fill="#3A9060"/>
+      <circle cx="38" cy="44" r="3.2" fill="#1A1A1A"/>
+      <circle cx="39.5" cy="42" r="1.8" fill="white"/>
+      <ellipse cx="62" cy="44" rx="8" ry="6.5" fill="white"/>
+      <ellipse cx="62" cy="44" rx="5" ry="4.5" fill="#3A9060"/>
+      <circle cx="62" cy="44" r="3" fill="#1A1A1A"/>
+      <circle cx="63.5" cy="42.5" r="1.5" fill="white"/>
+      <path d="M47 57 L50 61 L53 57z" fill="#E890B0"/>
+      <path d="M44 64 Q50 68 56 64" stroke="#9B7EC4" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M12 56 L36 58 M12 62 L36 60" stroke="#9B7EC4" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
+      <path d="M88 56 L64 58 M88 62 L64 60" stroke="#9B7EC4" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
+      <circle cx="28" cy="62" r="5" fill="#E890B0" opacity="0.35"/>
+      <circle cx="72" cy="62" r="5" fill="#E890B0" opacity="0.35"/>
     </svg>`,
 
-    // Q3: Kangaroo - influencer promise, skeptical, one eyebrow raised, long muzzle
+    // Q3: Kangaroo - sandy orange, tall oval ears, skeptical raised brow
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <ellipse cx="34" cy="22" rx="7" ry="18" fill="#1C1C1C"/>
-      <ellipse cx="62" cy="22" rx="7" ry="18" fill="#1C1C1C"/>
-      <ellipse cx="34" cy="24" rx="3" ry="11" fill="#E8251A" opacity="0.5"/>
-      <ellipse cx="62" cy="24" rx="3" ry="11" fill="#E8251A" opacity="0.5"/>
-      <ellipse cx="46" cy="48" rx="26" ry="24" fill="#1C1C1C"/>
-      <path d="M60 52 Q82 56 80 68 Q78 78 64 72 Q56 68 56 58z" fill="#2E2E2E"/>
-      <circle cx="76" cy="65" r="3" fill="#1C1C1C"/>
-      <ellipse cx="40" cy="46" rx="7" ry="8" fill="#FDFBF8"/>
-      <circle cx="41" cy="47" r="4" fill="#1C1C1C"/>
-      <circle cx="42.5" cy="45.5" r="1.4" fill="white" opacity="0.85"/>
-      <ellipse cx="58" cy="46" rx="7" ry="6" fill="#FDFBF8"/>
-      <circle cx="59" cy="47" r="4" fill="#1C1C1C"/>
-      <circle cx="60.5" cy="45.5" r="1.4" fill="white" opacity="0.85"/>
-      <path d="M32 34 Q40 28 48 33" stroke="#E8251A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <path d="M52 37 L64 37" stroke="#E8251A" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M58 62 Q64 64 69 61" stroke="#1C1C1C" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="34" cy="22" rx="10" ry="20" fill="#D96830"/>
+      <ellipse cx="66" cy="22" rx="10" ry="20" fill="#D96830"/>
+      <ellipse cx="34" cy="22" rx="6" ry="14" fill="#FFD8A0"/>
+      <ellipse cx="66" cy="22" rx="6" ry="14" fill="#FFD8A0"/>
+      <ellipse cx="50" cy="54" rx="26" ry="28" fill="#E87840"/>
+      <ellipse cx="50" cy="63" rx="19" ry="14" fill="#F5B070"/>
+      <circle cx="40" cy="46" r="8" fill="white"/>
+      <circle cx="41.5" cy="46" r="4.8" fill="#3D1800"/>
+      <circle cx="43" cy="44" r="1.8" fill="white"/>
+      <circle cx="60" cy="46" r="8" fill="white"/>
+      <circle cx="61.5" cy="46" r="4.8" fill="#3D1800"/>
+      <circle cx="63" cy="44" r="1.8" fill="white"/>
+      <path d="M32 35 Q40 29 48 35" stroke="#B85020" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M53 37 L68 36" stroke="#B85020" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="50" cy="59" rx="5" ry="3.5" fill="#3D1800"/>
+      <path d="M43 68 Q50 73 59 68" stroke="#B85020" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="30" cy="58" r="6" fill="#FF8848" opacity="0.28"/>
+      <circle cx="70" cy="58" r="6" fill="#FF8848" opacity="0.28"/>
     </svg>`,
 
-    // Q4: Koala - hoarding programs, overwhelmed, clinging, big fluffy ears and nose
+    // Q4: Koala - soft sky blue, enormous fluffy round ears, big oval nose, wide eyes
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="24" cy="36" r="16" fill="#2E2E2E"/>
-      <circle cx="76" cy="36" r="16" fill="#2E2E2E"/>
-      <circle cx="24" cy="36" r="8" fill="#E8251A" opacity="0.4"/>
-      <circle cx="76" cy="36" r="8" fill="#E8251A" opacity="0.4"/>
-      <ellipse cx="50" cy="54" rx="28" ry="26" fill="#1C1C1C"/>
-      <ellipse cx="50" cy="60" rx="10" ry="14" fill="#2E2E2E"/>
-      <circle cx="36" cy="48" r="9" fill="#FDFBF8"/>
-      <circle cx="37" cy="49" r="4.5" fill="#1C1C1C"/>
-      <circle cx="38.5" cy="47.5" r="1.5" fill="white" opacity="0.85"/>
-      <circle cx="64" cy="48" r="9" fill="#FDFBF8"/>
-      <circle cx="65" cy="49" r="4.5" fill="#1C1C1C"/>
-      <circle cx="66.5" cy="47.5" r="1.5" fill="white" opacity="0.85"/>
-      <path d="M28 40 Q35 37 42 41" stroke="#E8251A" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M58 41 Q65 37 72 40" stroke="#E8251A" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M44 74 Q50 77 56 74" stroke="#E8251A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="20" cy="38" r="20" fill="#7ABCD4"/>
+      <circle cx="80" cy="38" r="20" fill="#7ABCD4"/>
+      <circle cx="20" cy="38" r="14" fill="#B4D8EC"/>
+      <circle cx="80" cy="38" r="14" fill="#B4D8EC"/>
+      <circle cx="20" cy="38" r="7" fill="#8CCCE0"/>
+      <circle cx="80" cy="38" r="7" fill="#8CCCE0"/>
+      <circle cx="50" cy="56" r="28" fill="#7ABCD4"/>
+      <ellipse cx="50" cy="67" rx="20" ry="13" fill="#C8E8F4"/>
+      <ellipse cx="50" cy="59" rx="10" ry="8" fill="#2A4A5C"/>
+      <ellipse cx="48" cy="58" rx="3" ry="2" fill="#3A6070" opacity="0.6"/>
+      <circle cx="36" cy="48" r="9" fill="white"/>
+      <circle cx="37.5" cy="48" r="5.5" fill="#4A8AA0"/>
+      <circle cx="37.5" cy="48" r="3" fill="#1A2A34"/>
+      <circle cx="39" cy="46" r="1.8" fill="white"/>
+      <circle cx="64" cy="48" r="9" fill="white"/>
+      <circle cx="65.5" cy="48" r="5.5" fill="#4A8AA0"/>
+      <circle cx="65.5" cy="48" r="3" fill="#1A2A34"/>
+      <circle cx="67" cy="46" r="1.8" fill="white"/>
+      <path d="M43 72 Q50 77 57 72" stroke="#2A4A5C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="27" cy="60" r="6" fill="#50B0D0" opacity="0.38"/>
+      <circle cx="73" cy="60" r="6" fill="#50B0D0" opacity="0.38"/>
     </svg>`,
 
-    // Q5: Lizard - missed workout, sleepy and lazy basking, half-lidded eyes
+    // Q5: Lizard - bright lime green, sleepy heavy eyelids, ridge spines, forked pink tongue
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M14 72 Q32 66 52 68 Q76 70 90 58 Q94 55 91 51 Q86 56 74 56 Q70 50 60 52 L60 62 Q40 58 30 64 Q20 68 14 68z" fill="#2E2E2E"/>
-      <circle cx="22" cy="36" r="3" fill="#E8251A" opacity="0.7"/>
-      <circle cx="32" cy="32" r="3" fill="#E8251A" opacity="0.7"/>
-      <circle cx="44" cy="31" r="3" fill="#E8251A" opacity="0.7"/>
-      <ellipse cx="42" cy="50" rx="28" ry="20" fill="#1C1C1C"/>
-      <path d="M64 48 Q80 48 80 56 Q80 63 65 60 Q58 58 60 52z" fill="#1C1C1C"/>
-      <circle cx="36" cy="44" r="11" fill="#1C1C1C"/>
-      <circle cx="36" cy="44" r="9" fill="#2E2E2E"/>
-      <path d="M28 45 Q36 40 44 45" stroke="#FDFBF8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <circle cx="36" cy="46" r="2" fill="#FDFBF8"/>
-      <circle cx="56" cy="46" r="7" fill="#2E2E2E"/>
-      <path d="M50 47 Q56 43 62 47" stroke="#FDFBF8" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <circle cx="76" cy="54" r="1.6" fill="#FDFBF8" opacity="0.6"/>
-      <path d="M58 62 Q67 64 75 60" stroke="#E8251A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M36 24 L38 14 L40 24z" fill="#3AA858"/>
+      <path d="M45 22 L47 12 L49 22z" fill="#3AA858"/>
+      <path d="M54 22 L56 12 L58 22z" fill="#3AA858"/>
+      <path d="M63 24 L65 14 L67 24z" fill="#3AA858"/>
+      <ellipse cx="50" cy="52" rx="32" ry="26" fill="#5DBF6E"/>
+      <ellipse cx="50" cy="63" rx="22" ry="14" fill="#A8E8B8"/>
+      <circle cx="36" cy="44" r="10" fill="white"/>
+      <circle cx="37" cy="44" r="6.5" fill="#D8CC20"/>
+      <circle cx="37" cy="44" r="3.5" fill="#1A2A10"/>
+      <circle cx="38.5" cy="42" r="2" fill="white"/>
+      <path d="M26 39 Q36 32 46 39" stroke="#2E9040" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="64" cy="44" r="10" fill="white"/>
+      <circle cx="65" cy="44" r="6.5" fill="#D8CC20"/>
+      <circle cx="65" cy="44" r="3.5" fill="#1A2A10"/>
+      <circle cx="66.5" cy="42" r="2" fill="white"/>
+      <path d="M54 39 Q64 32 74 39" stroke="#2E9040" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M46 72 Q43 82 40 88" stroke="#F06080" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M46 72 Q49 82 52 88" stroke="#F06080" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="22" cy="58" r="5" fill="#3AA858" opacity="0.4"/>
+      <circle cx="78" cy="58" r="5" fill="#3AA858" opacity="0.4"/>
     </svg>`,
 
-    // Q6: Parrot - which statement sounds like you, chatty and expressive, crest and beak
+    // Q6: Parrot - scarlet red with gold crest feathers, green cheek patches, open beak, amber eye
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M44 16 Q40 4 48 6 Q46 12 50 16z" fill="#E8251A"/>
-      <path d="M52 14 Q52 3 59 7 Q54 11 57 16z" fill="#E8251A" opacity="0.8"/>
-      <path d="M36 20 Q29 11 38 11 Q38 17 43 20z" fill="#E8251A" opacity="0.65"/>
-      <ellipse cx="48" cy="46" rx="28" ry="28" fill="#1C1C1C"/>
-      <ellipse cx="43" cy="48" rx="18" ry="20" fill="#2E2E2E"/>
-      <circle cx="42" cy="44" r="11" fill="#FDFBF8"/>
-      <circle cx="43.5" cy="45" r="5.5" fill="#1C1C1C"/>
-      <circle cx="45.5" cy="43" r="2" fill="white" opacity="0.85"/>
-      <path d="M66 42 Q85 44 80 56 Q77 64 65 60 Q72 57 70 49 Q68 45 64 47z" fill="#E8251A"/>
-      <path d="M67 52 Q74 53 76 57" stroke="#C01E14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <circle cx="33" cy="60" r="4" fill="#E8251A" opacity="0.45"/>
+      <path d="M36 24 Q30 8 40 6 Q43 16 42 26z" fill="#FFD050"/>
+      <path d="M50 22 Q50 6 60 8 Q57 18 55 24z" fill="#FFD050"/>
+      <path d="M28 28 Q20 12 32 10 Q36 20 34 28z" fill="#E8C020"/>
+      <circle cx="50" cy="54" r="30" fill="#E84025"/>
+      <ellipse cx="30" cy="62" rx="11" ry="10" fill="#22A060"/>
+      <ellipse cx="70" cy="62" rx="11" ry="10" fill="#22A060"/>
+      <circle cx="36" cy="46" r="9.5" fill="white"/>
+      <circle cx="37" cy="46" r="6" fill="#E8B020"/>
+      <circle cx="37" cy="46" r="3.5" fill="#1A1A1A"/>
+      <circle cx="38.5" cy="44" r="2" fill="white"/>
+      <circle cx="64" cy="46" r="9.5" fill="white"/>
+      <circle cx="65" cy="46" r="6" fill="#E8B020"/>
+      <circle cx="65" cy="46" r="3.5" fill="#1A1A1A"/>
+      <circle cx="66.5" cy="44" r="2" fill="white"/>
+      <path d="M38 62 Q50 57 62 62 Q62 73 50 75 Q38 73 38 62z" fill="#E8A020"/>
+      <path d="M38 62 Q50 64 62 62" stroke="#C07818" stroke-width="1.5" fill="none"/>
+      <path d="M42 64 Q50 71 58 64 Q55 74 50 75 Q45 74 42 64z" fill="#C02010"/>
     </svg>`,
 
-    // Q7: Cow - secretly watching your last 30 days, curious and watchful, one raised brow
+    // Q7: Cow - warm white with dark spots, golden horns, pink nose, curious raised brow
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <ellipse cx="22" cy="44" rx="12" ry="8" fill="#1C1C1C"/>
-      <ellipse cx="78" cy="44" rx="12" ry="8" fill="#1C1C1C"/>
-      <path d="M34 30 Q27 19 36 17 Q39 25 43 31z" fill="#FDFBF8"/>
-      <path d="M66 30 Q73 19 64 17 Q61 25 57 31z" fill="#FDFBF8"/>
-      <ellipse cx="50" cy="48" rx="28" ry="26" fill="#1C1C1C"/>
-      <ellipse cx="64" cy="40" rx="11" ry="10" fill="#2E2E2E"/>
-      <ellipse cx="50" cy="64" rx="20" ry="14" fill="#E8251A" opacity="0.4"/>
-      <circle cx="42" cy="64" r="2.5" fill="#1C1C1C"/>
-      <circle cx="58" cy="64" r="2.5" fill="#1C1C1C"/>
-      <ellipse cx="40" cy="46" rx="7" ry="8" fill="#FDFBF8"/>
-      <circle cx="41" cy="47" r="4" fill="#1C1C1C"/>
-      <circle cx="42.5" cy="45.5" r="1.4" fill="white" opacity="0.85"/>
-      <ellipse cx="60" cy="46" rx="7" ry="8" fill="#FDFBF8"/>
-      <circle cx="61" cy="47" r="4" fill="#1C1C1C"/>
-      <circle cx="62.5" cy="45.5" r="1.4" fill="white" opacity="0.85"/>
-      <path d="M33 36 Q40 31 47 35" stroke="#2E2E2E" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <path d="M54 37 L66 37" stroke="#2E2E2E" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M34 30 Q28 18 35 14 Q40 22 38 32z" fill="#F0E8CC"/>
+      <path d="M66 30 Q72 18 65 14 Q60 22 62 32z" fill="#F0E8CC"/>
+      <ellipse cx="25" cy="44" rx="12" ry="8" fill="#D8D0B8"/>
+      <ellipse cx="75" cy="44" rx="12" ry="8" fill="#D8D0B8"/>
+      <circle cx="50" cy="52" r="30" fill="#F5F0E8"/>
+      <path d="M30 36 Q26 52 30 66 Q38 60 38 48z" fill="#2E2E2E" opacity="0.8"/>
+      <path d="M66 34 Q74 44 72 60 Q62 56 62 44z" fill="#2E2E2E" opacity="0.8"/>
+      <path d="M44 28 Q50 22 56 28 Q54 38 50 40 Q46 38 44 28z" fill="#2E2E2E" opacity="0.65"/>
+      <ellipse cx="50" cy="67" rx="19" ry="12" fill="#FFB5C0"/>
+      <circle cx="45" cy="68" r="3" fill="#E08090"/>
+      <circle cx="55" cy="68" r="3" fill="#E08090"/>
+      <circle cx="38" cy="46" r="8.5" fill="white"/>
+      <circle cx="39" cy="46" r="5" fill="#3D2800"/>
+      <circle cx="40.5" cy="44" r="1.8" fill="white"/>
+      <circle cx="62" cy="46" r="8.5" fill="white"/>
+      <circle cx="63" cy="46" r="5" fill="#3D2800"/>
+      <circle cx="64.5" cy="44" r="1.8" fill="white"/>
+      <path d="M30 37 Q38 31 46 36" stroke="#3D2800" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M54 37 L68 37" stroke="#3D2800" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M42 74 Q50 79 58 74" stroke="#E08090" stroke-width="2.2" fill="none" stroke-linecap="round"/>
     </svg>`,
 
-    // Q8: Dolphin - instantly improve one thing, determined and leaping, big grin
+    // Q8: Dolphin - ocean blue, light belly, large happy arc smile, leaping pose
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M12 86 Q24 80 40 80 Q34 84 24 88z" fill="#E8251A" opacity="0.35"/>
-      <path d="M60 86 Q72 80 88 80 Q82 84 72 88z" fill="#E8251A" opacity="0.35"/>
-      <path d="M24 78 Q14 70 12 56 Q22 60 28 70z" fill="#2E2E2E"/>
-      <path d="M30 72 Q24 40 50 24 Q78 30 74 58 Q72 74 56 80 Q40 84 30 72z" fill="#1C1C1C"/>
-      <path d="M50 24 Q60 14 70 16 Q64 26 58 30z" fill="#2E2E2E"/>
-      <path d="M64 50 Q86 50 92 40 Q88 56 70 60z" fill="#2E2E2E"/>
-      <ellipse cx="54" cy="46" rx="8" ry="9" fill="#FDFBF8"/>
-      <circle cx="55.5" cy="46" r="4.5" fill="#1C1C1C"/>
-      <circle cx="57" cy="44" r="1.6" fill="white" opacity="0.85"/>
-      <path d="M42 62 Q54 72 68 62" stroke="#E8251A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <circle cx="64" cy="36" r="2" fill="#FDFBF8" opacity="0.6"/>
+      <path d="M14 80 Q22 72 36 76 Q28 84 16 84z" fill="#1A6EA0" opacity="0.75"/>
+      <path d="M58 80 Q70 74 84 80 Q76 88 64 86z" fill="#1A6EA0" opacity="0.75"/>
+      <path d="M44 10 Q58 4 68 12 Q62 22 54 20z" fill="#2E90CC"/>
+      <path d="M26 70 Q14 58 16 44 Q28 48 30 62z" fill="#2E90CC"/>
+      <path d="M26 70 Q48 82 70 72 Q82 62 78 42 Q68 22 52 18 Q36 18 28 34 Q20 46 26 70z" fill="#2E90CC"/>
+      <path d="M30 60 Q48 74 68 62 Q76 50 70 36 Q62 22 48 22 Q34 24 28 40 Q24 52 30 60z" fill="#B8E0F4"/>
+      <path d="M72 38 Q90 34 92 22 Q84 32 72 36z" fill="#2E90CC"/>
+      <circle cx="46" cy="40" r="9" fill="white"/>
+      <circle cx="47.5" cy="40" r="5.5" fill="#1A3A5A"/>
+      <circle cx="49" cy="38" r="2" fill="white"/>
+      <path d="M30 64 Q50 80 70 66" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="72" rx="10" ry="4" fill="white" opacity="0.4"/>
     </svg>`,
 
-    // Q9: Horse - relationship with motivation, tired and sheepish, droopy eyes and red mane
+    // Q9: Horse - warm chestnut, golden mane, large nostrils, tired droopy eyes
     `<svg class="mascot-guide" width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M34 26 L30 10 L45 23z" fill="#1C1C1C"/>
-      <path d="M62 24 L70 10 L56 22z" fill="#1C1C1C"/>
-      <path d="M32 20 Q24 42 30 66 Q35 50 37 40 Q34 30 39 24z" fill="#E8251A" opacity="0.7"/>
-      <path d="M36 22 Q60 20 62 40 Q64 60 56 76 Q52 84 46 80 Q40 74 38 60 Q34 40 36 22z" fill="#1C1C1C"/>
-      <ellipse cx="50" cy="72" rx="11" ry="10" fill="#2E2E2E"/>
-      <circle cx="46" cy="74" r="2" fill="#1C1C1C"/>
-      <circle cx="54" cy="73" r="2" fill="#1C1C1C"/>
-      <ellipse cx="44" cy="45" rx="7" ry="7" fill="#FDFBF8"/>
-      <circle cx="44" cy="47" r="4" fill="#1C1C1C"/>
-      <circle cx="45.5" cy="45.5" r="1.3" fill="white" opacity="0.85"/>
-      <path d="M38 40 Q44 37 50 41" stroke="#2E2E2E" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <ellipse cx="58" cy="47" rx="6" ry="6" fill="#FDFBF8"/>
-      <circle cx="58" cy="49" r="3.5" fill="#1C1C1C"/>
-      <circle cx="59.5" cy="47.5" r="1.2" fill="white" opacity="0.85"/>
-      <path d="M44 79 Q50 82 56 78" stroke="#E8251A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M30 34 Q20 12 32 8 Q38 18 36 34z" fill="#F0C030"/>
+      <path d="M40 28 Q36 6 48 6 Q48 18 46 28z" fill="#F0C030"/>
+      <path d="M56 30 Q58 8 68 10 Q64 22 62 30z" fill="#E8A820"/>
+      <ellipse cx="34" cy="24" rx="8" ry="14" fill="#A05028"/>
+      <ellipse cx="66" cy="24" rx="8" ry="14" fill="#A05028"/>
+      <ellipse cx="34" cy="24" rx="5" ry="9" fill="#E8A080"/>
+      <ellipse cx="66" cy="24" rx="5" ry="9" fill="#E8A080"/>
+      <ellipse cx="50" cy="56" rx="28" ry="30" fill="#A05028"/>
+      <ellipse cx="50" cy="70" rx="20" ry="16" fill="#C8724A"/>
+      <ellipse cx="44" cy="72" rx="3.5" ry="2.5" fill="#7A3818"/>
+      <ellipse cx="56" cy="72" rx="3.5" ry="2.5" fill="#7A3818"/>
+      <circle cx="38" cy="48" r="8.5" fill="white"/>
+      <circle cx="38" cy="50" r="5" fill="#7A4020"/>
+      <circle cx="39.5" cy="48.5" r="1.8" fill="white"/>
+      <path d="M29 43 Q38 38 47 43" stroke="#7A3818" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <circle cx="62" cy="48" r="8.5" fill="white"/>
+      <circle cx="62" cy="50" r="5" fill="#7A4020"/>
+      <circle cx="63.5" cy="48.5" r="1.8" fill="white"/>
+      <path d="M53 43 Q62 38 71 43" stroke="#7A3818" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M43 78 Q50 83 57 78" stroke="#7A3818" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="30" cy="60" r="5" fill="#E8A080" opacity="0.45"/>
+      <circle cx="70" cy="60" r="5" fill="#E8A080" opacity="0.45"/>
     </svg>`
   ];
   return mascots[index] || mascots[0];
