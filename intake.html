@@ -904,10 +904,42 @@
     <div class="other-box" id="conditions-other-box">
       <input type="text" id="conditions-other-text" placeholder="Tell me about it...">
     </div>
+
+    <div class="divider"></div>
+    <div class="field">
+      <label>Anything else I should know?</label>
+      <textarea id="health-notes" placeholder="Any extra context is welcome but not required." rows="4"></textarea>
+    </div>
   </div>
 
   <!-- ====================================================
-       SCREEN 13: Celebration
+       SCREEN 13: Emergency Contact
+       ==================================================== -->
+  <div class="screen" id="screen-13">
+    <div class="section-tag">Almost done</div>
+    <div class="screen-title">Just in case</div>
+    <div class="screen-subtitle">We hope we never need this, but it's good to have.</div>
+    <div class="field-group">
+      <div class="field" id="f-ec-name">
+        <label>Full name</label>
+        <input type="text" id="ec-name" placeholder="e.g. Jordan Smith" autocomplete="off">
+        <span class="err-msg">Please enter their full name</span>
+      </div>
+      <div class="field" id="f-ec-relationship">
+        <label>Relationship to you</label>
+        <input type="text" id="ec-relationship" placeholder="e.g. Partner, Parent, Friend">
+        <span class="err-msg">Please enter their relationship to you</span>
+      </div>
+      <div class="field" id="f-ec-mobile">
+        <label>Mobile number</label>
+        <input type="tel" id="ec-mobile" placeholder="04XX XXX XXX" autocomplete="off">
+        <span class="err-msg">Please enter their mobile number</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 14: Celebration
        ==================================================== -->
   <div class="screen" id="screen-celebrate">
     <div class="celebrate-ring"><i class="ti ti-check"></i></div>
@@ -993,7 +1025,7 @@
   let goingBack   = false;
   let coins       = 0;
   let level       = 1;
-  const TOTAL_DATA_STEPS = 12; // steps 1-12
+  const TOTAL_DATA_STEPS = 13; // steps 1-13
 
   const formData = {
     firstname:'', lastname:'', mobile:'', email:'', dob:'', occupation:'',
@@ -1010,6 +1042,8 @@
     pregnant:'',
     injuries:[], injuriesOther:'',
     conditions:[], conditionsOther:'',
+    healthNotes:'',
+    emergencyName:'', emergencyRelationship:'', emergencyMobile:'',
   };
 
   /* key -> formData property mapping for Yes/No toggles */
@@ -1185,7 +1219,7 @@
     /* Build the main-goal grid from whatever goals were selected */
     if (currentStep === 2) buildMainGoalGrid();
 
-    if (currentStep === 12) {
+    if (currentStep === 13) {
       submitForm();
       return;
     }
@@ -1214,7 +1248,7 @@
   }
 
   function stepId(s) {
-    return s === 13 ? 'screen-celebrate' : `screen-${s}`;
+    return s === 14 ? 'screen-celebrate' : `screen-${s}`;
   }
 
   /* ==============================================================
@@ -1232,12 +1266,12 @@
     const back = document.getElementById('btn-back');
     const lbl  = document.getElementById('btn-next-label');
     /* Hide nav on welcome and celebrate */
-    nav.classList.toggle('hidden', currentStep === 0 || currentStep === 13);
+    nav.classList.toggle('hidden', currentStep === 0 || currentStep === 14);
     back.style.visibility = currentStep <= 1 ? 'hidden' : 'visible';
-    lbl.textContent = currentStep === 12 ? 'Submit' : 'Next';
+    lbl.textContent = currentStep === 13 ? 'Submit' : 'Next';
     /* Show arrow on Next, hide on Submit */
     document.querySelector('#btn-next .ti-arrow-right').style.display =
-      currentStep === 12 ? 'none' : '';
+      currentStep === 13 ? 'none' : '';
   }
 
   /* ==============================================================
@@ -1313,6 +1347,12 @@
       ok = false;
     }
 
+    if (step === 13) {
+      req('f-ec-name',         'ec-name');
+      req('f-ec-relationship', 'ec-relationship');
+      req('f-ec-mobile',       'ec-mobile');
+    }
+
     return ok;
   }
 
@@ -1351,6 +1391,12 @@
       formData.medicationDetail = v('medication-detail');
       formData.injuriesOther    = v('injuries-other-text');
       formData.conditionsOther  = v('conditions-other-text');
+      formData.healthNotes      = v('health-notes');
+    }
+    if (step === 13) {
+      formData.emergencyName         = v('ec-name');
+      formData.emergencyRelationship = v('ec-relationship');
+      formData.emergencyMobile       = v('ec-mobile');
     }
   }
 
@@ -1392,6 +1438,7 @@
     /* Collect final screens */
     collectStep(11);
     collectStep(12);
+    collectStep(13);
 
     const btn = document.getElementById('btn-next');
     btn.disabled = true;
@@ -1452,6 +1499,12 @@
       `Pregnant / recently given birth:${formData.pregnant      || 'Not answered'}`,
       `Injuries:   ${injLabels  || 'None'}${formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''}`,
       `Conditions: ${condLabels || 'None'}${formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''}`,
+      `Anything else: ${formData.healthNotes || 'Nothing added'}`,
+      '',
+      '--- EMERGENCY CONTACT ---',
+      `Name:         ${formData.emergencyName}`,
+      `Relationship: ${formData.emergencyRelationship}`,
+      `Mobile:       ${formData.emergencyMobile}`,
     ].join('\n');
 
     const payload = {
@@ -1484,7 +1537,7 @@
      CELEBRATION
      ============================================================== */
   function showCelebration(failed = false) {
-    navigateTo(13, false);
+    navigateTo(14, false);
     if (failed) document.getElementById('email-error').classList.add('visible');
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) launchConfetti();
   }
