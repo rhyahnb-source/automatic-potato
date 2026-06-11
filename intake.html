@@ -340,8 +340,18 @@
     }
     .yn-btn.yes.active { background: var(--accent); border-color: var(--accent); color: white; }
     .yn-btn.no.active  { background: #FEE2E2; border-color: var(--danger); color: #DC2626; }
-    .sub-reveal { margin-top: 8px; display: none; }
-    .sub-reveal.visible { display: block; }
+    /* Slide-reveal for conditional sub-fields */
+    .sub-reveal {
+      margin-top: 8px;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease;
+    }
+    .sub-reveal.visible {
+      max-height: 400px; /* generous upper bound; content never reaches this */
+      opacity: 1;
+    }
 
     /* =============================================================
        IMPORTANCE SLIDER
@@ -831,6 +841,12 @@
           <button class="yn-btn no"  onclick="setYN(this,'heart-history','no')">No</button>
         </div>
       </div>
+      <div class="sub-reveal" id="sub-heart-history">
+        <div class="field">
+          <label>Can you tell me a bit more about this?</label>
+          <textarea id="heart-history-detail" placeholder="e.g. My father had a heart attack at 52..." rows="3"></textarea>
+        </div>
+      </div>
       <div class="toggle-item">
         <label>High blood pressure</label>
         <div class="yn-btns">
@@ -887,6 +903,12 @@
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'pregnant','yes')">Yes</button>
           <button class="yn-btn no"  onclick="setYN(this,'pregnant','no')">No</button>
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-pregnant">
+        <div class="field">
+          <label>Is there anything specific I should be aware of?</label>
+          <textarea id="pregnant-detail" placeholder="Any relevant details are helpful..." rows="3"></textarea>
         </div>
       </div>
     </div>
@@ -1036,10 +1058,10 @@
     availability:[],
     experienceLevel:'',
     currentlyExercising:'', currentlyExType:'', gymMember:'', ptBefore:'',
-    heartHistory:'', highBP:'', smoker:'', highChol:'',
+    heartHistory:'', heartHistoryDetail:'', highBP:'', smoker:'', highChol:'',
     diabetes:'', diabetesType:'',
     medication:'', medicationDetail:'',
-    pregnant:'',
+    pregnant:'', pregnantDetail:'',
     injuries:[], injuriesOther:'',
     conditions:[], conditionsOther:'',
     healthNotes:'',
@@ -1387,11 +1409,13 @@
       formData.currentlyExType = v('currently-ex-type');
     }
     if (step === 12) {
-      formData.diabetesType     = v('diabetes-type');
-      formData.medicationDetail = v('medication-detail');
-      formData.injuriesOther    = v('injuries-other-text');
-      formData.conditionsOther  = v('conditions-other-text');
-      formData.healthNotes      = v('health-notes');
+      formData.heartHistoryDetail = v('heart-history-detail');
+      formData.diabetesType       = v('diabetes-type');
+      formData.medicationDetail   = v('medication-detail');
+      formData.pregnantDetail     = v('pregnant-detail');
+      formData.injuriesOther      = v('injuries-other-text');
+      formData.conditionsOther    = v('conditions-other-text');
+      formData.healthNotes        = v('health-notes');
     }
     if (step === 13) {
       formData.emergencyName         = v('ec-name');
@@ -1490,13 +1514,13 @@
       `Trained with PT:   ${formData.ptBefore  || 'Not answered'}`,
       '',
       '--- HEALTH ---',
-      `Heart disease / family history: ${formData.heartHistory  || 'Not answered'}`,
+      `Heart disease / family history: ${formData.heartHistory  || 'Not answered'}${formData.heartHistoryDetail ? ` - ${formData.heartHistoryDetail}` : ''}`,
       `High blood pressure:            ${formData.highBP        || 'Not answered'}`,
       `Smoker:                         ${formData.smoker        || 'Not answered'}`,
       `High cholesterol:               ${formData.highChol      || 'Not answered'}`,
       `Diabetes:                       ${formData.diabetes      || 'Not answered'}${formData.diabetesType ? ` (${formData.diabetesType})` : ''}`,
       `On medication:                  ${formData.medication    || 'Not answered'}${formData.medicationDetail ? ` - ${formData.medicationDetail}` : ''}`,
-      `Pregnant / recently given birth:${formData.pregnant      || 'Not answered'}`,
+      `Pregnant / recently given birth:${formData.pregnant      || 'Not answered'}${formData.pregnantDetail ? ` - ${formData.pregnantDetail}` : ''}`,
       `Injuries:   ${injLabels  || 'None'}${formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''}`,
       `Conditions: ${condLabels || 'None'}${formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''}`,
       `Anything else: ${formData.healthNotes || 'Nothing added'}`,
