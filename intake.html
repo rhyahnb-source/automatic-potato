@@ -352,6 +352,15 @@
       max-height: 400px; /* generous upper bound; content never reaches this */
       opacity: 1;
     }
+    /* The clearance section contains nested sub-reveals so needs more room */
+    #sub-clearance-section.visible { max-height: 700px; }
+
+    /* Informational note box (used for the no-clearance advisory) */
+    .info-note {
+      background: #FFF7ED; border: 1px solid #FED7AA;
+      border-radius: var(--radius-sm); padding: 14px 16px;
+      font-size: 14px; line-height: 1.65; color: #9A3412;
+    }
 
     /* =============================================================
        IMPORTANCE SLIDER
@@ -927,6 +936,30 @@
       <input type="text" id="conditions-other-text" placeholder="Tell me about it...">
     </div>
 
+    <!-- Revealed automatically when any health condition toggle above is Yes -->
+    <div class="sub-reveal" id="sub-clearance-section">
+      <div class="divider" style="margin-bottom:8px;"></div>
+      <div class="toggle-item">
+        <label>Have you received clearance from your doctor to exercise?</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setDoctorClearance(this,'yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setDoctorClearance(this,'no')">No</button>
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-clearance-no">
+        <div class="info-note">
+          We recommend getting a clearance letter from your GP before beginning any training program.
+          Rhyahn will discuss this with you at your first session.
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-clearance-yes">
+        <div class="field">
+          <label>Great. When did you receive clearance, and is there anything specific your doctor flagged?</label>
+          <textarea id="doctor-clearance-detail" placeholder="e.g. Cleared last month, told to avoid high-impact until further review..." rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
     <div class="divider"></div>
     <div class="field">
       <label>Anything else I should know?</label>
@@ -1062,6 +1095,7 @@
     diabetes:'', diabetesType:'',
     medication:'', medicationDetail:'',
     pregnant:'', pregnantDetail:'',
+    doctorClearance:'', doctorClearanceDetail:'',
     injuries:[], injuriesOther:'',
     conditions:[], conditionsOther:'',
     healthNotes:'',
@@ -1206,12 +1240,32 @@
   /* ==============================================================
      YES/NO TOGGLES
      ============================================================== */
+  /* Keys whose Yes answer should reveal the doctor-clearance question */
+  const HEALTH_CONDITION_KEYS = ['heart-history','high-bp','smoker','high-chol','diabetes','medication','pregnant'];
+
   function setYN(btn, key, val) {
     btn.closest('.toggle-item').querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     if (YN_MAP[key]) formData[YN_MAP[key]] = val;
     const sub = document.getElementById(`sub-${key}`);
     if (sub) sub.classList.toggle('visible', val === 'yes');
+    /* Reveal the doctor-clearance block if any health condition is now Yes */
+    if (HEALTH_CONDITION_KEYS.includes(key)) checkClearanceReveal();
+  }
+
+  /* Show/hide the entire clearance question based on whether any condition is Yes */
+  function checkClearanceReveal() {
+    const anyYes = HEALTH_CONDITION_KEYS.some(k => formData[YN_MAP[k]] === 'yes');
+    document.getElementById('sub-clearance-section').classList.toggle('visible', anyYes);
+  }
+
+  /* Handle the doctor-clearance Yes/No - each answer reveals something different */
+  function setDoctorClearance(btn, val) {
+    btn.closest('.toggle-item').querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    formData.doctorClearance = val;
+    document.getElementById('sub-clearance-yes').classList.toggle('visible', val === 'yes');
+    document.getElementById('sub-clearance-no').classList.toggle('visible',  val === 'no');
   }
 
   /* ==============================================================
@@ -1409,13 +1463,14 @@
       formData.currentlyExType = v('currently-ex-type');
     }
     if (step === 12) {
-      formData.heartHistoryDetail = v('heart-history-detail');
-      formData.diabetesType       = v('diabetes-type');
-      formData.medicationDetail   = v('medication-detail');
-      formData.pregnantDetail     = v('pregnant-detail');
-      formData.injuriesOther      = v('injuries-other-text');
-      formData.conditionsOther    = v('conditions-other-text');
-      formData.healthNotes        = v('health-notes');
+      formData.heartHistoryDetail   = v('heart-history-detail');
+      formData.diabetesType         = v('diabetes-type');
+      formData.medicationDetail     = v('medication-detail');
+      formData.pregnantDetail       = v('pregnant-detail');
+      formData.doctorClearanceDetail= v('doctor-clearance-detail');
+      formData.injuriesOther        = v('injuries-other-text');
+      formData.conditionsOther      = v('conditions-other-text');
+      formData.healthNotes          = v('health-notes');
     }
     if (step === 13) {
       formData.emergencyName         = v('ec-name');
@@ -1523,6 +1578,7 @@
       `Pregnant / recently given birth:${formData.pregnant      || 'Not answered'}${formData.pregnantDetail ? ` - ${formData.pregnantDetail}` : ''}`,
       `Injuries:   ${injLabels  || 'None'}${formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''}`,
       `Conditions: ${condLabels || 'None'}${formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''}`,
+      `Doctor clearance to exercise: ${formData.doctorClearance || 'Not shown / not answered'}${formData.doctorClearanceDetail ? ` - ${formData.doctorClearanceDetail}` : ''}`,
       `Anything else: ${formData.healthNotes || 'Nothing added'}`,
       '',
       '--- EMERGENCY CONTACT ---',
