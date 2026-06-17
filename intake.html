@@ -1793,27 +1793,23 @@
       '(Signature image attached to this email)',
     ].join('\n');
 
-    /* Build the request as FormData so the signature can be sent as a real
-       image attachment. Web3Forms turns uploaded files into email attachments,
-       which keeps the email body clean plain text while still including the
-       signature as a viewable image. */
-    const fd = new FormData();
-    fd.append('access_key', ACCESS_KEY);
-    fd.append('subject',    `New Client Intake - ${formData.firstname} ${formData.lastname}`);
-    fd.append('from_name',  `${formData.firstname} ${formData.lastname}`);
-    fd.append('replyto',    formData.email);
-    fd.append('message',    message);
-    /* Attach the signature PNG (convert the stored data URL to a file) */
-    const sigBlob = dataUrlToBlob(formData.signatureDataUrl);
-    if (sigBlob) {
-      fd.append('attachment', sigBlob, `signature-${formData.firstname || 'client'}.png`);
-    }
+    /* Plain JSON POST - the reliable path for Web3Forms.
+       File attachments require a paid feature and cause silent failures on
+       free plans, so we skip them and keep to the plain text summary. */
+    const payload = {
+      access_key: ACCESS_KEY,
+      subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
+      from_name:  `${formData.firstname} ${formData.lastname}`,
+      replyto:    formData.email,
+      message,
+    };
 
     let failed = false;
     try {
       const res  = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body:   fd, /* no Content-Type header - browser sets the multipart boundary */
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
       });
       const data = await res.json();
       if (!data.success) failed = true;
@@ -1826,16 +1822,6 @@
     showCelebration(failed);
   }
 
-  /* Convert a data URL (e.g. canvas PNG) into a Blob for file upload */
-  function dataUrlToBlob(dataUrl) {
-    if (!dataUrl || dataUrl.indexOf(',') === -1) return null;
-    const [header, base64] = dataUrl.split(',');
-    const mime  = (header.match(/:(.*?);/) || [])[1] || 'image/png';
-    const bytes = atob(base64);
-    const arr   = new Uint8Array(bytes.length);
-    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-    return new Blob([arr], { type: mime });
-  }
 
   /* ==============================================================
      CELEBRATION
