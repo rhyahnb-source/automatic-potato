@@ -1800,32 +1800,16 @@
       'SIGNATURE',
       '--------------------------------------------------',
       line('Date signed', formData.signatureDate),
-      line('Date signed', formData.signatureDate),
+      line('Date signed',    formData.signatureDate),
+      line('Signature',      'Captured on form - client signed digitally'),
     ].join('\n');
-
-    /* Build a minimal HTML email: plain-text summary inside <pre> so it is
-       readable in any client, plus the signature JPEG embedded inline.
-       Keeping the HTML lean (no giant tables) means the total payload stays
-       well under Web3Forms' size limits even with the image. */
-    const safeMsg = message
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:680px;margin:0 auto;padding:20px;color:#0F172A">
-<h2 style="margin:0 0 4px;color:#059669">New Client Intake</h2>
-<p style="margin:0 0 24px;color:#64748B;font-size:14px">Rhyahn Brock Health &amp; Fitness</p>
-<pre style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:16px;font-size:13px;line-height:1.75;white-space:pre-wrap;word-break:break-word">${safeMsg}</pre>
-<p style="margin:24px 0 8px;font-size:14px"><strong>Client signature</strong> &mdash; signed ${formData.signatureDate}:</p>
-<img src="${formData.signatureDataUrl}" alt="Client signature" style="display:block;max-width:100%;border:1px solid #E2E8F0;border-radius:8px">
-</body></html>`;
 
     const payload = {
       access_key: ACCESS_KEY,
       subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
       from_name:  `${formData.firstname} ${formData.lastname}`,
       replyto:    formData.email,
-      html,
+      message,
     };
 
     let failed = false;
