@@ -1722,98 +1722,98 @@
     const availStr    = formData.availability.length ? formData.availability.join(', ') : 'None selected';
     const areasStr    = formData.bodyAreas.length    ? formData.bodyAreas.join(', ')    : 'None selected';
 
-    /* Helper: one table row */
-    const row = (label, value) =>
-      `<tr><td style="padding:6px 14px;color:#64748B;font-size:13px;white-space:nowrap;vertical-align:top">${label}</td>`+
-      `<td style="padding:6px 14px;font-size:14px;vertical-align:top">${value || '<span style="color:#94A3B8">Not answered</span>'}</td></tr>`;
+    /* Helper: format a single labelled line, padding the label so values line up */
+    const line = (label, value) => `${(label + ':').padEnd(26)}${value || 'Not answered'}`;
 
-    /* Helper: section header row */
-    const section = title =>
-      `<tr><td colspan="2" style="padding:10px 14px 6px;font-size:11px;font-weight:700;text-transform:uppercase;`+
-      `letter-spacing:0.08em;color:#059669;background:#F0FDF8;border-top:2px solid #D1FAE5">${title}</td></tr>`;
+    /* Build a clean, readable PLAIN TEXT summary. No HTML tags. */
+    const message = [
+      'NEW CLIENT INTAKE',
+      'Rhyahn Brock Health & Fitness',
+      '==================================================',
+      '',
+      'ABOUT YOU',
+      '--------------------------------------------------',
+      line('Name',          `${formData.firstname} ${formData.lastname}`),
+      line('Mobile',        formData.mobile),
+      line('Email',         formData.email),
+      line('Date of birth', formData.dob),
+      line('Occupation',    formData.occupation),
+      '',
+      'GOALS',
+      '--------------------------------------------------',
+      line('Goals selected',    goalLabels + (formData.goalsOther ? ` (Other: ${formData.goalsOther})` : '')),
+      line('Top priority goal', mainLabel),
+      '',
+      'BODY MAP',
+      '--------------------------------------------------',
+      line('Focus areas', areasStr),
+      '',
+      'MOTIVATION',
+      '--------------------------------------------------',
+      line('Importance (1-10)',  formData.importance),
+      line('Why',                formData.why),
+      line('Target timeframe',   formData.targetDate),
+      line('Biggest obstacle',   formData.obstacle),
+      line('Favourite movement', formData.favouriteMove),
+      '',
+      'AVAILABILITY',
+      '--------------------------------------------------',
+      line('Slots', availStr),
+      '',
+      'EXPERIENCE',
+      '--------------------------------------------------',
+      line('Level',                expLabel),
+      line('Currently exercising', (formData.currentlyExercising || 'Not answered') + (formData.currentlyExType ? ` (${formData.currentlyExType})` : '')),
+      line('Gym member before',    formData.gymMember),
+      line('Trained with PT',      formData.ptBefore),
+      '',
+      'HEALTH',
+      '--------------------------------------------------',
+      line('Heart disease/family', formData.heartHistory + (formData.heartHistoryDetail ? ` - ${formData.heartHistoryDetail}` : '')),
+      line('High blood pressure',  formData.highBP),
+      line('Smoker',               formData.smoker),
+      line('High cholesterol',     formData.highChol),
+      line('Diabetes',             formData.diabetes + (formData.diabetesType ? ` (${formData.diabetesType})` : '')),
+      line('On medication',        formData.medication + (formData.medicationDetail ? ` - ${formData.medicationDetail}` : '')),
+      line('Pregnant/recent birth',formData.pregnant + (formData.pregnantDetail ? ` - ${formData.pregnantDetail}` : '')),
+      line('Injuries',             (injLabels  || 'None') + (formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : '')),
+      line('Conditions',           (condLabels || 'None') + (formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : '')),
+      line('Doctor clearance',     (formData.doctorClearance || 'Not shown / not answered') + (formData.doctorClearanceDetail ? ` - ${formData.doctorClearanceDetail}` : '')),
+      line('Anything else',        formData.healthNotes || 'Nothing added'),
+      '',
+      'EMERGENCY CONTACT',
+      '--------------------------------------------------',
+      line('Name',         formData.emergencyName),
+      line('Relationship', formData.emergencyRelationship),
+      line('Mobile',       formData.emergencyMobile),
+      '',
+      'SIGNATURE',
+      '--------------------------------------------------',
+      line('Date signed', formData.signatureDate),
+      '(Signature image attached to this email)',
+    ].join('\n');
 
-    const html = `
-<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:620px;color:#0F172A">
-  <h2 style="margin:0 0 2px;font-size:22px;color:#059669">New Client Intake</h2>
-  <p style="margin:0 0 24px;font-size:14px;color:#64748B">Rhyahn Brock Health &amp; Fitness</p>
-
-  <table style="width:100%;border-collapse:collapse;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;margin-bottom:20px">
-    ${section('About')}
-    ${row('Name',        `${formData.firstname} ${formData.lastname}`)}
-    ${row('Mobile',      formData.mobile)}
-    ${row('Email',       formData.email)}
-    ${row('Date of birth', formData.dob)}
-    ${row('Occupation',  formData.occupation)}
-
-    ${section('Goals')}
-    ${row('Goals selected',    goalLabels + (formData.goalsOther ? ` (Other: ${formData.goalsOther})` : ''))}
-    ${row('Top priority goal', mainLabel)}
-
-    ${section('Body Map')}
-    ${row('Focus areas', areasStr)}
-
-    ${section('Motivation')}
-    ${row('Importance (1-10)', formData.importance)}
-    ${row('Why',               formData.why)}
-    ${row('Target timeframe',  formData.targetDate)}
-    ${row('Biggest obstacle',  formData.obstacle)}
-    ${row('Favourite movement',formData.favouriteMove)}
-
-    ${section('Availability')}
-    ${row('Slots', availStr)}
-
-    ${section('Experience')}
-    ${row('Level',                expLabel)}
-    ${row('Currently exercising', (formData.currentlyExercising || '') + (formData.currentlyExType ? ` (${formData.currentlyExType})` : ''))}
-    ${row('Gym member before',    formData.gymMember)}
-    ${row('Trained with PT',      formData.ptBefore)}
-
-    ${section('Health')}
-    ${row('Heart disease / family history', formData.heartHistory + (formData.heartHistoryDetail ? ` &mdash; ${formData.heartHistoryDetail}` : ''))}
-    ${row('High blood pressure',   formData.highBP)}
-    ${row('Smoker',                formData.smoker)}
-    ${row('High cholesterol',      formData.highChol)}
-    ${row('Diabetes',              formData.diabetes + (formData.diabetesType ? ` (${formData.diabetesType})` : ''))}
-    ${row('On medication',         formData.medication + (formData.medicationDetail ? ` &mdash; ${formData.medicationDetail}` : ''))}
-    ${row('Pregnant / recently given birth', formData.pregnant + (formData.pregnantDetail ? ` &mdash; ${formData.pregnantDetail}` : ''))}
-    ${row('Injuries',   (injLabels  || 'None') + (formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''))}
-    ${row('Conditions', (condLabels || 'None') + (formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''))}
-    ${row('Doctor clearance', (formData.doctorClearance || 'Not shown / not answered') + (formData.doctorClearanceDetail ? ` &mdash; ${formData.doctorClearanceDetail}` : ''))}
-    ${row('Anything else', formData.healthNotes || 'Nothing added')}
-
-    ${section('Emergency Contact')}
-    ${row('Name',         formData.emergencyName)}
-    ${row('Relationship', formData.emergencyRelationship)}
-    ${row('Mobile',       formData.emergencyMobile)}
-
-    ${section('Signature')}
-    ${row('Date signed', formData.signatureDate)}
-  </table>
-
-  <p style="font-size:13px;color:#64748B;margin:0 0 8px"><strong>Client signature:</strong></p>
-  <img src="${formData.signatureDataUrl}"
-       alt="Client signature"
-       style="display:block;border:1px solid #E2E8F0;border-radius:10px;max-width:100%;background:#fff">
-
-  <p style="font-size:11px;color:#94A3B8;margin:24px 0 0">
-    Submitted via Rhyahn Brock Health &amp; Fitness intake form
-  </p>
-</div>`.trim();
-
-    const payload = {
-      access_key: ACCESS_KEY,
-      subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
-      from_name:  `${formData.firstname} ${formData.lastname}`,
-      replyto:    formData.email,
-      html,
-    };
+    /* Build the request as FormData so the signature can be sent as a real
+       image attachment. Web3Forms turns uploaded files into email attachments,
+       which keeps the email body clean plain text while still including the
+       signature as a viewable image. */
+    const fd = new FormData();
+    fd.append('access_key', ACCESS_KEY);
+    fd.append('subject',    `New Client Intake - ${formData.firstname} ${formData.lastname}`);
+    fd.append('from_name',  `${formData.firstname} ${formData.lastname}`);
+    fd.append('replyto',    formData.email);
+    fd.append('message',    message);
+    /* Attach the signature PNG (convert the stored data URL to a file) */
+    const sigBlob = dataUrlToBlob(formData.signatureDataUrl);
+    if (sigBlob) {
+      fd.append('attachment', sigBlob, `signature-${formData.firstname || 'client'}.png`);
+    }
 
     let failed = false;
     try {
       const res  = await fetch('https://api.web3forms.com/submit', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
+        method: 'POST',
+        body:   fd, /* no Content-Type header - browser sets the multipart boundary */
       });
       const data = await res.json();
       if (!data.success) failed = true;
@@ -1824,6 +1824,17 @@
     btn.disabled = false;
     btn.innerHTML = '<span>Submit</span>';
     showCelebration(failed);
+  }
+
+  /* Convert a data URL (e.g. canvas PNG) into a Blob for file upload */
+  function dataUrlToBlob(dataUrl) {
+    if (!dataUrl || dataUrl.indexOf(',') === -1) return null;
+    const [header, base64] = dataUrl.split(',');
+    const mime  = (header.match(/:(.*?);/) || [])[1] || 'image/png';
+    const bytes = atob(base64);
+    const arr   = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return new Blob([arr], { type: mime });
   }
 
   /* ==============================================================
