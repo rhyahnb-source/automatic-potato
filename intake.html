@@ -8,6 +8,9 @@
   <!-- Tabler outline icons (webfont) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/dist/tabler-icons.min.css">
 
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
   <style>
     /* =============================================================
        ROOT VARIABLES
@@ -1100,11 +1103,13 @@
 
 <script>
   /* ==============================================================
-     CONFIG
-     Paste your Web3Forms key below to enable email delivery.
-     Get a free key at https://web3forms.com
+     CONFIG - EmailJS credentials
      ============================================================== */
-  const ACCESS_KEY = "d16f93be-bc5d-41ae-abe7-6908abf373fe";
+  const EMAILJS_SERVICE_ID  = "service_kcwha3p";
+  const EMAILJS_TEMPLATE_ID = "template_mlwkhpa";
+  const EMAILJS_PUBLIC_KEY  = "7BTeH5ZXQ-n1RvTlp";
+
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
   /* ==============================================================
      CARD DATA
@@ -1800,27 +1805,28 @@
       'SIGNATURE',
       '--------------------------------------------------',
       line('Date signed', formData.signatureDate),
-      line('Date signed',    formData.signatureDate),
-      line('Signature',      'Captured on form - client signed digitally'),
     ].join('\n');
 
-    const payload = {
-      access_key: ACCESS_KEY,
-      subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
-      from_name:  `${formData.firstname} ${formData.lastname}`,
-      replyto:    formData.email,
-      message,
-    };
-
+    /* EmailJS: pass the full plain-text summary plus the signature image
+       as a base64 data URL. Your template should include these variables:
+         {{from_name}}      - client full name
+         {{reply_to}}       - client email address
+         {{message}}        - full plain-text summary (wrap in <pre> in the template)
+         {{signature_date}} - date the form was signed
+         {{signature_img}}  - base64 JPEG data URL of the signature drawing
+       Recommended template body:
+         <pre>{{message}}</pre>
+         <p><strong>Signed on:</strong> {{signature_date}}</p>
+         <img src="{{signature_img}}" style="max-width:400px;border:1px solid #ddd"> */
     let failed = false;
     try {
-      const res  = await fetch('https://api.web3forms.com/submit', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        from_name:      `${formData.firstname} ${formData.lastname}`,
+        reply_to:       formData.email,
+        message,
+        signature_date: formData.signatureDate,
+        signature_img:  formData.signatureDataUrl,
       });
-      const data = await res.json();
-      if (!data.success) failed = true;
     } catch {
       failed = true;
     }
