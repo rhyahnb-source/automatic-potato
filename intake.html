@@ -1563,8 +1563,18 @@
       formData.emergencyMobile       = v('ec-mobile');
     }
     if (step === 14) {
-      const canvas = document.getElementById('sig-canvas');
-      formData.signatureDataUrl = canvas.toDataURL('image/png');
+      const src = document.getElementById('sig-canvas');
+      /* Normalise to a fixed 400x140 JPEG regardless of screen DPR.
+         This keeps the base64 payload small (~10-20 KB) so it fits
+         inside Web3Forms' request limits without issue. */
+      const out = document.createElement('canvas');
+      out.width  = 400;
+      out.height = 140;
+      const octx = out.getContext('2d');
+      octx.fillStyle = '#ffffff';
+      octx.fillRect(0, 0, 400, 140);
+      octx.drawImage(src, 0, 0, 400, 140);
+      formData.signatureDataUrl = out.toDataURL('image/jpeg', 0.80);
       formData.signatureDate    = document.getElementById('sig-date-display').textContent;
     }
   }
@@ -1790,18 +1800,32 @@
       'SIGNATURE',
       '--------------------------------------------------',
       line('Date signed', formData.signatureDate),
-      '(Signature image attached to this email)',
+      line('Date signed', formData.signatureDate),
     ].join('\n');
 
-    /* Plain JSON POST - the reliable path for Web3Forms.
-       File attachments require a paid feature and cause silent failures on
-       free plans, so we skip them and keep to the plain text summary. */
+    /* Build a minimal HTML email: plain-text summary inside <pre> so it is
+       readable in any client, plus the signature JPEG embedded inline.
+       Keeping the HTML lean (no giant tables) means the total payload stays
+       well under Web3Forms' size limits even with the image. */
+    const safeMsg = message
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:680px;margin:0 auto;padding:20px;color:#0F172A">
+<h2 style="margin:0 0 4px;color:#059669">New Client Intake</h2>
+<p style="margin:0 0 24px;color:#64748B;font-size:14px">Rhyahn Brock Health &amp; Fitness</p>
+<pre style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:16px;font-size:13px;line-height:1.75;white-space:pre-wrap;word-break:break-word">${safeMsg}</pre>
+<p style="margin:24px 0 8px;font-size:14px"><strong>Client signature</strong> &mdash; signed ${formData.signatureDate}:</p>
+<img src="${formData.signatureDataUrl}" alt="Client signature" style="display:block;max-width:100%;border:1px solid #E2E8F0;border-radius:8px">
+</body></html>`;
+
     const payload = {
       access_key: ACCESS_KEY,
       subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
       from_name:  `${formData.firstname} ${formData.lastname}`,
       replyto:    formData.email,
-      message,
+      html,
     };
 
     let failed = false;
