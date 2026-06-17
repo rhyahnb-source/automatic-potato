@@ -528,6 +528,56 @@
        LOADER SPIN (while submitting)
        ============================================================= */
     @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+    /* =============================================================
+       SIGNATURE PAD
+       ============================================================= */
+    .sig-wrap {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sig-consent {
+      font-size: 14px; color: var(--text-muted); line-height: 1.6;
+    }
+    .sig-canvas-wrap {
+      position: relative;
+      background: #fff;
+      border: 2px solid #E2E8F0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      touch-action: none; /* prevent scroll-jank while drawing */
+    }
+    .sig-canvas-wrap.error { border-color: var(--danger); }
+    #sig-canvas {
+      display: block; width: 100%; height: 180px; cursor: crosshair;
+    }
+    .sig-placeholder {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: #CBD5E1; pointer-events: none;
+      gap: 6px;
+    }
+    .sig-placeholder.hidden { display: none; }
+    .sig-actions {
+      display: flex; justify-content: flex-end;
+    }
+    .btn-clear {
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+      background: var(--card-bg); border: 1.5px solid #E2E8F0;
+      border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color 0.18s, color 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-clear:hover { border-color: var(--danger); color: var(--danger); }
+    .sig-err { font-size: 12px; color: var(--danger); display: none; }
+    .sig-err.visible { display: block; }
+    .sig-date {
+      font-size: 14px; color: var(--text-muted);
+      background: #F8FAFC; border: 1px solid #E2E8F0;
+      border-radius: var(--radius-sm); padding: 12px 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sig-date i { color: var(--accent); }
     .spin { animation: spin 0.8s linear infinite; display: inline-block; }
   </style>
 </head>
@@ -994,7 +1044,34 @@
   </div>
 
   <!-- ====================================================
-       SCREEN 14: Celebration
+       SCREEN 14: Signature
+       ==================================================== -->
+  <div class="screen" id="screen-14">
+    <div class="section-tag">Final step</div>
+    <div class="screen-title">Your signature</div>
+    <div class="sig-wrap">
+      <p class="sig-consent">By signing below you confirm that the information you have provided is accurate and complete to the best of your knowledge.</p>
+      <div class="sig-canvas-wrap" id="sig-canvas-wrap">
+        <canvas id="sig-canvas"></canvas>
+        <div class="sig-placeholder" id="sig-placeholder">
+          <i class="ti ti-pencil"></i> Sign here with your finger
+        </div>
+      </div>
+      <span class="sig-err" id="sig-err">Please sign before continuing</span>
+      <div class="sig-actions">
+        <button class="btn-clear" onclick="clearSignature()">
+          <i class="ti ti-refresh"></i> Clear
+        </button>
+      </div>
+      <div class="sig-date">
+        <i class="ti ti-calendar"></i>
+        <span id="sig-date-display"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 15: Celebration
        ==================================================== -->
   <div class="screen" id="screen-celebrate">
     <div class="celebrate-ring"><i class="ti ti-check"></i></div>
@@ -1080,7 +1157,7 @@
   let goingBack   = false;
   let coins       = 0;
   let level       = 1;
-  const TOTAL_DATA_STEPS = 13; // steps 1-13
+  const TOTAL_DATA_STEPS = 14; // steps 1-14
 
   const formData = {
     firstname:'', lastname:'', mobile:'', email:'', dob:'', occupation:'',
@@ -1100,6 +1177,7 @@
     conditions:[], conditionsOther:'',
     healthNotes:'',
     emergencyName:'', emergencyRelationship:'', emergencyMobile:'',
+    signatureDataUrl:'', signatureDate:'',
   };
 
   /* key -> formData property mapping for Yes/No toggles */
@@ -1295,7 +1373,7 @@
     /* Build the main-goal grid from whatever goals were selected */
     if (currentStep === 2) buildMainGoalGrid();
 
-    if (currentStep === 13) {
+    if (currentStep === 14) {
       submitForm();
       return;
     }
@@ -1321,10 +1399,11 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
     updateHUD();
     updateNav();
+    if (step === 14) initSignaturePad();
   }
 
   function stepId(s) {
-    return s === 14 ? 'screen-celebrate' : `screen-${s}`;
+    return s === 15 ? 'screen-celebrate' : `screen-${s}`;
   }
 
   /* ==============================================================
@@ -1342,12 +1421,12 @@
     const back = document.getElementById('btn-back');
     const lbl  = document.getElementById('btn-next-label');
     /* Hide nav on welcome and celebrate */
-    nav.classList.toggle('hidden', currentStep === 0 || currentStep === 14);
+    nav.classList.toggle('hidden', currentStep === 0 || currentStep === 15);
     back.style.visibility = currentStep <= 1 ? 'hidden' : 'visible';
-    lbl.textContent = currentStep === 13 ? 'Submit' : 'Next';
+    lbl.textContent = currentStep === 14 ? 'Submit' : 'Next';
     /* Show arrow on Next, hide on Submit */
     document.querySelector('#btn-next .ti-arrow-right').style.display =
-      currentStep === 13 ? 'none' : '';
+      currentStep === 14 ? 'none' : '';
   }
 
   /* ==============================================================
@@ -1429,6 +1508,12 @@
       req('f-ec-mobile',       'ec-mobile');
     }
 
+    if (step === 14 && !hasSigned) {
+      document.getElementById('sig-canvas-wrap').classList.add('error');
+      document.getElementById('sig-err').classList.add('visible');
+      ok = false;
+    }
+
     return ok;
   }
 
@@ -1477,6 +1562,11 @@
       formData.emergencyRelationship = v('ec-relationship');
       formData.emergencyMobile       = v('ec-mobile');
     }
+    if (step === 14) {
+      const canvas = document.getElementById('sig-canvas');
+      formData.signatureDataUrl = canvas.toDataURL('image/png');
+      formData.signatureDate    = document.getElementById('sig-date-display').textContent;
+    }
   }
 
   /* ==============================================================
@@ -1511,6 +1601,103 @@
   }
 
   /* ==============================================================
+     SIGNATURE PAD
+     ============================================================== */
+  let hasSigned   = false;
+  let sigPadReady = false; /* init only once */
+
+  function initSignaturePad() {
+    if (sigPadReady) return;
+    sigPadReady = true;
+
+    const canvas      = document.getElementById('sig-canvas');
+    const wrap        = document.getElementById('sig-canvas-wrap');
+    const placeholder = document.getElementById('sig-placeholder');
+    const ctx         = canvas.getContext('2d');
+
+    /* Size canvas to its CSS display size, honouring device pixel ratio */
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const w   = wrap.clientWidth;
+      const h   = 180;
+      canvas.width  = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width  = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.scale(dpr, dpr);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#0F172A';
+      ctx.lineWidth   = 2.5;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+    }
+    resizeCanvas();
+
+    /* Set today's date display */
+    const today = new Date();
+    document.getElementById('sig-date-display').textContent =
+      today.toLocaleDateString('en-AU', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+    let drawing = false;
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const src  = e.touches ? e.touches[0] : e;
+      return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      drawing = true;
+      const { x, y } = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      /* First mark: hide placeholder, clear error */
+      if (!hasSigned) {
+        hasSigned = true;
+        placeholder.classList.add('hidden');
+        wrap.classList.remove('error');
+        document.getElementById('sig-err').classList.remove('visible');
+      }
+    }
+    function draw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const { x, y } = getPos(e);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+    function endDraw() { drawing = false; }
+
+    canvas.addEventListener('mousedown',  startDraw);
+    canvas.addEventListener('mousemove',  draw);
+    canvas.addEventListener('mouseup',    endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove',  draw,      { passive: false });
+    canvas.addEventListener('touchend',   endDraw);
+  }
+
+  function clearSignature() {
+    const canvas = document.getElementById('sig-canvas');
+    const ctx    = canvas.getContext('2d');
+    const dpr    = window.devicePixelRatio || 1;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth   = 2.5;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    hasSigned = false;
+    document.getElementById('sig-placeholder').classList.remove('hidden');
+    document.getElementById('sig-canvas-wrap').classList.remove('error');
+    document.getElementById('sig-err').classList.remove('visible');
+  }
+
+  /* ==============================================================
      SUBMIT
      ============================================================== */
   async function submitForm() {
@@ -1518,6 +1705,7 @@
     collectStep(11);
     collectStep(12);
     collectStep(13);
+    collectStep(14);
 
     const btn = document.getElementById('btn-next');
     btn.disabled = true;
@@ -1534,65 +1722,90 @@
     const availStr    = formData.availability.length ? formData.availability.join(', ') : 'None selected';
     const areasStr    = formData.bodyAreas.length    ? formData.bodyAreas.join(', ')    : 'None selected';
 
-    const message = [
-      'NEW CLIENT INTAKE - Rhyahn Brock Health & Fitness',
-      '===================================================',
-      '',
-      '--- ABOUT ---',
-      `Name:              ${formData.firstname} ${formData.lastname}`,
-      `Mobile:            ${formData.mobile}`,
-      `Email:             ${formData.email}`,
-      `Date of birth:     ${formData.dob}`,
-      `Occupation:        ${formData.occupation}`,
-      '',
-      '--- GOALS ---',
-      `Goals selected:    ${goalLabels}${formData.goalsOther ? ` (Other: ${formData.goalsOther})` : ''}`,
-      `Top priority goal: ${mainLabel}`,
-      '',
-      '--- BODY MAP ---',
-      `Focus areas:       ${areasStr}`,
-      '',
-      '--- MOTIVATION ---',
-      `Importance (1-10): ${formData.importance}`,
-      `Why:               ${formData.why}`,
-      `Target timeframe:  ${formData.targetDate}`,
-      `Biggest obstacle:  ${formData.obstacle}`,
-      `Favourite movement:${formData.favouriteMove}`,
-      '',
-      '--- AVAILABILITY ---',
-      availStr,
-      '',
-      '--- EXPERIENCE ---',
-      `Level:             ${expLabel}`,
-      `Currently exercising: ${formData.currentlyExercising || 'Not answered'}${formData.currentlyExType ? ` (${formData.currentlyExType})` : ''}`,
-      `Gym member before: ${formData.gymMember || 'Not answered'}`,
-      `Trained with PT:   ${formData.ptBefore  || 'Not answered'}`,
-      '',
-      '--- HEALTH ---',
-      `Heart disease / family history: ${formData.heartHistory  || 'Not answered'}${formData.heartHistoryDetail ? ` - ${formData.heartHistoryDetail}` : ''}`,
-      `High blood pressure:            ${formData.highBP        || 'Not answered'}`,
-      `Smoker:                         ${formData.smoker        || 'Not answered'}`,
-      `High cholesterol:               ${formData.highChol      || 'Not answered'}`,
-      `Diabetes:                       ${formData.diabetes      || 'Not answered'}${formData.diabetesType ? ` (${formData.diabetesType})` : ''}`,
-      `On medication:                  ${formData.medication    || 'Not answered'}${formData.medicationDetail ? ` - ${formData.medicationDetail}` : ''}`,
-      `Pregnant / recently given birth:${formData.pregnant      || 'Not answered'}${formData.pregnantDetail ? ` - ${formData.pregnantDetail}` : ''}`,
-      `Injuries:   ${injLabels  || 'None'}${formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''}`,
-      `Conditions: ${condLabels || 'None'}${formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''}`,
-      `Doctor clearance to exercise: ${formData.doctorClearance || 'Not shown / not answered'}${formData.doctorClearanceDetail ? ` - ${formData.doctorClearanceDetail}` : ''}`,
-      `Anything else: ${formData.healthNotes || 'Nothing added'}`,
-      '',
-      '--- EMERGENCY CONTACT ---',
-      `Name:         ${formData.emergencyName}`,
-      `Relationship: ${formData.emergencyRelationship}`,
-      `Mobile:       ${formData.emergencyMobile}`,
-    ].join('\n');
+    /* Helper: one table row */
+    const row = (label, value) =>
+      `<tr><td style="padding:6px 14px;color:#64748B;font-size:13px;white-space:nowrap;vertical-align:top">${label}</td>`+
+      `<td style="padding:6px 14px;font-size:14px;vertical-align:top">${value || '<span style="color:#94A3B8">Not answered</span>'}</td></tr>`;
+
+    /* Helper: section header row */
+    const section = title =>
+      `<tr><td colspan="2" style="padding:10px 14px 6px;font-size:11px;font-weight:700;text-transform:uppercase;`+
+      `letter-spacing:0.08em;color:#059669;background:#F0FDF8;border-top:2px solid #D1FAE5">${title}</td></tr>`;
+
+    const html = `
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:620px;color:#0F172A">
+  <h2 style="margin:0 0 2px;font-size:22px;color:#059669">New Client Intake</h2>
+  <p style="margin:0 0 24px;font-size:14px;color:#64748B">Rhyahn Brock Health &amp; Fitness</p>
+
+  <table style="width:100%;border-collapse:collapse;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;margin-bottom:20px">
+    ${section('About')}
+    ${row('Name',        `${formData.firstname} ${formData.lastname}`)}
+    ${row('Mobile',      formData.mobile)}
+    ${row('Email',       formData.email)}
+    ${row('Date of birth', formData.dob)}
+    ${row('Occupation',  formData.occupation)}
+
+    ${section('Goals')}
+    ${row('Goals selected',    goalLabels + (formData.goalsOther ? ` (Other: ${formData.goalsOther})` : ''))}
+    ${row('Top priority goal', mainLabel)}
+
+    ${section('Body Map')}
+    ${row('Focus areas', areasStr)}
+
+    ${section('Motivation')}
+    ${row('Importance (1-10)', formData.importance)}
+    ${row('Why',               formData.why)}
+    ${row('Target timeframe',  formData.targetDate)}
+    ${row('Biggest obstacle',  formData.obstacle)}
+    ${row('Favourite movement',formData.favouriteMove)}
+
+    ${section('Availability')}
+    ${row('Slots', availStr)}
+
+    ${section('Experience')}
+    ${row('Level',                expLabel)}
+    ${row('Currently exercising', (formData.currentlyExercising || '') + (formData.currentlyExType ? ` (${formData.currentlyExType})` : ''))}
+    ${row('Gym member before',    formData.gymMember)}
+    ${row('Trained with PT',      formData.ptBefore)}
+
+    ${section('Health')}
+    ${row('Heart disease / family history', formData.heartHistory + (formData.heartHistoryDetail ? ` &mdash; ${formData.heartHistoryDetail}` : ''))}
+    ${row('High blood pressure',   formData.highBP)}
+    ${row('Smoker',                formData.smoker)}
+    ${row('High cholesterol',      formData.highChol)}
+    ${row('Diabetes',              formData.diabetes + (formData.diabetesType ? ` (${formData.diabetesType})` : ''))}
+    ${row('On medication',         formData.medication + (formData.medicationDetail ? ` &mdash; ${formData.medicationDetail}` : ''))}
+    ${row('Pregnant / recently given birth', formData.pregnant + (formData.pregnantDetail ? ` &mdash; ${formData.pregnantDetail}` : ''))}
+    ${row('Injuries',   (injLabels  || 'None') + (formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''))}
+    ${row('Conditions', (condLabels || 'None') + (formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''))}
+    ${row('Doctor clearance', (formData.doctorClearance || 'Not shown / not answered') + (formData.doctorClearanceDetail ? ` &mdash; ${formData.doctorClearanceDetail}` : ''))}
+    ${row('Anything else', formData.healthNotes || 'Nothing added')}
+
+    ${section('Emergency Contact')}
+    ${row('Name',         formData.emergencyName)}
+    ${row('Relationship', formData.emergencyRelationship)}
+    ${row('Mobile',       formData.emergencyMobile)}
+
+    ${section('Signature')}
+    ${row('Date signed', formData.signatureDate)}
+  </table>
+
+  <p style="font-size:13px;color:#64748B;margin:0 0 8px"><strong>Client signature:</strong></p>
+  <img src="${formData.signatureDataUrl}"
+       alt="Client signature"
+       style="display:block;border:1px solid #E2E8F0;border-radius:10px;max-width:100%;background:#fff">
+
+  <p style="font-size:11px;color:#94A3B8;margin:24px 0 0">
+    Submitted via Rhyahn Brock Health &amp; Fitness intake form
+  </p>
+</div>`.trim();
 
     const payload = {
       access_key: ACCESS_KEY,
       subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
       from_name:  `${formData.firstname} ${formData.lastname}`,
       replyto:    formData.email,
-      message,
+      html,
     };
 
     let failed = false;
@@ -1617,7 +1830,7 @@
      CELEBRATION
      ============================================================== */
   function showCelebration(failed = false) {
-    navigateTo(14, false);
+    navigateTo(15, false);
     if (failed) document.getElementById('email-error').classList.add('visible');
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) launchConfetti();
   }
