@@ -148,7 +148,9 @@
 .sft-mob-top__price { font-size: 15px; font-weight: 300; color: var(--text-b); }
 .sft-mob-top__stars { color: var(--gold); font-size: 13px; letter-spacing: 1.5px; }
 .sft-mob-top__ct { font-size: 11px; font-weight: 300; color: var(--text-m); margin-left: 4px; }
-@media (max-width: 860px) { .sft-mob-top { display: block; } }
+@media (max-width: 860px) {
+  .sft-mob-top { display: block; padding-top: {{ section.settings.header_offset | default: 72 }}px; }
+}
 
 /* ===== MAIN 2-COL LAYOUT ===== */
 .sft-layout {
@@ -167,7 +169,7 @@
 .sft-carousel { display: none; position: relative; }
 .sft-car__main {
   aspect-ratio: 3/4; overflow: hidden; background: #f4f4f2;
-  touch-action: pan-y; user-select: none;
+  user-select: none;
 }
 .sft-car__main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.28s ease; pointer-events: none; }
 .sft-car__main img.fading { opacity: 0; }
@@ -794,11 +796,21 @@
   /* Touch swipe on carousel */
   (function(){
     var el=document.getElementById('sft-car-main'); if(!el) return;
-    var sx=0, sy=0;
-    el.addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+    var sx=0, sy=0, isH=null;
+    el.addEventListener('touchstart',function(e){
+      sx=e.touches[0].clientX; sy=e.touches[0].clientY; isH=null;
+    },{passive:true});
+    el.addEventListener('touchmove',function(e){
+      if(isH===null){
+        var dx=Math.abs(e.touches[0].clientX-sx), dy=Math.abs(e.touches[0].clientY-sy);
+        if(dx>6||dy>6) isH=(dx>dy);
+      }
+      if(isH) e.preventDefault();
+    },{passive:false});
     el.addEventListener('touchend',function(e){
-      var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
-      if(Math.abs(dx)<36||Math.abs(dy)>Math.abs(dx)*0.8) return;
+      if(!isH) return;
+      var dx=e.changedTouches[0].clientX-sx;
+      if(Math.abs(dx)<30) return;
       var n=curImgs.length;
       if(dx<0&&activeIdx<n-1) setIdx(activeIdx+1,false);
       else if(dx>0&&activeIdx>0) setIdx(activeIdx-1,false);
