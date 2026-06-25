@@ -685,8 +685,8 @@
 </div><!-- end sft-section -->
 
 <!-- ===== SLIDE-OUT SIZE PANEL ===== -->
-<div class="sft-overlay" id="sft-overlay"></div>
-<aside class="sft-panel" id="sft-panel" role="dialog" aria-modal="true" aria-label="Select size">
+<div class="sft-overlay" id="sft-overlay" hidden></div>
+<aside class="sft-panel" id="sft-panel" role="dialog" aria-modal="true" aria-label="Select size" hidden>
 
   <div class="sft-panel__top">
     <span class="sft-panel__title">Select your size</span>
@@ -856,7 +856,12 @@
   var overlay=document.getElementById('sft-overlay');
   var panel=document.getElementById('sft-panel');
 
-  function openPanel(){ renderSizes(); overlay.classList.add('open'); panel.classList.add('open'); document.body.style.overflow='hidden'; }
+  function openPanel(){
+    renderSizes();
+    overlay.hidden=false; panel.hidden=false;
+    requestAnimationFrame(function(){ overlay.classList.add('open'); panel.classList.add('open'); });
+    document.body.style.overflow='hidden';
+  }
   function closePanel(){ overlay.classList.remove('open'); panel.classList.remove('open'); document.body.style.overflow=''; }
 
   document.getElementById('sft-sz-btn').addEventListener('click', openPanel);
