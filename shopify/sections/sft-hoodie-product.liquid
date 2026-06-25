@@ -35,7 +35,10 @@
   assign sw_names = ''
   assign sw_urls = ''
   assign sw_active = ''
+  assign sw_imgs = ''
+  assign img_swatches = false
   if colour_coll
+    assign img_swatches = true
     for p in colour_coll.products
       assign cname = ''
       for o in p.options_with_values
@@ -50,8 +53,13 @@
         assign title_parts = p.title | split: ' - '
         assign cname = title_parts | last | strip
       endif
+      assign p_img = ''
+      if p.featured_media
+        assign p_img = p.featured_media | image_url: width: 300
+      endif
       assign sw_names = sw_names | append: cname | append: '~~'
       assign sw_urls = sw_urls | append: p.url | append: '~~'
+      assign sw_imgs = sw_imgs | append: p_img | append: '~~'
       if p.id == product.id
         assign sw_active = sw_active | append: '1~~'
       else
@@ -60,8 +68,18 @@
     endfor
   elsif colour_option
     for v in colour_option.values
+      assign v_img = ''
+      for var in product.variants
+        if var[opt_colour_key] == v and var.featured_media and v_img == ''
+          assign v_img = var.featured_media | image_url: width: 300
+        endif
+      endfor
+      if v_img != ''
+        assign img_swatches = true
+      endif
       assign sw_names = sw_names | append: v | append: '~~'
       assign sw_urls = sw_urls | append: '#~~'
+      assign sw_imgs = sw_imgs | append: v_img | append: '~~'
       if v == current_colour
         assign sw_active = sw_active | append: '1~~'
       else
@@ -72,6 +90,17 @@
   assign names_a = sw_names | split: '~~'
   assign urls_a = sw_urls | split: '~~'
   assign act_a = sw_active | split: '~~'
+  assign imgs_a = sw_imgs | split: '~~'
+  # If any swatch is missing an image, fall back to colour circles for consistency
+  if img_swatches
+    for nm in names_a
+      assign chk_img = imgs_a[forloop.index0]
+      if chk_img == blank
+        assign img_swatches = false
+        break
+      endif
+    endfor
+  endif
 -%}
 
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -158,6 +187,43 @@
 }
 .sft-swatch.active::after { border-color: var(--forest); }
 .sft-swatch:hover { transform: scale(1.12); }
+
+/* Rating */
+.sft-rating { display: flex; align-items: center; gap: 9px; margin-bottom: 22px; }
+.sft-stars { color: var(--gold); font-size: 14px; letter-spacing: 2px; }
+.sft-rating-ct { font-size: 12px; font-weight: 400; color: var(--text-m); }
+
+/* Section header rows (Size / Colour) */
+.sft-row-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.sft-row-hd--col { margin-top: 30px; }
+.sft-row-lbl { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-b); }
+.sft-link { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--moss-dk); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+.sft-link:hover { color: var(--text); }
+.sft-returns-note { text-align: center; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-m); margin: 4px 0 2px; }
+
+/* Image swatches */
+.sft-iswatches { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+.sft-iswatch { flex: 0 0 auto; width: 86px; cursor: pointer; text-decoration: none; background: none; border: none; padding: 0; font-family: inherit; }
+.sft-iswatch__imgwrap { position: relative; display: block; }
+.sft-iswatch__img { width: 86px; height: 104px; object-fit: cover; background: var(--cream); border: 1.5px solid var(--line); transition: border-color 0.2s; display: block; }
+.sft-iswatch:hover .sft-iswatch__img { border-color: var(--moss-dk); }
+.sft-iswatch.active .sft-iswatch__img { border-color: var(--forest); }
+.sft-iswatch__check { position: absolute; top: 7px; right: 7px; width: 20px; height: 20px; border-radius: 50%; background: var(--forest); display: none; align-items: center; justify-content: center; }
+.sft-iswatch.active .sft-iswatch__check { display: flex; }
+.sft-iswatch__check svg { width: 11px; height: 11px; stroke: #fff; stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.sft-iswatch__nm { display: block; text-align: center; margin-top: 8px; font-size: 9px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-m); }
+.sft-iswatch.active .sft-iswatch__nm { color: var(--text); font-weight: 500; }
+
+/* Tabs */
+.sft-tabs { margin-top: 36px; }
+.sft-tabs__nav { display: flex; border-bottom: 1px solid var(--line); }
+.sft-tab { flex: 1; padding: 14px 6px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: var(--text-m); transition: color 0.2s, border-color 0.2s; }
+.sft-tab.active { color: var(--text); border-bottom-color: var(--forest); }
+.sft-tab:hover { color: var(--text); }
+.sft-tabpanel { display: none; padding: 22px 2px 0; font-size: 13px; font-weight: 300; line-height: 1.85; color: var(--text-m); }
+.sft-tabpanel.active { display: block; }
+.sft-tabpanel ul { padding-left: 16px; margin: 0; }
+.sft-tabpanel li { margin-bottom: 5px; }
 
 .sft-sz-btn {
   width: 100%; padding: 18px 24px; background: var(--forest); color: var(--cream);
@@ -321,9 +387,13 @@
   .sft-feat__col:first-child { border-top: none; }
 }
 @media (max-width: 860px) {
-  .sft-wrap { padding: 32px 16px 56px; }
-  .sft-inner { grid-template-columns: 1fr; gap: 28px; }
+  .sft-wrap { padding: 0 0 48px; }
+  .sft-inner { grid-template-columns: 1fr; gap: 0; }
   .sft-gallery { position: static; }
+  /* full-bleed product image on mobile */
+  .sft-gallery__main { aspect-ratio: 3/4; }
+  .sft-thumbs { padding: 8px 16px 0; }
+  .sft-details { padding: 26px 16px 0; max-width: none; }
   .sft-title { font-size: 32px; }
   .sft-ed { padding: 64px 20px; }
   .sft-ed__h { font-size: 40px; }
@@ -374,14 +444,58 @@
           {{ shop.currency }}
         </div>
 
-        <div class="sft-rule"></div>
-        <div class="sft-desc">{{ product.description | strip_html | truncatewords: 55 }}</div>
+        {%- if section.settings.show_rating -%}
+        <div class="sft-rating">
+          <span class="sft-stars">★★★★★</span>
+          <span class="sft-rating-ct">{{ section.settings.rating_count | default: '43 reviews' }}</span>
+        </div>
+        {%- endif -%}
 
+        <div class="sft-rule"></div>
+
+        <!-- SIZE -->
+        <div class="sft-row-hd">
+          <span class="sft-row-lbl">Size</span>
+          <button class="sft-link" id="sft-guide-open">Size guide</button>
+        </div>
+        <button class="sft-sz-btn" id="sft-sz-btn" aria-haspopup="dialog">
+          <span class="sft-sz-btn__l">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h8m-8 6h16"/></svg>
+            <span id="sft-sz-lbl">Select Size</span>
+          </span>
+          <span class="sft-sz-btn__r">
+            <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+          </span>
+        </button>
+        <div class="sft-returns-note">{{ section.settings.returns_note | default: 'Free 30-day returns and exchanges' }}</div>
+
+        <!-- COLOUR -->
         {%- if names_a.size > 0 -%}
-        <div class="sft-pick-label">
-          {%- if colour_option -%}{{ colour_option.name }}{%- else -%}Colour{%- endif -%}
+        <div class="sft-row-hd sft-row-hd--col">
+          <span class="sft-row-lbl">{%- if colour_option -%}{{ colour_option.name }}{%- else -%}Colour{%- endif -%}</span>
           <span class="sft-pick-val" id="sft-col-lbl">{{ current_colour }}</span>
         </div>
+
+        {%- if img_swatches -%}
+        <div class="sft-iswatches" id="sft-swatches">
+          {%- for nm in names_a -%}
+            {%- assign sw_url = urls_a[forloop.index0] -%}
+            {%- assign sw_is_active = act_a[forloop.index0] -%}
+            {%- assign sw_img = imgs_a[forloop.index0] -%}
+            {%- if sw_url == '#' -%}
+              <button class="sft-iswatch{% if sw_is_active == '1' %} active{% endif %}" data-colour="{{ nm | escape }}" aria-label="{{ nm | escape }}">
+                <span class="sft-iswatch__imgwrap"><img class="sft-iswatch__img" src="{{ sw_img }}" alt="{{ nm | escape }}" loading="lazy"/><span class="sft-iswatch__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                <span class="sft-iswatch__nm">{{ nm }}</span>
+              </button>
+            {%- else -%}
+              <a class="sft-iswatch{% if sw_is_active == '1' %} active{% endif %}" href="{{ sw_url }}" aria-label="{{ nm | escape }}">
+                <span class="sft-iswatch__imgwrap"><img class="sft-iswatch__img" src="{{ sw_img }}" alt="{{ nm | escape }}" loading="lazy"/><span class="sft-iswatch__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                <span class="sft-iswatch__nm">{{ nm }}</span>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+        {%- else -%}
         <div class="sft-swatches" id="sft-swatches">
           {%- for nm in names_a -%}
             {%- assign sw_url = urls_a[forloop.index0] -%}
@@ -427,50 +541,27 @@
           {%- endfor -%}
         </div>
         {%- endif -%}
+        {%- endif -%}
 
-        <!-- Select Size button -->
-        <button class="sft-sz-btn" id="sft-sz-btn" aria-haspopup="dialog">
-          <span class="sft-sz-btn__l">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h8m-8 6h16"/></svg>
-            <span id="sft-sz-lbl">Select Size</span>
-          </span>
-          <span class="sft-sz-btn__r">
-            <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
-          </span>
-        </button>
-
-        <button class="sft-sz-guide-link" id="sft-guide-open">Size guide</button>
-
-        <!-- Accordions -->
-        <div class="sft-accs">
-          <div class="sft-acc" id="sft-acc-desc">
-            <button class="sft-acc__t" onclick="sftAcc('sft-acc-desc')">
-              <span class="sft-acc__lbl">Description</span>
-              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="sft-acc__body"><div class="sft-acc__c">{{ product.description }}</div></div>
+        <!-- Tabs -->
+        <div class="sft-tabs">
+          <div class="sft-tabs__nav" role="tablist">
+            <button class="sft-tab active" data-tab="desc" role="tab">Details</button>
+            <button class="sft-tab" data-tab="fabric" role="tab">Fabric &amp; Care</button>
+            <button class="sft-tab" data-tab="ship" role="tab">Shipping &amp; Returns</button>
           </div>
-          <div class="sft-acc" id="sft-acc-fabric">
-            <button class="sft-acc__t" onclick="sftAcc('sft-acc-fabric')">
-              <span class="sft-acc__lbl">Fabric &amp; Care</span>
-              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="sft-acc__body"><div class="sft-acc__c">
+          <div class="sft-tabs__panels">
+            <div class="sft-tabpanel active" data-panel="desc">{{ product.description }}</div>
+            <div class="sft-tabpanel" data-panel="fabric">
               {%- if product.metafields.custom.fabric_care != blank -%}
                 {{ product.metafields.custom.fabric_care }}
               {%- else -%}
                 <ul><li>460gsm brushed fleece, soft warm interior</li><li>80% ring-spun cotton, 20% recycled polyester</li><li>Garment dyed after construction</li><li>Cold machine wash inside out</li><li>Tumble dry low or lay flat</li></ul>
               {%- endif -%}
-            </div></div>
-          </div>
-          <div class="sft-acc" id="sft-acc-ship">
-            <button class="sft-acc__t" onclick="sftAcc('sft-acc-ship')">
-              <span class="sft-acc__lbl">Shipping &amp; Returns</span>
-              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="sft-acc__body"><div class="sft-acc__c">
+            </div>
+            <div class="sft-tabpanel" data-panel="ship">
               <ul><li>Free standard shipping on orders over $150 AUD</li><li>Express (1–3 business days): $12</li><li>Standard (3–7 business days): $8</li><li>International from $18 AUD</li><li>Returns within 30 days — unworn, tags attached</li></ul>
-            </div></div>
+            </div>
           </div>
         </div>
 
@@ -616,13 +707,13 @@
   function fmtMoney(cents){ return '$' + (cents/100).toFixed(2); }
 
   /* ---- Swatches (option mode only; collection mode uses links) ---- */
-  document.querySelectorAll('button.sft-swatch').forEach(sw => {
+  document.querySelectorAll('button.sft-swatch, button.sft-iswatch').forEach(sw => {
     sw.addEventListener('click', () => setColour(sw.dataset.colour));
   });
 
   function setColour(col){
     activeCol = col;
-    document.querySelectorAll('.sft-swatch').forEach(s => s.classList.toggle('active', s.dataset && s.dataset.colour === col));
+    document.querySelectorAll('.sft-swatch, .sft-iswatch').forEach(s => s.classList.toggle('active', s.dataset && s.dataset.colour === col));
     const lbl = document.getElementById('sft-col-lbl'); if (lbl) lbl.textContent = col;
     renderGallery(col);
     selectedVariant = null;
@@ -786,7 +877,14 @@
   const guide = document.getElementById('sft-guide');
   ['sft-guide-open','sft-guide-open2'].forEach(id => { const el=document.getElementById(id); if (el) el.addEventListener('click', ()=>guide.showModal()); });
 
-  window.sftAcc = function(id){ document.getElementById(id)?.classList.toggle('open'); };
+  /* ---- Tabs ---- */
+  document.querySelectorAll('.sft-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const key = tab.dataset.tab;
+      document.querySelectorAll('.sft-tab').forEach(t => t.classList.toggle('active', t === tab));
+      document.querySelectorAll('.sft-tabpanel').forEach(p => p.classList.toggle('active', p.dataset.panel === key));
+    });
+  });
 
   function toast(msg){
     const t = document.getElementById('sft-toast'); if (!t) return;
@@ -807,6 +905,9 @@
     { "type": "collection", "id": "colour_collection", "label": "Colour family collection", "info": "Optional. If set, colour swatches link to each hoodie product in this collection (use when each colour is a separate product). Leave empty to use this product's own colour variants." },
     { "type": "text", "id": "size_order", "label": "Sizes to show", "default": "XS,S,M,L,XL,XXL", "info": "Comma separated. All are shown; sizes without stock show Notify Me." },
     { "type": "range", "id": "low_threshold", "label": "Low stock threshold", "min": 1, "max": 20, "step": 1, "default": 5 },
+    { "type": "checkbox", "id": "show_rating", "label": "Show star rating", "default": true },
+    { "type": "text", "id": "rating_count", "label": "Rating caption", "default": "43 reviews" },
+    { "type": "text", "id": "returns_note", "label": "Returns note (under Select Size)", "default": "Free 30-day returns and exchanges" },
 
     { "type": "header", "content": "Feature bar" },
     { "type": "checkbox", "id": "show_feature_bar", "label": "Show feature bar", "default": true },
