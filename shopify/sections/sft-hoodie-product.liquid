@@ -1,0 +1,851 @@
+{% comment %}SFT Apparel — Hoodie Product Section{% endcomment %}
+{%- liquid
+  assign colour_option = nil
+  assign size_option = nil
+  assign colour_position = 1
+  assign size_position = 2
+  for opt in product.options_with_values
+    if opt.name == 'Colour' or opt.name == 'Color' or opt.name == 'colour' or opt.name == 'color'
+      assign colour_option = opt
+      assign colour_position = forloop.index
+    endif
+    if opt.name == 'Size' or opt.name == 'size'
+      assign size_option = opt
+      assign size_position = forloop.index
+    endif
+  endfor
+  assign current_variant = product.selected_or_first_available_variant
+  assign colour_pos_0 = colour_position | minus: 1
+  assign size_pos_0 = size_position | minus: 1
+  assign opt_colour_key = 'option' | append: colour_position
+  assign current_colour = current_variant[opt_colour_key]
+  if current_colour == blank and colour_option
+    assign current_colour = colour_option.values | first
+  endif
+  if current_colour == blank
+    assign title_parts = product.title | split: ' - '
+    assign current_colour = title_parts | last | strip
+  endif
+
+  # Build the swatch list. If a colour collection is set, link across products.
+  assign colour_coll = nil
+  if section.settings.colour_collection != blank
+    assign colour_coll = collections[section.settings.colour_collection]
+  endif
+  assign sw_names = ''
+  assign sw_urls = ''
+  assign sw_active = ''
+  if colour_coll
+    for p in colour_coll.products
+      assign cname = ''
+      for o in p.options_with_values
+        if o.name == 'Colour' or o.name == 'Color' or o.name == 'colour' or o.name == 'color'
+          assign cname = o.values | first
+        endif
+      endfor
+      if cname == ''
+        assign cname = p.metafields.custom.colour
+      endif
+      if cname == blank
+        assign title_parts = p.title | split: ' - '
+        assign cname = title_parts | last | strip
+      endif
+      assign sw_names = sw_names | append: cname | append: '~~'
+      assign sw_urls = sw_urls | append: p.url | append: '~~'
+      if p.id == product.id
+        assign sw_active = sw_active | append: '1~~'
+      else
+        assign sw_active = sw_active | append: '0~~'
+      endif
+    endfor
+  elsif colour_option
+    for v in colour_option.values
+      assign sw_names = sw_names | append: v | append: '~~'
+      assign sw_urls = sw_urls | append: '#~~'
+      if v == current_colour
+        assign sw_active = sw_active | append: '1~~'
+      else
+        assign sw_active = sw_active | append: '0~~'
+      endif
+    endfor
+  endif
+  assign names_a = sw_names | split: '~~'
+  assign urls_a = sw_urls | split: '~~'
+  assign act_a = sw_active | split: '~~'
+-%}
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<style>
+.sft-section {
+  --forest: #2A3B27;
+  --ink: #161613;
+  --cream: #F6F4F0;
+  --paper: #F2ECE4;
+  --sage: #E8EDE4;
+  --moss: #A8BE98;
+  --moss-dk: #6B7D5E;
+  --text: #1E2B1C;
+  --text-b: #2E3D2A;
+  --text-m: #5B6A54;
+  --line: #D9D4CC;
+  --line-d: #E4DED5;
+  --amber: #B07D3A;
+  --gold: #C9A227;
+  --red: #7A3030;
+  --pill: 40px;
+  --ease: cubic-bezier(0.22,1,0.36,1);
+  --spring: cubic-bezier(0.34,1.56,0.64,1);
+  font-family: 'DM Sans', Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--sage);
+}
+.sft-section *, .sft-panel *, .sft-overlay * { box-sizing: border-box; }
+
+/* ===== PRODUCT TOP ===== */
+.sft-wrap { padding: 56px 24px 72px; }
+.sft-inner {
+  max-width: 1180px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
+}
+.sft-gallery { position: sticky; top: 80px; }
+.sft-gallery__main {
+  width: 100%; aspect-ratio: 3/4; background: var(--cream); overflow: hidden;
+}
+.sft-gallery__main img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.32s ease; }
+.sft-gallery__main img.fading { opacity: 0; }
+.sft-thumbs { display: flex; gap: 8px; margin-top: 8px; }
+.sft-thumb {
+  flex: 1; aspect-ratio: 1; overflow: hidden; cursor: pointer;
+  border: 1.5px solid transparent; opacity: 0.55;
+  transition: opacity 0.2s, border-color 0.2s; background: var(--cream);
+}
+.sft-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.sft-thumb.active, .sft-thumb:hover { opacity: 1; border-color: var(--forest); }
+
+.sft-details { padding-top: 8px; max-width: 460px; }
+.sft-eyebrow {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--moss-dk); margin-bottom: 14px;
+}
+.sft-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 42px; font-weight: 400; line-height: 1.05;
+  letter-spacing: -0.01em; color: var(--text); margin: 0 0 10px;
+}
+.sft-title em { font-style: italic; }
+.sft-price { font-size: 16px; font-weight: 400; color: var(--text-b); margin-bottom: 26px; }
+.sft-rule { width: 38px; height: 1px; background: var(--moss); margin-bottom: 26px; }
+.sft-desc { font-size: 14px; font-weight: 300; line-height: 1.85; color: var(--text-m); margin-bottom: 34px; }
+
+.sft-pick-label {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-m);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.sft-pick-val { font-size: 12px; font-weight: 500; color: var(--text); text-transform: none; letter-spacing: 0.04em; }
+.sft-swatches { display: flex; gap: 12px; margin-bottom: 34px; flex-wrap: wrap; }
+.sft-swatch {
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: block;
+  border: 2px solid transparent; position: relative; padding: 0;
+  transition: transform 0.2s var(--spring); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+}
+.sft-swatch::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 50%;
+  border: 1.5px solid transparent; transition: border-color 0.2s;
+}
+.sft-swatch.active::after { border-color: var(--forest); }
+.sft-swatch:hover { transform: scale(1.12); }
+
+.sft-sz-btn {
+  width: 100%; padding: 18px 24px; background: var(--forest); color: var(--cream);
+  font-family: 'DM Sans', Helvetica, Arial, sans-serif;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+  border-radius: var(--pill); border: none; display: flex; align-items: center;
+  justify-content: space-between; cursor: pointer; transition: background 0.18s, transform 0.15s; margin-bottom: 14px;
+}
+.sft-sz-btn:hover { background: #1C2A1A; }
+.sft-sz-btn:active { transform: scale(0.99); }
+.sft-sz-btn__l { display: flex; align-items: center; gap: 11px; }
+.sft-sz-btn__l svg { width: 16px; height: 16px; stroke: var(--moss); fill: none; stroke-width: 1.5; stroke-linecap: round; }
+.sft-sz-btn__r svg { width: 13px; height: 13px; stroke: var(--moss); fill: none; stroke-width: 2; stroke-linecap: round; }
+
+.sft-sz-guide-link {
+  display: block; text-align: center; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--moss-dk);
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+  margin: 0 auto 30px; background: none; border: none; font-family: inherit;
+}
+
+.sft-accs { border-top: 1px solid var(--line); }
+.sft-acc { border-bottom: 1px solid var(--line); }
+.sft-acc__t {
+  width: 100%; padding: 17px 0; display: flex; align-items: center;
+  justify-content: space-between; background: none; border: none; cursor: pointer; font-family: inherit;
+}
+.sft-acc__lbl { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-b); }
+.sft-acc__t svg { width: 13px; height: 13px; stroke: var(--moss-dk); fill: none; stroke-width: 2; stroke-linecap: round; transition: transform 0.25s var(--ease); }
+.sft-acc.open .sft-acc__t svg { transform: rotate(180deg); }
+.sft-acc__body { overflow: hidden; max-height: 0; transition: max-height 0.35s var(--ease); }
+.sft-acc.open .sft-acc__body { max-height: 460px; }
+.sft-acc__c { padding-bottom: 22px; font-size: 13px; font-weight: 300; line-height: 1.85; color: var(--text-m); }
+.sft-acc__c ul { padding-left: 16px; margin: 0; }
+.sft-acc__c li { margin-bottom: 5px; }
+
+/* ===== SLIDE-OUT SIZE PANEL ===== */
+.sft-overlay {
+  position: fixed; inset: 0; background: rgba(20,25,18,0.42);
+  opacity: 0; visibility: hidden; transition: opacity 0.4s var(--ease), visibility 0.4s; z-index: 99998;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+.sft-overlay.open { opacity: 1; visibility: visible; }
+.sft-panel {
+  position: fixed; top: 0; right: 0; height: 100%; width: 460px; max-width: 92vw;
+  background: var(--cream); transform: translateX(100%); transition: transform 0.5s var(--ease);
+  z-index: 99999; display: flex; flex-direction: column;
+  font-family: 'DM Sans', Helvetica, Arial, sans-serif; color: var(--text);
+  box-shadow: -20px 0 60px rgba(0,0,0,0.12);
+}
+.sft-panel.open { transform: translateX(0); }
+.sft-panel__top { display: flex; justify-content: flex-end; padding: 22px 26px 0; }
+.sft-panel__close { background: none; border: none; cursor: pointer; padding: 6px; line-height: 0; }
+.sft-panel__close svg { width: 18px; height: 18px; stroke: var(--text); fill: none; stroke-width: 1.5; stroke-linecap: round; }
+.sft-panel__prod { display: flex; align-items: center; gap: 16px; padding: 8px 30px 24px; }
+.sft-panel__thumb { width: 64px; height: 80px; object-fit: cover; background: var(--sage); flex-shrink: 0; }
+.sft-panel__pt { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px; font-weight: 400; line-height: 1.15; margin: 0 0 4px; }
+.sft-panel__pp { font-size: 13px; font-weight: 400; color: var(--text-m); }
+.sft-panel__hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 30px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.sft-panel__hl { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-m); }
+.sft-panel__hg { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-b); background: none; border: none; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+.sft-panel__hg svg { width: 12px; height: 12px; stroke: var(--text-b); fill: none; stroke-width: 1.6; }
+.sft-panel__list { flex: 1; overflow-y: auto; }
+.sft-prow {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 30px; border-bottom: 1px solid var(--line-d); cursor: pointer;
+  transition: background 0.18s; position: relative;
+}
+.sft-prow:hover { background: rgba(42,59,39,0.035); }
+.sft-prow.selected { background: var(--sage); }
+.sft-prow.selected::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--forest); }
+.sft-prow.disabled { cursor: default; }
+.sft-prow.disabled:hover { background: transparent; }
+.sft-prow__nm { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
+.sft-prow.disabled .sft-prow__nm { color: #B7B1A7; }
+.sft-prow__st { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+.sft-prow__st.in { color: var(--moss-dk); }
+.sft-prow__st.low { color: var(--amber); }
+.sft-prow__st.notify { color: var(--text-m); text-decoration: underline; text-underline-offset: 3px; }
+.sft-notify-wrap { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.32s var(--ease), opacity 0.25s; background: var(--paper); }
+.sft-notify-wrap.open { max-height: 110px; opacity: 1; }
+.sft-notify-inner { padding: 16px 30px 20px; }
+.sft-notify-cap { font-size: 11px; font-weight: 300; color: var(--text-m); margin-bottom: 9px; }
+.sft-notify-row { display: flex; gap: 7px; }
+.sft-notify-input { flex: 1; padding: 11px 15px; font-family: inherit; font-size: 12px; font-weight: 300; color: var(--text); background: white; border: 1px solid var(--line); border-radius: var(--pill); outline: none; }
+.sft-notify-input:focus { border-color: var(--forest); }
+.sft-notify-sub { padding: 11px 18px; font-family: inherit; font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; background: var(--forest); color: var(--cream); border-radius: var(--pill); border: none; cursor: pointer; white-space: nowrap; }
+.sft-notify-sub:hover { background: #1C2A1A; }
+.sft-notify-sub.sent { background: #DFF0D8; color: var(--forest); }
+.sft-panel__foot { padding: 20px 30px 28px; border-top: 1px solid var(--line); }
+.sft-panel__sel { font-size: 11px; font-weight: 400; letter-spacing: 0.04em; color: var(--text-m); margin-bottom: 12px; min-height: 15px; text-align: center; }
+.sft-panel__sel b { color: var(--text); font-weight: 500; }
+.sft-addbag {
+  width: 100%; padding: 18px; background: var(--forest); color: var(--cream);
+  font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.2em;
+  text-transform: uppercase; border: none; border-radius: var(--pill); cursor: pointer;
+  transition: background 0.18s, opacity 0.2s, transform 0.15s;
+}
+.sft-addbag:hover:not(:disabled) { background: #1C2A1A; }
+.sft-addbag:active:not(:disabled) { transform: scale(0.99); }
+.sft-addbag:disabled { background: #C3C8BD; color: #F0F0EC; cursor: not-allowed; }
+.sft-addbag.added { background: #DFF0D8; color: var(--forest); }
+
+/* ===== FEATURE BAR ===== */
+.sft-feat { background: var(--ink); color: #EDEAE3; }
+.sft-feat__in { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); }
+.sft-feat__col { padding: 44px 48px; border-left: 1px solid rgba(255,255,255,0.1); }
+.sft-feat__col:first-child { border-left: none; }
+.sft-feat__t { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; font-weight: 500; margin: 0 0 12px; color: #fff; }
+.sft-feat__x { font-size: 14px; font-weight: 300; line-height: 1.65; color: #A7A39B; margin: 0; }
+
+/* ===== EDITORIAL ===== */
+.sft-ed { background: var(--paper); padding: 96px 24px; }
+.sft-ed__in { max-width: 1180px; margin: 0 auto; }
+.sft-ed__h { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 58px; font-weight: 500; line-height: 1.04; letter-spacing: -0.01em; color: var(--ink); margin: 0 0 22px; }
+.sft-ed__b { font-size: 16px; font-weight: 300; line-height: 1.7; color: #4A4640; max-width: 620px; margin: 0 0 56px; }
+.sft-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 22px; }
+.sft-card { background: #FBF8F3; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 30px 26px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+.sft-card__t { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; font-weight: 500; line-height: 1.15; color: var(--ink); margin: 0 0 12px; }
+.sft-card__x { font-size: 13px; font-weight: 300; line-height: 1.7; color: #6A655D; margin: 0; }
+
+/* ===== REVIEWS ===== */
+.sft-rev { background: var(--ink); padding: 90px 24px; }
+.sft-rev__in { max-width: 1180px; margin: 0 auto; }
+.sft-rev__h { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 52px; font-weight: 500; line-height: 1.05; color: #fff; margin: 0 0 44px; }
+.sft-rev__grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+.sft-rev__card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 32px 30px; }
+.sft-rev__stars { color: var(--gold); font-size: 15px; letter-spacing: 3px; margin-bottom: 18px; }
+.sft-rev__q { font-size: 16px; font-weight: 300; line-height: 1.55; color: #E7E3DC; margin: 0 0 22px; }
+.sft-rev__a { font-size: 11px; font-weight: 400; letter-spacing: 0.08em; color: #8C8880; }
+
+/* ===== FINAL CTA ===== */
+.sft-cta { background: var(--cream); padding: 104px 24px; text-align: center; }
+.sft-cta__h { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 60px; font-weight: 500; line-height: 1.02; letter-spacing: -0.01em; color: var(--ink); margin: 0 0 18px; }
+.sft-cta__x { font-size: 16px; font-weight: 300; color: var(--text-m); margin: 0 0 38px; }
+.sft-cta__btn {
+  display: inline-block; padding: 19px 56px; background: var(--ink); color: #fff;
+  font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.2em;
+  text-transform: uppercase; border: none; border-radius: 2px; cursor: pointer; transition: background 0.2s, transform 0.15s;
+}
+.sft-cta__btn:hover { background: #000; }
+.sft-cta__btn:active { transform: scale(0.99); }
+
+/* ===== TOAST ===== */
+.sft-toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); opacity: 0;
+  background: var(--forest); color: var(--cream); font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 14px 26px; border-radius: var(--pill); z-index: 999999; pointer-events: none;
+  transition: transform 0.4s var(--spring), opacity 0.3s ease; white-space: nowrap;
+}
+.sft-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@media (max-width: 980px) {
+  .sft-cards { grid-template-columns: repeat(2,1fr); }
+  .sft-rev__grid { grid-template-columns: 1fr; }
+  .sft-feat__in { grid-template-columns: 1fr; }
+  .sft-feat__col { border-left: none; border-top: 1px solid rgba(255,255,255,0.1); }
+  .sft-feat__col:first-child { border-top: none; }
+}
+@media (max-width: 860px) {
+  .sft-wrap { padding: 32px 16px 56px; }
+  .sft-inner { grid-template-columns: 1fr; gap: 28px; }
+  .sft-gallery { position: static; }
+  .sft-title { font-size: 32px; }
+  .sft-ed { padding: 64px 20px; }
+  .sft-ed__h { font-size: 40px; }
+  .sft-rev { padding: 60px 20px; }
+  .sft-rev__h { font-size: 36px; }
+  .sft-cta { padding: 72px 20px; }
+  .sft-cta__h { font-size: 40px; }
+}
+@media (max-width: 560px) {
+  .sft-cards { grid-template-columns: 1fr; }
+  .sft-title { font-size: 28px; }
+}
+</style>
+
+<div class="sft-section">
+
+  <!-- ===== PRODUCT TOP ===== -->
+  <div class="sft-wrap">
+    <div class="sft-inner">
+
+      <!-- GALLERY -->
+      <div class="sft-gallery">
+        <div class="sft-gallery__main">
+          {%- if current_variant.featured_media -%}
+            <img id="sft-main-img" src="{{ current_variant.featured_media | image_url: width: 1000 }}" alt="{{ current_variant.featured_media.alt | escape | default: product.title | escape }}" loading="eager"/>
+          {%- elsif product.featured_media -%}
+            <img id="sft-main-img" src="{{ product.featured_media | image_url: width: 1000 }}" alt="{{ product.title | escape }}" loading="eager"/>
+          {%- else -%}
+            <img id="sft-main-img" src="{{ 'product-1' | placeholder_svg_tag }}" alt="{{ product.title | escape }}"/>
+          {%- endif -%}
+        </div>
+        <div class="sft-thumbs" id="sft-thumbs"></div>
+      </div>
+
+      <!-- DETAILS -->
+      <div class="sft-details">
+
+        <div class="sft-eyebrow">{{ section.settings.eyebrow | default: shop.name }}</div>
+        <h1 class="sft-title">{{ product.title }}</h1>
+
+        <div class="sft-price" id="sft-price">
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <span style="color:var(--red);margin-right:8px;">{{ current_variant.price | money }}</span>
+            <span style="text-decoration:line-through;opacity:0.5;">{{ current_variant.compare_at_price | money }}</span>
+          {%- else -%}
+            {{ current_variant.price | money }}
+          {%- endif -%}
+          {{ shop.currency }}
+        </div>
+
+        <div class="sft-rule"></div>
+        <div class="sft-desc">{{ product.description | strip_html | truncatewords: 55 }}</div>
+
+        {%- if names_a.size > 0 -%}
+        <div class="sft-pick-label">
+          {%- if colour_option -%}{{ colour_option.name }}{%- else -%}Colour{%- endif -%}
+          <span class="sft-pick-val" id="sft-col-lbl">{{ current_colour }}</span>
+        </div>
+        <div class="sft-swatches" id="sft-swatches">
+          {%- for nm in names_a -%}
+            {%- assign sw_url = urls_a[forloop.index0] -%}
+            {%- assign sw_is_active = act_a[forloop.index0] -%}
+            {%- assign c_handle = nm | downcase | strip -%}
+            {%- case c_handle -%}
+              {%- when 'moss' -%}{%- assign sw_bg = '#6B7D5E' -%}
+              {%- when 'oat' -%}{%- assign sw_bg = '#D9C9B0' -%}
+              {%- when 'charcoal' -%}{%- assign sw_bg = '#3A3A3A' -%}
+              {%- when 'dusk' -%}{%- assign sw_bg = '#9E8FAB' -%}
+              {%- when 'black' -%}{%- assign sw_bg = '#1A1A1A' -%}
+              {%- when 'white' -%}{%- assign sw_bg = '#F0EEE8' -%}
+              {%- when 'cream','natural','ecru' -%}{%- assign sw_bg = '#EFE8DA' -%}
+              {%- when 'mocha' -%}{%- assign sw_bg = '#6F4E37' -%}
+              {%- when 'mint' -%}{%- assign sw_bg = '#A8D5BA' -%}
+              {%- when 'navy' -%}{%- assign sw_bg = '#1B2A4A' -%}
+              {%- when 'grey','gray' -%}{%- assign sw_bg = '#8A8A8A' -%}
+              {%- when 'sand','taupe' -%}{%- assign sw_bg = '#C2A882' -%}
+              {%- when 'sage' -%}{%- assign sw_bg = '#8FA886' -%}
+              {%- when 'forest','green' -%}{%- assign sw_bg = '#2A3B27' -%}
+              {%- when 'camel' -%}{%- assign sw_bg = '#C19A6B' -%}
+              {%- when 'blush','pink' -%}{%- assign sw_bg = '#E8BFCA' -%}
+              {%- when 'rust' -%}{%- assign sw_bg = '#B45309' -%}
+              {%- when 'sky','sky blue' -%}{%- assign sw_bg = '#7EB8D4' -%}
+              {%- when 'lavender' -%}{%- assign sw_bg = '#B5A0D4' -%}
+              {%- when 'mauve' -%}{%- assign sw_bg = '#956D7D' -%}
+              {%- when 'terracotta','clay' -%}{%- assign sw_bg = '#C07558' -%}
+              {%- when 'stone' -%}{%- assign sw_bg = '#9B8F82' -%}
+              {%- when 'olive' -%}{%- assign sw_bg = '#6B7C3A' -%}
+              {%- when 'burgundy','wine' -%}{%- assign sw_bg = '#7C2535' -%}
+              {%- when 'teal' -%}{%- assign sw_bg = '#2A8080' -%}
+              {%- when 'cobalt','blue' -%}{%- assign sw_bg = '#3A5A8A' -%}
+              {%- when 'brown','chocolate' -%}{%- assign sw_bg = '#5A4632' -%}
+              {%- when 'mushroom' -%}{%- assign sw_bg = '#B3A593' -%}
+              {%- when 'slate' -%}{%- assign sw_bg = '#586068' -%}
+              {%- else -%}{%- assign sw_bg = '#888888' -%}
+            {%- endcase -%}
+            {%- if sw_url == '#' -%}
+              <button class="sft-swatch{% if sw_is_active == '1' %} active{% endif %}" data-colour="{{ nm | escape }}" style="background:{{ sw_bg }};" aria-label="{{ nm | escape }}" title="{{ nm | escape }}"></button>
+            {%- else -%}
+              <a class="sft-swatch{% if sw_is_active == '1' %} active{% endif %}" href="{{ sw_url }}" style="background:{{ sw_bg }};" aria-label="{{ nm | escape }}" title="{{ nm | escape }}"></a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Select Size button -->
+        <button class="sft-sz-btn" id="sft-sz-btn" aria-haspopup="dialog">
+          <span class="sft-sz-btn__l">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h8m-8 6h16"/></svg>
+            <span id="sft-sz-lbl">Select Size</span>
+          </span>
+          <span class="sft-sz-btn__r">
+            <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+          </span>
+        </button>
+
+        <button class="sft-sz-guide-link" id="sft-guide-open">Size guide</button>
+
+        <!-- Accordions -->
+        <div class="sft-accs">
+          <div class="sft-acc" id="sft-acc-desc">
+            <button class="sft-acc__t" onclick="sftAcc('sft-acc-desc')">
+              <span class="sft-acc__lbl">Description</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="sft-acc__body"><div class="sft-acc__c">{{ product.description }}</div></div>
+          </div>
+          <div class="sft-acc" id="sft-acc-fabric">
+            <button class="sft-acc__t" onclick="sftAcc('sft-acc-fabric')">
+              <span class="sft-acc__lbl">Fabric &amp; Care</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="sft-acc__body"><div class="sft-acc__c">
+              {%- if product.metafields.custom.fabric_care != blank -%}
+                {{ product.metafields.custom.fabric_care }}
+              {%- else -%}
+                <ul><li>460gsm brushed fleece, soft warm interior</li><li>80% ring-spun cotton, 20% recycled polyester</li><li>Garment dyed after construction</li><li>Cold machine wash inside out</li><li>Tumble dry low or lay flat</li></ul>
+              {%- endif -%}
+            </div></div>
+          </div>
+          <div class="sft-acc" id="sft-acc-ship">
+            <button class="sft-acc__t" onclick="sftAcc('sft-acc-ship')">
+              <span class="sft-acc__lbl">Shipping &amp; Returns</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="sft-acc__body"><div class="sft-acc__c">
+              <ul><li>Free standard shipping on orders over $150 AUD</li><li>Express (1–3 business days): $12</li><li>Standard (3–7 business days): $8</li><li>International from $18 AUD</li><li>Returns within 30 days — unworn, tags attached</li></ul>
+            </div></div>
+          </div>
+        </div>
+
+      </div><!-- end details -->
+    </div><!-- end inner -->
+  </div><!-- end wrap -->
+
+  <!-- ===== FEATURE BAR ===== -->
+  {%- if section.settings.show_feature_bar -%}
+  <div class="sft-feat">
+    <div class="sft-feat__in">
+      <div class="sft-feat__col">
+        <h3 class="sft-feat__t">{{ section.settings.feature_1_title }}</h3>
+        <p class="sft-feat__x">{{ section.settings.feature_1_text }}</p>
+      </div>
+      <div class="sft-feat__col">
+        <h3 class="sft-feat__t">{{ section.settings.feature_2_title }}</h3>
+        <p class="sft-feat__x">{{ section.settings.feature_2_text }}</p>
+      </div>
+      <div class="sft-feat__col">
+        <h3 class="sft-feat__t">{{ section.settings.feature_3_title }}</h3>
+        <p class="sft-feat__x">{{ section.settings.feature_3_text }}</p>
+      </div>
+    </div>
+  </div>
+  {%- endif -%}
+
+  <!-- ===== EDITORIAL ===== -->
+  {%- if section.settings.show_editorial -%}
+  <div class="sft-ed">
+    <div class="sft-ed__in">
+      <h2 class="sft-ed__h">{{ section.settings.editorial_heading }}</h2>
+      <p class="sft-ed__b">{{ section.settings.editorial_body }}</p>
+      <div class="sft-cards">
+        <div class="sft-card"><h4 class="sft-card__t">{{ section.settings.card_1_title }}</h4><p class="sft-card__x">{{ section.settings.card_1_text }}</p></div>
+        <div class="sft-card"><h4 class="sft-card__t">{{ section.settings.card_2_title }}</h4><p class="sft-card__x">{{ section.settings.card_2_text }}</p></div>
+        <div class="sft-card"><h4 class="sft-card__t">{{ section.settings.card_3_title }}</h4><p class="sft-card__x">{{ section.settings.card_3_text }}</p></div>
+        <div class="sft-card"><h4 class="sft-card__t">{{ section.settings.card_4_title }}</h4><p class="sft-card__x">{{ section.settings.card_4_text }}</p></div>
+      </div>
+    </div>
+  </div>
+  {%- endif -%}
+
+  <!-- ===== REVIEWS ===== -->
+  {%- if section.settings.show_reviews -%}
+  <div class="sft-rev">
+    <div class="sft-rev__in">
+      <h2 class="sft-rev__h">{{ section.settings.reviews_heading }}</h2>
+      <div class="sft-rev__grid">
+        <div class="sft-rev__card"><div class="sft-rev__stars">★★★★★</div><p class="sft-rev__q">{{ section.settings.review_1_text }}</p><div class="sft-rev__a">{{ section.settings.review_1_author }}</div></div>
+        <div class="sft-rev__card"><div class="sft-rev__stars">★★★★★</div><p class="sft-rev__q">{{ section.settings.review_2_text }}</p><div class="sft-rev__a">{{ section.settings.review_2_author }}</div></div>
+        <div class="sft-rev__card"><div class="sft-rev__stars">★★★★★</div><p class="sft-rev__q">{{ section.settings.review_3_text }}</p><div class="sft-rev__a">{{ section.settings.review_3_author }}</div></div>
+      </div>
+    </div>
+  </div>
+  {%- endif -%}
+
+  <!-- ===== FINAL CTA ===== -->
+  {%- if section.settings.show_final_cta -%}
+  <div class="sft-cta">
+    <h2 class="sft-cta__h">{{ section.settings.cta_heading }}</h2>
+    <p class="sft-cta__x">{{ section.settings.cta_text }}</p>
+    <button class="sft-cta__btn" id="sft-cta-btn">{{ section.settings.cta_button | default: 'Add to Bag' }}{%- if current_variant.price -%} — {{ current_variant.price | money_without_trailing_zeros }}{%- endif -%}</button>
+  </div>
+  {%- endif -%}
+
+</div><!-- end section -->
+
+<!-- ===== SLIDE-OUT SIZE PANEL ===== -->
+<div class="sft-overlay" id="sft-overlay"></div>
+<aside class="sft-panel" id="sft-panel" role="dialog" aria-modal="true" aria-label="Select size">
+  <div class="sft-panel__top">
+    <button class="sft-panel__close" id="sft-panel-close" aria-label="Close"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div class="sft-panel__prod">
+    {%- if current_variant.featured_media -%}
+      <img class="sft-panel__thumb" id="sft-panel-thumb" src="{{ current_variant.featured_media | image_url: width: 160 }}" alt="{{ product.title | escape }}"/>
+    {%- elsif product.featured_media -%}
+      <img class="sft-panel__thumb" id="sft-panel-thumb" src="{{ product.featured_media | image_url: width: 160 }}" alt="{{ product.title | escape }}"/>
+    {%- else -%}
+      <div class="sft-panel__thumb" id="sft-panel-thumb"></div>
+    {%- endif -%}
+    <div>
+      <h3 class="sft-panel__pt">{{ product.title }}</h3>
+      <div class="sft-panel__pp" id="sft-panel-price">{{ current_variant.price | money }} {{ shop.currency }}</div>
+    </div>
+  </div>
+  <div class="sft-panel__hd">
+    <span class="sft-panel__hl">Select a size</span>
+    <button class="sft-panel__hg" id="sft-guide-open2">Size guide <svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></button>
+  </div>
+  <div class="sft-panel__list" id="sft-sz-list"></div>
+  <div class="sft-panel__foot">
+    <div class="sft-panel__sel" id="sft-panel-sel"></div>
+    <button class="sft-addbag" id="sft-addbag" disabled>Select a size</button>
+  </div>
+</aside>
+
+<!-- Size guide dialog -->
+<dialog id="sft-guide" style="padding:32px;border:1px solid #D9D4CC;border-radius:2px;font-family:'DM Sans',Helvetica,Arial,sans-serif;max-width:440px;width:90%;">
+  <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:500;color:#1E2B1C;margin:0 0 18px;">Size Guide</p>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;font-weight:300;color:#5B6A54;">
+    <thead><tr>
+      <th style="text-align:left;padding:7px 0;border-bottom:1px solid #D9D4CC;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;">Size</th>
+      <th style="text-align:left;padding:7px 0;border-bottom:1px solid #D9D4CC;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;">Chest (cm)</th>
+      <th style="text-align:left;padding:7px 0;border-bottom:1px solid #D9D4CC;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;">Length (cm)</th>
+    </tr></thead>
+    <tbody>
+      <tr><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">XS</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">86–90</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">65</td></tr>
+      <tr><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">S</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">91–96</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">67</td></tr>
+      <tr><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">M</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">97–102</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">70</td></tr>
+      <tr><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">L</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">103–108</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">72</td></tr>
+      <tr><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">XL</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">109–115</td><td style="padding:9px 0;border-bottom:1px solid #D9D4CC;">74</td></tr>
+      <tr><td style="padding:9px 0;">XXL</td><td style="padding:9px 0;">116–122</td><td style="padding:9px 0;">76</td></tr>
+    </tbody>
+  </table>
+  <button onclick="document.getElementById('sft-guide').close()" style="margin-top:20px;background:#2A3B27;color:#F6F4F0;border:none;padding:11px 24px;border-radius:40px;font-family:inherit;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;">Close</button>
+</dialog>
+
+<div class="sft-toast" id="sft-toast"></div>
+
+<script>
+(function(){
+  const LOW = {{ section.settings.low_threshold | default: 5 }};
+  const VARIANTS = {{ product.variants | json }};
+  const MEDIA = [{% for m in product.media %}{"id":{{ m.id }},"url":"{{ m | image_url: width: 1000 }}","thumb":"{{ m | image_url: width: 220 }}","alt":{{ m.alt | default: product.title | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}];
+  const COL_POS = {{ colour_pos_0 }};
+  const SZ_POS  = {{ size_pos_0 }};
+  const OPT_COL = 'option' + (COL_POS + 1);
+  const OPT_SZ  = 'option' + (SZ_POS + 1);
+  const HAS_COLOUR = {% if colour_option %}true{% else %}false{% endif %};
+  const SIZE_MASTER = {{ section.settings.size_order | default: 'XS,S,M,L,XL,XXL' | split: ',' | json }}.map(s => s.trim()).filter(Boolean);
+  const CURRENCY = '{{ shop.currency }}';
+
+  // colour -> featured media id
+  const COL_MEDIA = {};
+  VARIANTS.forEach(v => { const c = v[OPT_COL]; if (c && !COL_MEDIA[c] && v.featured_media) COL_MEDIA[c] = v.featured_media.id; });
+
+  let activeCol = {{ current_colour | json }};
+  let selectedVariant = null;
+  const notifyOpen = {};
+
+  function fmtMoney(cents){ return '$' + (cents/100).toFixed(2); }
+
+  /* ---- Swatches (option mode only; collection mode uses links) ---- */
+  document.querySelectorAll('button.sft-swatch').forEach(sw => {
+    sw.addEventListener('click', () => setColour(sw.dataset.colour));
+  });
+
+  function setColour(col){
+    activeCol = col;
+    document.querySelectorAll('.sft-swatch').forEach(s => s.classList.toggle('active', s.dataset && s.dataset.colour === col));
+    const lbl = document.getElementById('sft-col-lbl'); if (lbl) lbl.textContent = col;
+    renderGallery(col);
+    selectedVariant = null;
+    updateFoot();
+    renderSizes();
+    const v = VARIANTS.find(x => x[OPT_COL] === col);
+    if (v){
+      try { const p = new URLSearchParams(window.location.search); p.set('variant', v.id); history.replaceState(null,'','?'+p); } catch(e){}
+      const priceEl = document.getElementById('sft-price'); if (priceEl) priceEl.textContent = fmtMoney(v.price) + ' ' + CURRENCY;
+      const pp = document.getElementById('sft-panel-price'); if (pp) pp.textContent = fmtMoney(v.price) + ' ' + CURRENCY;
+      if (v.featured_media){ const t = document.getElementById('sft-panel-thumb'); if (t && t.tagName === 'IMG') t.src = v.featured_media.preview_image ? v.featured_media.preview_image.src : t.src; }
+    }
+  }
+
+  /* ---- Gallery ---- */
+  function renderGallery(col){
+    const featId = COL_MEDIA[col];
+    const imgs = featId ? [...MEDIA.filter(m=>m.id===featId), ...MEDIA.filter(m=>m.id!==featId)] : MEDIA;
+    if (!imgs.length) return;
+    const main = document.getElementById('sft-main-img');
+    if (main){ main.classList.add('fading'); setTimeout(()=>{ main.src=imgs[0].url; main.alt=imgs[0].alt||col; main.classList.remove('fading'); },180); }
+    renderThumbs(imgs);
+  }
+  function renderThumbs(imgs){
+    const row = document.getElementById('sft-thumbs'); if (!row) return; row.innerHTML='';
+    imgs.slice(0,5).forEach((img,i)=>{
+      const d = document.createElement('div'); d.className='sft-thumb'+(i===0?' active':'');
+      d.onclick=()=>setThumb(i,imgs);
+      const el=document.createElement('img'); el.src=img.thumb||img.url; el.alt=img.alt||activeCol;
+      d.appendChild(el); row.appendChild(d);
+    });
+  }
+  function setThumb(i,imgs){
+    const main=document.getElementById('sft-main-img');
+    if (main){ main.classList.add('fading'); setTimeout(()=>{ main.src=imgs[i].url; main.alt=imgs[i].alt||activeCol; main.classList.remove('fading'); },180); }
+    document.querySelectorAll('.sft-thumb').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+  }
+  renderGallery(activeCol);
+
+  /* ---- Panel open/close ---- */
+  const overlay = document.getElementById('sft-overlay');
+  const panel = document.getElementById('sft-panel');
+  function openPanel(){ renderSizes(); overlay.classList.add('open'); panel.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closePanel(){ overlay.classList.remove('open'); panel.classList.remove('open'); document.body.style.overflow=''; }
+  document.getElementById('sft-sz-btn').addEventListener('click', openPanel);
+  document.getElementById('sft-panel-close').addEventListener('click', closePanel);
+  overlay.addEventListener('click', closePanel);
+  document.addEventListener('keydown', e => { if (e.key==='Escape') closePanel(); });
+  const ctaBtn = document.getElementById('sft-cta-btn'); if (ctaBtn) ctaBtn.addEventListener('click', openPanel);
+
+  /* ---- Render all sizes ---- */
+  function renderSizes(){
+    const list = document.getElementById('sft-sz-list'); if (!list) return; list.innerHTML='';
+    // map size -> variant for active colour
+    const map = {};
+    VARIANTS.forEach(v => {
+      if (HAS_COLOUR && v[OPT_COL] !== activeCol) return;
+      const s = (v[OPT_SZ] || v.title || '').trim();
+      if (s) map[s] = v;
+    });
+    // master list, then any extra sizes the product has that aren't in master
+    let sizes = SIZE_MASTER.slice();
+    Object.keys(map).forEach(s => { if (!sizes.includes(s)) sizes.push(s); });
+
+    sizes.forEach(sz => {
+      const v = map[sz];
+      const exists = !!v;
+      const avail = exists && v.available;
+      const managed = exists && v.inventory_management && v.inventory_management !== '';
+      const qty = exists ? v.inventory_quantity : 0;
+      const isLow = avail && managed && qty !== null && qty <= LOW;
+      const canBuy = avail;
+
+      let stCls, stTxt;
+      if (!canBuy){ stCls='notify'; stTxt='Notify Me'; }
+      else if (isLow){ stCls='low'; stTxt='Low Stock'; }
+      else { stCls='in'; stTxt='In Stock'; }
+
+      const key = (activeCol+'-'+sz).replace(/[^a-z0-9]/gi,'_');
+      const row = document.createElement('div');
+      row.className = 'sft-prow' + (canBuy?'':' disabled');
+      row.innerHTML = '<span class="sft-prow__nm">'+sz+'</span><span class="sft-prow__st '+stCls+'">'+stTxt+'</span>';
+
+      if (canBuy){
+        row.addEventListener('click', () => selectSize(v, sz, row));
+      } else {
+        row.addEventListener('click', () => toggleNotify(key));
+      }
+      list.appendChild(row);
+
+      if (!canBuy){
+        const nw = document.createElement('div');
+        nw.className = 'sft-notify-wrap'; nw.id = 'nw_'+key;
+        nw.innerHTML = '<div class="sft-notify-inner"><div class="sft-notify-cap">Out of stock — get an email the moment '+activeCol+' / '+sz+' is back.</div><div class="sft-notify-row"><input class="sft-notify-input" type="email" placeholder="your@email.com" id="ne_'+key+'"/><button class="sft-notify-sub" id="ns_'+key+'">Notify</button></div></div>';
+        list.appendChild(nw);
+        const sub = nw.querySelector('#ns_'+key);
+        sub.addEventListener('click', () => submitNotify(key));
+      }
+    });
+    updateFoot();
+  }
+
+  function selectSize(v, sz, row){
+    selectedVariant = { v: v, sz: sz };
+    document.querySelectorAll('.sft-prow').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+    updateFoot();
+  }
+
+  function updateFoot(){
+    const sel = document.getElementById('sft-panel-sel');
+    const btn = document.getElementById('sft-addbag');
+    if (selectedVariant){
+      sel.innerHTML = 'Selected: <b>'+activeCol+' / '+selectedVariant.sz+'</b>';
+      btn.disabled = false; btn.textContent = 'Add to Bag — '+fmtMoney(selectedVariant.v.price);
+      btn.classList.remove('added');
+    } else {
+      sel.textContent = '';
+      btn.disabled = true; btn.textContent = 'Select a size';
+      btn.classList.remove('added');
+    }
+  }
+
+  function toggleNotify(key){
+    const nw = document.getElementById('nw_'+key); if (!nw) return;
+    notifyOpen[key] = !notifyOpen[key];
+    nw.classList.toggle('open', notifyOpen[key]);
+    if (notifyOpen[key]){ const inp = document.getElementById('ne_'+key); if (inp) setTimeout(()=>inp.focus(),300); }
+  }
+
+  function submitNotify(key){
+    const inp = document.getElementById('ne_'+key);
+    if (!inp || !inp.value.trim() || inp.value.indexOf('@')<0){ if(inp){inp.style.borderColor='#7A3030'; setTimeout(()=>{inp.style.borderColor='';},1200);} return; }
+    inp.disabled = true;
+    const sub = document.getElementById('ns_'+key);
+    if (sub){ sub.textContent='✓ Done'; sub.classList.add('sent'); }
+    toast("We'll let you know when it's back");
+    // Merchants: wire this to a back-in-stock app or /contact form submission.
+  }
+
+  /* ---- Add to bag ---- */
+  document.getElementById('sft-addbag').addEventListener('click', async function(){
+    if (!selectedVariant) return;
+    const btn = this; btn.disabled = true; btn.textContent = 'Adding…';
+    try {
+      const r = await fetch('/cart/add.js', { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({ id: selectedVariant.v.id, quantity: 1 }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.description||'Error');
+      btn.textContent = '✓ Added to Bag'; btn.classList.add('added');
+      const lbl = document.getElementById('sft-sz-lbl'); if (lbl) lbl.textContent = activeCol + ' / ' + selectedVariant.sz;
+      toast(activeCol + ' / ' + selectedVariant.sz + ' added to bag');
+      document.dispatchEvent(new CustomEvent('cart:updated',{bubbles:true}));
+      setTimeout(closePanel, 900);
+      setTimeout(()=>{ updateFoot(); }, 1100);
+    } catch(e){
+      btn.disabled=false; btn.textContent='Add to Bag'; toast('Could not add. Please try again.');
+    }
+  });
+
+  /* ---- Size guide ---- */
+  const guide = document.getElementById('sft-guide');
+  ['sft-guide-open','sft-guide-open2'].forEach(id => { const el=document.getElementById(id); if (el) el.addEventListener('click', ()=>guide.showModal()); });
+
+  window.sftAcc = function(id){ document.getElementById(id)?.classList.toggle('open'); };
+
+  function toast(msg){
+    const t = document.getElementById('sft-toast'); if (!t) return;
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'),2800);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "SFT Hoodie Product",
+  "tag": "section",
+  "class": "sft-hoodie-section",
+  "settings": [
+    { "type": "header", "content": "Product options" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "info": "Defaults to your shop name" },
+    { "type": "collection", "id": "colour_collection", "label": "Colour family collection", "info": "Optional. If set, colour swatches link to each hoodie product in this collection (use when each colour is a separate product). Leave empty to use this product's own colour variants." },
+    { "type": "text", "id": "size_order", "label": "Sizes to show", "default": "XS,S,M,L,XL,XXL", "info": "Comma separated. All are shown; sizes without stock show Notify Me." },
+    { "type": "range", "id": "low_threshold", "label": "Low stock threshold", "min": 1, "max": 20, "step": 1, "default": 5 },
+
+    { "type": "header", "content": "Feature bar" },
+    { "type": "checkbox", "id": "show_feature_bar", "label": "Show feature bar", "default": true },
+    { "type": "text", "id": "feature_1_title", "label": "Feature 1 title", "default": "Thick." },
+    { "type": "textarea", "id": "feature_1_text", "label": "Feature 1 text", "default": "460gsm brushed fleece with a soft, warm interior." },
+    { "type": "text", "id": "feature_2_title", "label": "Feature 2 title", "default": "Clean." },
+    { "type": "textarea", "id": "feature_2_text", "label": "Feature 2 text", "default": "Minimal tonal branding, no drawcords and a seam-free hood." },
+    { "type": "text", "id": "feature_3_title", "label": "Feature 3 title", "default": "Structured." },
+    { "type": "textarea", "id": "feature_3_text", "label": "Feature 3 text", "default": "Oversized comfort that still looks intentional." },
+
+    { "type": "header", "content": "Editorial" },
+    { "type": "checkbox", "id": "show_editorial", "label": "Show editorial section", "default": true },
+    { "type": "text", "id": "editorial_heading", "label": "Heading", "default": "Not your throwaway hoodie." },
+    { "type": "textarea", "id": "editorial_body", "label": "Body", "default": "Most oversized hoodies are either thin and floppy, or cosy but messy. The Cloud Hoodie was designed to do both: feel substantial and relaxed, while still falling cleanly through the shoulders and body." },
+    { "type": "text", "id": "card_1_title", "label": "Card 1 title", "default": "Heavyweight fleece" },
+    { "type": "textarea", "id": "card_1_text", "label": "Card 1 text", "default": "Dense enough to feel premium and hold shape, soft enough to live in all weekend." },
+    { "type": "text", "id": "card_2_title", "label": "Card 2 title", "default": "Oversized fit" },
+    { "type": "textarea", "id": "card_2_text", "label": "Card 2 text", "default": "Extra room through the chest, shoulders and body without excess bulk." },
+    { "type": "text", "id": "card_3_title", "label": "Card 3 title", "default": "Quiet branding" },
+    { "type": "textarea", "id": "card_3_text", "label": "Card 3 text", "default": "Tonal logo embroidery keeps the look elevated, minimal and easy to style." },
+    { "type": "text", "id": "card_4_title", "label": "Card 4 title", "default": "Made to last" },
+    { "type": "textarea", "id": "card_4_text", "label": "Card 4 text", "default": "Premium ribbing and a considered finish help the hoodie keep its shape." },
+
+    { "type": "header", "content": "Reviews" },
+    { "type": "checkbox", "id": "show_reviews", "label": "Show reviews section", "default": true },
+    { "type": "text", "id": "reviews_heading", "label": "Heading", "default": "People notice the quality." },
+    { "type": "textarea", "id": "review_1_text", "label": "Review 1", "default": "The first hoodie I've bought that actually feels worth the money." },
+    { "type": "text", "id": "review_1_author", "label": "Review 1 author", "default": "Verified customer" },
+    { "type": "textarea", "id": "review_2_text", "label": "Review 2", "default": "Heavy but not bulky. It feels expensive and sits really clean." },
+    { "type": "text", "id": "review_2_author", "label": "Review 2 author", "default": "Verified customer" },
+    { "type": "textarea", "id": "review_3_text", "label": "Review 3", "default": "I wore it once and immediately wanted another colour. Dangerous, honestly." },
+    { "type": "text", "id": "review_3_author", "label": "Review 3 author", "default": "Verified customer" },
+
+    { "type": "header", "content": "Final call to action" },
+    { "type": "checkbox", "id": "show_final_cta", "label": "Show final CTA", "default": true },
+    { "type": "text", "id": "cta_heading", "label": "Heading", "default": "Buy one. You'll get it." },
+    { "type": "textarea", "id": "cta_text", "label": "Text", "default": "The hoodie that makes your old ones feel a bit dramatic." },
+    { "type": "text", "id": "cta_button", "label": "Button label", "default": "Add to Bag" }
+  ],
+  "presets": [{ "name": "SFT Hoodie Product" }]
+}
+{% endschema %}
