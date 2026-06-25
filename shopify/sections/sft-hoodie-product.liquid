@@ -170,10 +170,10 @@
 /* Mobile carousel */
 .sft-carousel { display: none; position: relative; }
 .sft-car__main {
-  aspect-ratio: 3/4; overflow: hidden; background: #f4f4f2;
-  user-select: none; position: relative;
+  aspect-ratio: 4/5; overflow: hidden; background: #f4f4f2;
+  user-select: none; position: relative; touch-action: pan-y;
 }
-.sft-car__main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.28s ease; pointer-events: none; }
+.sft-car__main img { width: 100%; height: 100%; object-fit: contain; display: block; transition: opacity 0.28s ease; pointer-events: none; }
 .sft-car__main img.fading { opacity: 0; }
 
 /* Carousel nav arrows */
@@ -528,9 +528,9 @@
       <!-- SIZE -->
       <div class="sft-row-hd">
         <span class="sft-row-lbl">Size</span>
-        <button class="sft-link" id="sft-guide-open">Size guide</button>
+        <button type="button" class="sft-link" id="sft-guide-open">Size guide</button>
       </div>
-      <button class="sft-sz-btn" id="sft-sz-btn" aria-haspopup="dialog">
+      <button type="button" class="sft-sz-btn" id="sft-sz-btn" aria-haspopup="dialog">
         <span class="sft-sz-btn__l">
           <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h8m-8 6h16"/></svg>
           <span id="sft-sz-lbl">Select Size</span>
@@ -555,7 +555,7 @@
           {%- assign sw_is_active = act_a[forloop.index0] -%}
           {%- assign sw_img = imgs_a[forloop.index0] -%}
           {%- if sw_url == '#' -%}
-            <button class="sft-iswatch{% if sw_is_active == '1' %} active{% endif %}" data-colour="{{ nm | escape }}" aria-label="{{ nm | escape }}">
+            <button type="button" class="sft-iswatch{% if sw_is_active == '1' %} active{% endif %}" data-colour="{{ nm | escape }}" aria-label="{{ nm | escape }}">
               <span class="sft-iswatch__imgwrap"><img class="sft-iswatch__img" src="{{ sw_img }}" alt="{{ nm | escape }}" loading="lazy"/><span class="sft-iswatch__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
               <span class="sft-iswatch__nm">{{ nm }}</span>
             </button>
@@ -600,7 +600,7 @@
             {%- else -%}{%- assign sw_bg = '#888888' -%}
           {%- endcase -%}
           {%- if sw_url == '#' -%}
-            <button class="sft-swatch{% if sw_is_active == '1' %} active{% endif %}" data-colour="{{ nm | escape }}" style="background:{{ sw_bg }};" aria-label="{{ nm | escape }}" title="{{ nm | escape }}"></button>
+            <button type="button" class="sft-swatch{% if sw_is_active == '1' %} active{% endif %}" data-colour="{{ nm | escape }}" style="background:{{ sw_bg }};" aria-label="{{ nm | escape }}" title="{{ nm | escape }}"></button>
           {%- else -%}
             <a class="sft-swatch{% if sw_is_active == '1' %} active{% endif %}" href="{{ sw_url }}" style="background:{{ sw_bg }};" aria-label="{{ nm | escape }}" title="{{ nm | escape }}"></a>
           {%- endif -%}
@@ -612,9 +612,9 @@
       <!-- TABS -->
       <div class="sft-tabs">
         <div class="sft-tabs__nav" role="tablist">
-          <button class="sft-tab active" data-tab="desc" role="tab">Details</button>
-          <button class="sft-tab" data-tab="fabric" role="tab">Fabric &amp; Care</button>
-          <button class="sft-tab" data-tab="ship" role="tab">Shipping</button>
+          <button type="button" class="sft-tab active" data-tab="desc" role="tab">Details</button>
+          <button type="button" class="sft-tab" data-tab="fabric" role="tab">Fabric &amp; Care</button>
+          <button type="button" class="sft-tab" data-tab="ship" role="tab">Shipping</button>
         </div>
         <div class="sft-tabs__panels">
           <div class="sft-tabpanel active" data-panel="desc">{{ product.description }}</div>
@@ -678,7 +678,7 @@
   <div class="sft-cta">
     <h2 class="sft-cta__h">{{ section.settings.cta_heading }}</h2>
     <p class="sft-cta__x">{{ section.settings.cta_text }}</p>
-    <button class="sft-cta__btn" id="sft-cta-btn">{{ section.settings.cta_button | default: 'Add to Bag' }}{%- if current_variant.price -%} — {{ current_variant.price | money_without_trailing_zeros }}{%- endif -%}</button>
+    <button type="button" class="sft-cta__btn" id="sft-cta-btn">{{ section.settings.cta_button | default: 'Add to Bag' }}{%- if current_variant.price -%} — {{ current_variant.price | money_without_trailing_zeros }}{%- endif -%}</button>
   </div>
   {%- endif -%}
 
@@ -690,7 +690,7 @@
 
   <div class="sft-panel__top">
     <span class="sft-panel__title">Select your size</span>
-    <button class="sft-panel__close" id="sft-panel-close" aria-label="Close">
+    <button type="button" class="sft-panel__close" id="sft-panel-close" aria-label="Close">
       <svg viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       <span>Close</span>
     </button>
@@ -712,7 +712,7 @@
 
   <div class="sft-panel__hd">
     <span class="sft-panel__hl">Tap a size to add to bag</span>
-    <button class="sft-panel__hg" id="sft-guide-open2">Size guide <svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></button>
+    <button type="button" class="sft-panel__hg" id="sft-guide-open2">Size guide <svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></button>
   </div>
 
   <div class="sft-panel__list" id="sft-sz-list"></div>
@@ -737,7 +737,7 @@
       <tr><td style="padding:9px 0;">XXL</td><td style="padding:9px 0;">116–122</td><td style="padding:9px 0;">76</td></tr>
     </tbody>
   </table>
-  <button onclick="document.getElementById('sft-guide').close()" style="margin-top:20px;background:#0a0a0a;color:#fff;border:none;padding:11px 24px;border-radius:2px;font-family:inherit;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;">Close</button>
+  <button type="button" onclick="document.getElementById('sft-guide').close()" style="margin-top:20px;background:#0a0a0a;color:#fff;border:none;padding:11px 24px;border-radius:2px;font-family:inherit;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;">Close</button>
 </dialog>
 
 <div class="sft-toast" id="sft-toast"></div>
@@ -867,21 +867,32 @@
 
   /* Open cart drawer (works with most Shopify themes) */
   function openCartDrawer(){
+    /* Newer themes (Horizon/Dawn) expose a cart-drawer custom element */
+    var drawer=document.querySelector('cart-drawer, cart-drawer-component, #CartDrawer, [id*="cart-drawer"]');
+    if(drawer){
+      if(typeof drawer.open==='function'){ try{ drawer.open(); return; }catch(e){} }
+      if(typeof drawer.show==='function'){ try{ drawer.show(); return; }catch(e){} }
+      drawer.classList.add('active','is-open','open','animate');
+      drawer.removeAttribute('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+    /* Let the theme react to a cart update */
     ['cart:refresh','cart:updated','cart:open','theme:cart:open'].forEach(function(evt){
       document.dispatchEvent(new CustomEvent(evt,{bubbles:true,detail:{}}));
     });
-    var sels=['[data-cart-toggle]','[data-cart-icon-bubble]','#cart-icon-bubble',
-      '.header__icon--cart','[aria-controls="CartDrawer"]','[data-drawer="cart"]',
-      '[aria-label="Cart"]','a[href="/cart"].header__icon','.cart-count-bubble'];
+    if(drawer) return;
+    /* Click a drawer toggle — but never a plain link that navigates away (that causes the page reload) */
+    var sels=['button[data-cart-toggle]','[aria-controls="CartDrawer"]',
+      '[data-cart-icon-bubble]','#cart-icon-bubble','.header__icon--cart'];
     for(var i=0;i<sels.length;i++){
       var el=document.querySelector(sels[i]);
-      if(el&&el.offsetParent!==null){ el.click(); return; }
+      if(el&&el.offsetParent!==null&&el.tagName!=='A'){ el.click(); return; }
     }
   }
 
   /* Render sizes in panel */
   function renderSizes(){
-    var list=document.getElementById('sft-sz-list'); if(!list) return; list.innerHTML='';
+    var list=document.getElementById('sft-sz-list'); if(!list) return; list.innerHTML=''; notifyOpen={};
     var map={};
     VARIANTS.forEach(function(v){
       if(HAS_COLOUR&&v[OPT_COL]!==activeCol) return;
@@ -917,7 +928,7 @@
       if(!canBuy){
         var nw=document.createElement('div');
         nw.className='sft-notify-wrap'; nw.id='nw_'+key;
-        nw.innerHTML='<div class="sft-notify-inner"><div class="sft-notify-cap">Out of stock — get an email when '+sz+' is back.</div><div class="sft-notify-row"><input class="sft-notify-input" type="email" placeholder="your@email.com" id="ne_'+key+'"/><button class="sft-notify-sub" id="ns_'+key+'">Notify</button></div></div>';
+        nw.innerHTML='<div class="sft-notify-inner"><div class="sft-notify-cap">Out of stock — get an email when '+sz+' is back.</div><div class="sft-notify-row"><input class="sft-notify-input" type="email" placeholder="your@email.com" id="ne_'+key+'"/><button type="button" class="sft-notify-sub" id="ns_'+key+'">Notify</button></div></div>';
         list.appendChild(nw);
         var sub=nw.querySelector('#ns_'+key);
         sub.addEventListener('click',function(){ submitNotify(key, sz); });
@@ -954,9 +965,14 @@
 
   function toggleNotify(key){
     var nw=document.getElementById('nw_'+key); if(!nw) return;
-    notifyOpen[key]=!notifyOpen[key];
-    nw.classList.toggle('open',notifyOpen[key]);
-    if(notifyOpen[key]){ var inp=document.getElementById('ne_'+key); if(inp) setTimeout(function(){inp.focus();},300); }
+    var willOpen=!notifyOpen[key];
+    /* Only one notify form open at a time — collapse any others */
+    Object.keys(notifyOpen).forEach(function(k){
+      if(k!==key&&notifyOpen[k]){ notifyOpen[k]=false; var other=document.getElementById('nw_'+k); if(other) other.classList.remove('open'); }
+    });
+    notifyOpen[key]=willOpen;
+    nw.classList.toggle('open',willOpen);
+    if(willOpen){ var inp=document.getElementById('ne_'+key); if(inp) setTimeout(function(){inp.focus();},300); }
   }
 
   function submitNotify(key, sz){
