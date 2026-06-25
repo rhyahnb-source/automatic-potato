@@ -155,12 +155,14 @@
 /* ===== MAIN 2-COL LAYOUT ===== */
 .sft-layout {
   display: grid;
-  grid-template-columns: 1fr 400px;
+  grid-template-columns: minmax(0,1fr) 400px;
   align-items: start;
   background: #fff;
+  max-width: 1360px;
+  margin: 0 auto;
 }
-@media (max-width: 1100px) { .sft-layout { grid-template-columns: 1fr 360px; } }
-@media (max-width: 860px)  { .sft-layout { display: block; } }
+@media (max-width: 1100px) { .sft-layout { grid-template-columns: minmax(0,1fr) 360px; } }
+@media (max-width: 860px)  { .sft-layout { display: block; max-width: none; } }
 
 /* ===== GALLERY COLUMN (left) ===== */
 .sft-gallery-col { }
@@ -169,10 +171,23 @@
 .sft-carousel { display: none; position: relative; }
 .sft-car__main {
   aspect-ratio: 3/4; overflow: hidden; background: #f4f4f2;
-  user-select: none;
+  user-select: none; position: relative;
 }
 .sft-car__main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.28s ease; pointer-events: none; }
 .sft-car__main img.fading { opacity: 0; }
+
+/* Carousel nav arrows */
+.sft-car__nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.88); border: none; cursor: pointer; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.14); -webkit-tap-highlight-color: transparent;
+}
+.sft-car__nav svg { width: 17px; height: 17px; stroke: var(--ink); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sft-car__nav--prev { left: 12px; }
+.sft-car__nav--next { right: 12px; }
+.sft-car__nav:active { background: #fff; }
 
 /* Progress pill */
 .sft-progress { display: flex; justify-content: center; padding: 13px 0 6px; background: #fff; }
@@ -188,10 +203,10 @@
 
 @media (max-width: 860px) { .sft-carousel { display: block; } }
 
-/* Desktop mosaic gallery */
-.sft-mosaic { display: none; grid-template-columns: 1fr 1fr; gap: 3px; }
+/* Desktop gallery — uniform 2-up grid */
+.sft-mosaic { display: none; grid-template-columns: 1fr 1fr; gap: 4px; }
 .sft-mi { overflow: hidden; background: #f4f4f2; }
-.sft-mi.full { grid-column: 1 / -1; }
+.sft-mi.full { grid-column: auto; }
 .sft-mi img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; transition: transform 0.6s var(--ease); }
 .sft-mi:hover img { transform: scale(1.02); }
 @media (min-width: 861px) { .sft-mosaic { display: grid; } }
@@ -463,6 +478,8 @@
           {%- else -%}
             <img id="sft-main-img" src="{{ 'product-1' | placeholder_svg_tag }}" alt="{{ product.title | escape }}"/>
           {%- endif -%}
+          <button class="sft-car__nav sft-car__nav--prev" id="sft-car-prev" aria-label="Previous image" type="button"><svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg></button>
+          <button class="sft-car__nav sft-car__nav--next" id="sft-car-next" aria-label="Next image" type="button"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></button>
         </div>
         <div class="sft-progress">
           <div class="sft-progress__track">
@@ -737,6 +754,9 @@
   var HAS_COLOUR = {% if colour_option %}true{% else %}false{% endif %};
   var SIZE_MASTER = {{ section.settings.size_order | default: 'XS,S,M,L,XL,XXL' | split: ',' | json }}.map(function(s){return s.trim();}).filter(Boolean);
   var CURRENCY = '{{ shop.currency }}';
+  var PRODUCT_TITLE = {{ product.title | json }};
+  var KLAVIYO_KEY = {{ section.settings.klaviyo_public_key | default: '' | json }};
+  var KLAVIYO_LIST = {{ section.settings.klaviyo_notify_list_id | default: '' | json }};
   var COL_MEDIA = {};
   VARIANTS.forEach(function(v){ var c=v[OPT_COL]; if(c&&!COL_MEDIA[c]&&v.featured_media) COL_MEDIA[c]=v.featured_media.id; });
 
@@ -784,14 +804,31 @@
   }
 
   function updatePill(){
-    var fill=document.getElementById('sft-pfill'); if(!fill) return;
-    var n=curImgs.length; if(!n) return;
-    var pct=100/n;
-    fill.style.width=pct+'%';
-    fill.style.left=(activeIdx*pct)+'%';
+    var fill=document.getElementById('sft-pfill'); if(fill){
+      var n=curImgs.length||1;
+      var pct=100/n;
+      fill.style.width=pct+'%';
+      fill.style.left=(activeIdx*pct)+'%';
+    }
+    var multi=curImgs.length>1;
+    var pv=document.getElementById('sft-car-prev'), nx=document.getElementById('sft-car-next');
+    if(pv) pv.style.display=multi?'flex':'none';
+    if(nx) nx.style.display=multi?'flex':'none';
+  }
+
+  /* Advance carousel with wraparound */
+  function nav(dir){
+    var n=curImgs.length; if(n<2) return;
+    var i=activeIdx+dir;
+    if(i<0) i=n-1; else if(i>=n) i=0;
+    setIdx(i,false);
   }
 
   buildImgList(activeCol);
+
+  /* Nav arrows */
+  var prevBtn=document.getElementById('sft-car-prev'); if(prevBtn) prevBtn.addEventListener('click',function(){ nav(-1); });
+  var nextBtn=document.getElementById('sft-car-next'); if(nextBtn) nextBtn.addEventListener('click',function(){ nav(1); });
 
   /* Touch swipe on carousel */
   (function(){
@@ -811,9 +848,7 @@
       if(!isH) return;
       var dx=e.changedTouches[0].clientX-sx;
       if(Math.abs(dx)<30) return;
-      var n=curImgs.length;
-      if(dx<0&&activeIdx<n-1) setIdx(activeIdx+1,false);
-      else if(dx>0&&activeIdx>0) setIdx(activeIdx-1,false);
+      nav(dx<0?1:-1);
     },{passive:true});
   })();
 
@@ -885,7 +920,7 @@
         nw.innerHTML='<div class="sft-notify-inner"><div class="sft-notify-cap">Out of stock — get an email when '+sz+' is back.</div><div class="sft-notify-row"><input class="sft-notify-input" type="email" placeholder="your@email.com" id="ne_'+key+'"/><button class="sft-notify-sub" id="ns_'+key+'">Notify</button></div></div>';
         list.appendChild(nw);
         var sub=nw.querySelector('#ns_'+key);
-        sub.addEventListener('click',function(){ submitNotify(key); });
+        sub.addEventListener('click',function(){ submitNotify(key, sz); });
       }
     });
   }
@@ -924,12 +959,32 @@
     if(notifyOpen[key]){ var inp=document.getElementById('ne_'+key); if(inp) setTimeout(function(){inp.focus();},300); }
   }
 
-  function submitNotify(key){
+  function submitNotify(key, sz){
     var inp=document.getElementById('ne_'+key);
     if(!inp||!inp.value.trim()||inp.value.indexOf('@')<0){ if(inp){inp.style.borderColor='#7A3030'; setTimeout(function(){inp.style.borderColor='';},1200);} return; }
-    inp.disabled=true;
-    var sub=document.getElementById('ns_'+key); if(sub){sub.textContent='✓ Done'; sub.classList.add('sent');}
-    toast("We'll let you know when it's back");
+    var email=inp.value.trim();
+    var sub=document.getElementById('ns_'+key);
+    inp.disabled=true; if(sub){ sub.disabled=true; sub.textContent='···'; }
+
+    function done(){ if(sub){ sub.textContent='✓ Done'; sub.classList.add('sent'); } toast("We'll email you when "+sz+" is back"); }
+    function fail(){ inp.disabled=false; if(sub){ sub.disabled=false; sub.textContent='Notify'; } toast('Something went wrong — please try again'); }
+
+    /* Not configured — show optimistic confirmation */
+    if(!KLAVIYO_KEY||!KLAVIYO_LIST){ done(); return; }
+
+    /* Subscribe to the Klaviyo "Notify Me" list */
+    fetch('https://a.klaviyo.com/client/subscriptions/?company_id='+encodeURIComponent(KLAVIYO_KEY),{
+      method:'POST',
+      headers:{'Content-Type':'application/json','revision':'2024-10-15'},
+      body:JSON.stringify({data:{type:'subscription',attributes:{
+        custom_source:'Notify Me — '+PRODUCT_TITLE,
+        profile:{data:{type:'profile',attributes:{email:email,properties:{
+          'Requested Product':PRODUCT_TITLE,'Requested Colour':activeCol,'Requested Size':sz
+        }}}}
+      },relationships:{list:{data:{type:'list',id:KLAVIYO_LIST}}}}})
+    })
+    .then(function(r){ if(r.ok||r.status===202) done(); else fail(); })
+    .catch(fail);
   }
 
   /* Size guide */
@@ -970,6 +1025,11 @@
     { "type": "text", "id": "rating_count", "label": "Rating caption", "default": "43 reviews" },
     { "type": "text", "id": "returns_note", "label": "Returns note", "default": "Free 30-day returns and exchanges" },
     { "type": "range", "id": "header_offset", "label": "Header height (px) — for sticky panel", "min": 0, "max": 200, "step": 4, "default": 72, "info": "Match your theme's header height so images clear the nav bar." },
+
+    { "type": "header", "content": "Notify Me (Klaviyo)" },
+    { "type": "paragraph", "content": "When an out-of-stock size is requested, the shopper's email is added to a Klaviyo list. Leave blank to just show a confirmation without sending." },
+    { "type": "text", "id": "klaviyo_public_key", "label": "Klaviyo public API key (site ID)", "info": "The 6-character public key in Klaviyo → Settings → API keys." },
+    { "type": "text", "id": "klaviyo_notify_list_id", "label": "Klaviyo 'Notify Me' list ID", "info": "Klaviyo → Lists & Segments → open your 'Notify Me' list → the ID shown in the page URL." },
 
     { "type": "header", "content": "Feature bar" },
     { "type": "checkbox", "id": "show_feature_bar", "label": "Show feature bar", "default": true },
