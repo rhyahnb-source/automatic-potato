@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__graphql_mutation",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__graphql_query",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__graphql_schema",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__get-shop-info",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__search_products",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__get-product",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__update-product",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__validate_graphql_codeblocks",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__search_docs_chunks",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__list-orders",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__get-order",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__list-customers",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__get-inventory-levels",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__search_collections",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__get-collection",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__create-product",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__bulk-update-product-status",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__add-to-collection",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__create-collection",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__update-collection",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__set-inventory",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__create-discount",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__run-analytics-query",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__switch-shop",
+      "mcp__50ac52d5-ba7a-41e0-8c64-c09bf1ad7266__get-new-store-previews"
+    ]
+  }
+}
