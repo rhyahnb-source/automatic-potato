@@ -331,7 +331,10 @@
       background: var(--card-bg); border: 1.5px solid #E2E8F0;
       border-radius: var(--radius-sm); padding: 13px 14px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
     }
+    /* Unanswered-required highlight */
+    .toggle-item.error { border-color: var(--danger); background: #FEF2F2; }
     .toggle-item label { font-size: 14px; line-height: 1.45; color: var(--text); flex: 1; }
     .yn-btns { display: flex; gap: 6px; flex-shrink: 0; }
     .yn-btn {
@@ -890,13 +893,14 @@
   <div class="screen" id="screen-12">
     <div class="section-tag">Step 12 of 12</div>
     <div class="screen-title">A few health questions</div>
+    <div class="screen-subtitle">Please answer every question below so I can keep your training safe.</div>
     <div class="privacy-note">
       <i class="ti ti-lock"></i>
       <span>This stays private and just helps me build a safe program for you.</span>
     </div>
 
     <div class="toggle-group">
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="heart-history">
         <label>You or a blood relative under 55 had heart disease, stroke, high cholesterol, or sudden death</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'heart-history','yes')">Yes</button>
@@ -904,33 +908,34 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-heart-history">
-        <div class="field">
+        <div class="field" id="f-heart-history-detail">
           <label>Can you tell me a bit more about this?</label>
           <textarea id="heart-history-detail" placeholder="e.g. My father had a heart attack at 52..." rows="3"></textarea>
+          <span class="err-msg">Please tell me a bit more</span>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="high-bp">
         <label>High blood pressure</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'high-bp','yes')">Yes</button>
           <button class="yn-btn no"  onclick="setYN(this,'high-bp','no')">No</button>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="smoker">
         <label>Smoker</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'smoker','yes')">Yes</button>
           <button class="yn-btn no"  onclick="setYN(this,'smoker','no')">No</button>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="high-chol">
         <label>High cholesterol</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'high-chol','yes')">Yes</button>
           <button class="yn-btn no"  onclick="setYN(this,'high-chol','no')">No</button>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="diabetes">
         <label>Diabetes</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'diabetes','yes')">Yes</button>
@@ -938,16 +943,17 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-diabetes">
-        <div class="field">
+        <div class="field" id="f-diabetes-type">
           <label>Type</label>
           <select id="diabetes-type">
             <option value="">Select type...</option>
             <option value="Type 1">Type 1</option>
             <option value="Type 2">Type 2</option>
           </select>
+          <span class="err-msg">Please select a type</span>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="medication">
         <label>On prescribed medication</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'medication','yes')">Yes</button>
@@ -955,12 +961,13 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-medication">
-        <div class="field">
+        <div class="field" id="f-medication-detail">
           <label>Will it affect your exercise?</label>
           <input type="text" id="medication-detail" placeholder="Name and any relevant info...">
+          <span class="err-msg">Please add a few details</span>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="pregnant">
         <label>Pregnant or given birth in the last 6 weeks</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'pregnant','yes')">Yes</button>
@@ -968,9 +975,10 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-pregnant">
-        <div class="field">
+        <div class="field" id="f-pregnant-detail">
           <label>Is there anything specific I should be aware of?</label>
           <textarea id="pregnant-detail" placeholder="Any relevant details are helpful..." rows="3"></textarea>
+          <span class="err-msg">Please add a few details</span>
         </div>
       </div>
     </div>
@@ -992,7 +1000,7 @@
     <!-- Revealed automatically when any health condition toggle above is Yes -->
     <div class="sub-reveal" id="sub-clearance-section">
       <div class="divider" style="margin-bottom:8px;"></div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="clearance">
         <label>Have you received clearance from your doctor to exercise?</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setDoctorClearance(this,'yes')">Yes</button>
@@ -1006,9 +1014,10 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-clearance-yes">
-        <div class="field">
+        <div class="field" id="f-doctor-clearance-detail">
           <label>Great. When did you receive clearance, and is there anything specific your doctor flagged?</label>
           <textarea id="doctor-clearance-detail" placeholder="e.g. Cleared last month, told to avoid high-impact until further review..." rows="3"></textarea>
+          <span class="err-msg">Please add a few details</span>
         </div>
       </div>
     </div>
@@ -1327,8 +1336,10 @@
   const HEALTH_CONDITION_KEYS = ['heart-history','high-bp','smoker','high-chol','diabetes','medication','pregnant'];
 
   function setYN(btn, key, val) {
-    btn.closest('.toggle-item').querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+    const item = btn.closest('.toggle-item');
+    item.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    item.classList.remove('error'); /* answered - clear any required highlight */
     if (YN_MAP[key]) formData[YN_MAP[key]] = val;
     const sub = document.getElementById(`sub-${key}`);
     if (sub) sub.classList.toggle('visible', val === 'yes');
@@ -1344,8 +1355,10 @@
 
   /* Handle the doctor-clearance Yes/No - each answer reveals something different */
   function setDoctorClearance(btn, val) {
-    btn.closest('.toggle-item').querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+    const item = btn.closest('.toggle-item');
+    item.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    item.classList.remove('error'); /* answered - clear any required highlight */
     formData.doctorClearance = val;
     document.getElementById('sub-clearance-yes').classList.toggle('visible', val === 'yes');
     document.getElementById('sub-clearance-no').classList.toggle('visible',  val === 'no');
@@ -1505,6 +1518,50 @@
     if (step === 11 && !formData.experienceLevel) {
       flashGrid('exp-grid');
       ok = false;
+    }
+
+    /* Health check: every Yes/No question is mandatory. The conditional
+       detail fields are only required when their parent answer is Yes. */
+    if (step === 12) {
+      let firstError = null;
+
+      /* Mark a required conditional field, red-border + fail if empty */
+      const reqIf = (cond, fieldId, inputId) => {
+        if (!cond) return;
+        const fEl = document.getElementById(fieldId);
+        const iEl = document.getElementById(inputId);
+        if (!fEl || !iEl) return;
+        const pass = iEl.value.trim() !== '';
+        fEl.classList.toggle('error', !pass);
+        if (!pass) { ok = false; firstError = firstError || fEl; }
+      };
+
+      /* All seven condition toggles must be answered */
+      HEALTH_CONDITION_KEYS.forEach(key => {
+        const answered = formData[YN_MAP[key]] === 'yes' || formData[YN_MAP[key]] === 'no';
+        const item = document.querySelector(`.toggle-item[data-key="${key}"]`);
+        if (item) item.classList.toggle('error', !answered);
+        if (!answered) { ok = false; firstError = firstError || item; }
+      });
+
+      /* Detail fields required only when the relevant answer is Yes */
+      reqIf(formData.heartHistory === 'yes', 'f-heart-history-detail', 'heart-history-detail');
+      reqIf(formData.diabetes     === 'yes', 'f-diabetes-type',        'diabetes-type');
+      reqIf(formData.medication   === 'yes', 'f-medication-detail',    'medication-detail');
+      reqIf(formData.pregnant     === 'yes', 'f-pregnant-detail',      'pregnant-detail');
+
+      /* Doctor clearance only applies when the section is shown (any condition Yes) */
+      const clearanceShown = HEALTH_CONDITION_KEYS.some(k => formData[YN_MAP[k]] === 'yes');
+      if (clearanceShown) {
+        const answered = formData.doctorClearance === 'yes' || formData.doctorClearance === 'no';
+        const item = document.querySelector('.toggle-item[data-key="clearance"]');
+        if (item) item.classList.toggle('error', !answered);
+        if (!answered) { ok = false; firstError = firstError || item; }
+        reqIf(formData.doctorClearance === 'yes', 'f-doctor-clearance-detail', 'doctor-clearance-detail');
+      }
+
+      /* Bring the first unanswered question into view */
+      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     if (step === 13) {
