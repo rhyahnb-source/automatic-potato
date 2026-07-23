@@ -531,6 +531,35 @@
     }
 
     /* =============================================================
+       SEND-FAILURE OVERLAY
+       ============================================================= */
+    #send-error-overlay {
+      position: fixed; inset: 0; z-index: 9998;
+      background: rgba(15, 23, 42, 0.55);
+      display: none; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #send-error-overlay.visible { display: flex; }
+    .se-card {
+      background: var(--card-bg); border-radius: var(--radius-lg);
+      padding: 30px 24px; max-width: 380px; width: 100%;
+      text-align: center; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 14px; align-items: center;
+    }
+    .se-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #FEE2E2; color: var(--danger);
+      display: flex; align-items: center; justify-content: center; font-size: 32px;
+    }
+    .se-card h3 { font-size: 20px; font-weight: 900; color: var(--text); }
+    .se-card p  { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    .se-card .btn { width: 100%; }
+    .se-alt {
+      background: var(--card-bg); color: var(--accent-dark);
+      border: 1.5px solid var(--accent);
+    }
+
+    /* =============================================================
        LOADER SPIN (while submitting)
        ============================================================= */
     @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
@@ -1109,6 +1138,25 @@
   </button>
 </div>
 
+<!-- ====================================================
+     SEND-FAILURE OVERLAY
+     Shown only if the automatic email send fails, so the
+     client's answers are never silently lost.
+     ==================================================== -->
+<div id="send-error-overlay">
+  <div class="se-card">
+    <div class="se-icon"><i class="ti ti-mail-exclamation"></i></div>
+    <h3>That didn't send</h3>
+    <p>Your answers are safe on this screen. Let's make sure Rhyahn gets them - please don't close this page yet.</p>
+    <button class="btn btn-next" onclick="retrySend()">
+      <i class="ti ti-refresh"></i> <span>Try again</span>
+    </button>
+    <button class="btn se-alt" onclick="emailFallback()">
+      <i class="ti ti-mail"></i> <span>Email it to Rhyahn instead</span>
+    </button>
+  </div>
+</div>
+
 
 <script>
   /* ==============================================================
@@ -1117,6 +1165,11 @@
   const EMAILJS_SERVICE_ID  = "service_kcwha3p";
   const EMAILJS_TEMPLATE_ID = "template_mlwkhpa";
   const EMAILJS_PUBLIC_KEY  = "7BTeH5ZXQ-n1RvTlp";
+
+  /* Your business email - used ONLY as a fallback if the automatic send
+     fails, so the client can send you their answers straight from their
+     own email app. Change this if your address changes. */
+  const RECIPIENT_EMAIL = "hello@rhyahnbrock.com";
 
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
@@ -1875,6 +1928,18 @@
          <pre>{{message}}</pre>
          <p><strong>Signed on:</strong> {{signature_date}}</p>
          <img src="{{signature_img}}" style="max-width:400px;border:1px solid #ddd"> */
+    /* Keep the full summary around so the retry / email-fallback buttons
+       can reuse it, and stash a local backup so a completed form is never
+       lost even if every send attempt fails. */
+    lastSummary = message;
+    try {
+      localStorage.setItem('rbhf_last_submission', JSON.stringify({
+        when: new Date().toISOString(),
+        name: `${formData.firstname} ${formData.lastname}`,
+        summary: message,
+      }));
+    } catch (e) { /* private mode etc - ignore */ }
+
     let failed = false;
     try {
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -1884,13 +1949,37 @@
         signature_date: formData.signatureDate,
         signature_img:  formData.signatureDataUrl,
       });
-    } catch {
+    } catch (e) {
       failed = true;
+      console.error('EmailJS send failed:', e); /* visible in browser console for debugging */
     }
 
     btn.disabled = false;
     btn.innerHTML = '<span>Submit</span>';
-    showCelebration(failed);
+
+    if (failed) {
+      /* Do NOT show the celebration - the client must know it didn't send */
+      document.getElementById('send-error-overlay').classList.add('visible');
+    } else {
+      showCelebration(false);
+    }
+  }
+
+  /* Full plain-text summary of the latest submission, for retry / fallback */
+  let lastSummary = '';
+
+  /* Retry the automatic send */
+  function retrySend() {
+    document.getElementById('send-error-overlay').classList.remove('visible');
+    submitForm();
+  }
+
+  /* Fallback: open the client's own email app with everything pre-filled,
+     addressed to Rhyahn. Works even if EmailJS is down. */
+  function emailFallback() {
+    const subject = encodeURIComponent(`New Client Intake - ${formData.firstname} ${formData.lastname}`);
+    const body    = encodeURIComponent(lastSummary + '\n\n(Signature was captured on the form.)');
+    window.location.href = `mailto:${RECIPIENT_EMAIL}?subject=${subject}&body=${body}`;
   }
 
 
