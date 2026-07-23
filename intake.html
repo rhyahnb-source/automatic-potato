@@ -1171,6 +1171,11 @@
      own email app. Change this if your address changes. */
   const RECIPIENT_EMAIL = "hello@rhyahnbrock.com";
 
+  /* Backup delivery channel. Every submission is ALSO sent as plain text
+     through Web3Forms at the same time as EmailJS, so if one service is
+     down the other still gets the form to you. Key from web3forms.com. */
+  const WEB3FORMS_KEY = "d16f93be-bc5d-41ae-abe7-6908abf373fe";
+
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
   /* ==============================================================
@@ -1940,28 +1945,61 @@
       }));
     } catch (e) { /* private mode etc - ignore */ }
 
-    let failed = false;
-    try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        from_name:      `${formData.firstname} ${formData.lastname}`,
-        reply_to:       formData.email,
-        message,
-        signature_date: formData.signatureDate,
-        signature_img:  formData.signatureDataUrl,
-      });
-    } catch (e) {
-      failed = true;
-      console.error('EmailJS send failed:', e); /* visible in browser console for debugging */
+    const fullName = `${formData.firstname} ${formData.lastname}`;
+    const subject  = `New Client Intake - ${fullName}`;
+
+    /* Channel 1: EmailJS (carries the signature image) */
+    async function sendEmailJS() {
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          from_name:      fullName,
+          reply_to:       formData.email,
+          message,
+          signature_date: formData.signatureDate,
+          signature_img:  formData.signatureDataUrl,
+        });
+        return true;
+      } catch (e) {
+        console.error('EmailJS send failed:', e);
+        return false;
+      }
     }
+
+    /* Channel 2: Web3Forms (plain-text backup, proven reliable) */
+    async function sendWeb3Forms() {
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            subject,
+            from_name:  fullName,
+            replyto:    formData.email,
+            message,
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) console.error('Web3Forms rejected:', data);
+        return !!data.success;
+      } catch (e) {
+        console.error('Web3Forms send failed:', e);
+        return false;
+      }
+    }
+
+    /* Fire both at once - the form succeeds if EITHER channel delivers */
+    const results = await Promise.allSettled([sendEmailJS(), sendWeb3Forms()]);
+    const anyOk   = results.some(r => r.status === 'fulfilled' && r.value === true);
 
     btn.disabled = false;
     btn.innerHTML = '<span>Submit</span>';
 
-    if (failed) {
-      /* Do NOT show the celebration - the client must know it didn't send */
-      document.getElementById('send-error-overlay').classList.add('visible');
-    } else {
+    if (anyOk) {
       showCelebration(false);
+    } else {
+      /* Both channels failed - the client must know it didn't send */
+      document.getElementById('send-error-overlay').classList.add('visible');
     }
   }
 
