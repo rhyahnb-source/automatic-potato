@@ -1290,6 +1290,11 @@ body::after {
 // ============================================================
 const CALENDLY_URL = "https://calendly.com/admin-rhyahnbrock/free-consultation";
 
+// Anonymous completion alerts. Same Web3Forms key as the intake form.
+// Nothing identifying is ever sent: no name, no email, no message from the
+// visitor. Set to "" to switch notifications off entirely.
+const NOTIFY_KEY = "d16f93be-bc5d-41ae-abe7-6908abf373fe";
+
 // ============================================================
 // DATA: QUESTIONS
 // ============================================================
@@ -2098,6 +2103,9 @@ let currentQuestion = 0;
 let scores = { UA: 0, SC: 0, CB: 0, PC: 0, FA: 0 };
 let answered = false;
 let answerHistory = [];
+let quizStartedAt = null;
+let backCount = 0;
+let notified = false;
 const MICRO_RESPONSES = [
   "Noted.", "Got it.", "Good to know.",
   "Recorded.", "On to the next one.", "Data collected.",
@@ -2127,12 +2135,16 @@ function startQuiz() {
   scores = { UA: 0, SC: 0, CB: 0, PC: 0, FA: 0 };
   answerHistory = [];
   microIdx = 0;
+  quizStartedAt = Date.now();
+  backCount = 0;
+  notified = false;
   loadQuestion();
   showScreen('screen-question');
 }
 
 function goBack() {
   if (answered) return;
+  backCount++;
   if (currentQuestion === 0) {
     showScreen('screen-welcome');
     return;
@@ -2261,6 +2273,40 @@ function calculateResult() {
   return RESULTS[top[0]];
 }
 
+function notifyCompletion(result) {
+  // Guarded so one completion never sends twice; reset by startQuiz()
+  if (notified || !NOTIFY_KEY) return;
+  notified = true;
+
+  try {
+  const seconds = quizStartedAt ? Math.round((Date.now() - quizStartedAt) / 1000) : null;
+
+  let device = 'Desktop';
+  const narrow = (typeof window.matchMedia === 'function')
+    ? window.matchMedia('(max-width: 640px)').matches
+    : window.innerWidth <= 640;
+  if (narrow) device = 'Mobile';
+
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      access_key: NOTIFY_KEY,
+      subject: 'Quiz completed: ' + result.title,
+      from_name: 'Gym Member Quiz',
+      Result: result.title,
+      Completed: new Date().toLocaleString(),
+      Took: seconds === null ? 'unknown' : seconds + ' seconds',
+      Device: device,
+      Changed_answers: backCount,
+      Score_breakdown: Object.entries(scores).map(([k, v]) => k + ':' + v).join('  ')
+    })
+  }).catch(() => {});
+  } catch (e) {
+    // Deliberately swallowed. Analytics must never break someone's result.
+  }
+}
+
 function showResult() {
   const result = calculateResult();
   localStorage.setItem('gymQuizResult', result.id);
@@ -2289,6 +2335,9 @@ function showResult() {
   setTimeout(() => { card.classList.add('revealed'); }, 100);
   setTimeout(() => { document.getElementById('next-move-card').classList.add('revealed'); }, 300);
   setTimeout(() => { document.getElementById('result-actions').classList.add('revealed'); }, 500);
+
+  // Sent last, so nothing here can delay or block the visitor's result
+  notifyCompletion(result);
 }
 
 // ============================================================
