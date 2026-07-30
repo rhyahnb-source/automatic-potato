@@ -260,6 +260,16 @@ body::after {
   transform-origin: center 38px;
 }
 
+.rb-eyes {
+  animation: blink 4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-guide, .rb-eyes { animation: none; }
+}
+
 /* ============================================================
    WELCOME SCREEN
    ============================================================ */
@@ -1074,38 +1084,60 @@ body::after {
 
       <!-- GUIDE MASCOT - default expression -->
       <div class="mascot-wrap">
-        <svg class="mascot-guide" id="guide-welcome" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <!-- Body: rounded square -->
-          <rect x="28" y="38" width="64" height="62" rx="20" fill="#1C1C1C"/>
-          <!-- Ear-like antenna nubs -->
-          <circle cx="40" cy="34" r="6" fill="#1C1C1C"/>
-          <circle cx="80" cy="34" r="6" fill="#1C1C1C"/>
-          <!-- Antenna tips -->
-          <circle cx="40" cy="26" r="3" fill="#4A9A6B"/>
-          <circle cx="80" cy="26" r="3" fill="#4A9A6B"/>
-          <!-- Face plate -->
-          <rect x="36" y="48" width="48" height="34" rx="12" fill="#2E2E2E"/>
-          <!-- Eyes group (animated blink) -->
-          <g class="guide-eyes">
-            <!-- Left eye -->
-            <ellipse cx="48" cy="63" rx="6" ry="7" fill="#FDFBF8"/>
-            <circle cx="49.5" cy="62" r="3.5" fill="#1C1C1C"/>
-            <circle cx="50.5" cy="60.5" r="1.2" fill="white" opacity="0.8"/>
-            <!-- Right eye -->
-            <ellipse cx="72" cy="63" rx="6" ry="7" fill="#FDFBF8"/>
-            <circle cx="73.5" cy="62" r="3.5" fill="#1C1C1C"/>
-            <circle cx="74.5" cy="60.5" r="1.2" fill="white" opacity="0.8"/>
+        <svg class="mascot-guide" id="guide-welcome" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of Rhyahn Brock">
+          <!-- Hair: back volume, falling past the shoulders -->
+          <g fill="#2A2018">
+            <ellipse cx="60" cy="58" rx="32" ry="41"/>
+            <circle cx="40" cy="28" r="13"/>
+            <circle cx="58" cy="22" r="14"/>
+            <circle cx="76" cy="27" r="13"/>
+            <circle cx="89" cy="42" r="12"/>
+            <circle cx="31" cy="43" r="12"/>
+            <circle cx="27" cy="60" r="12"/>
+            <circle cx="93" cy="59" r="12"/>
+            <circle cx="29" cy="76" r="12"/>
+            <circle cx="91" cy="76" r="12"/>
+            <circle cx="33" cy="88" r="11"/>
+            <circle cx="87" cy="88" r="11"/>
+            <circle cx="37" cy="100" r="10"/>
+            <circle cx="83" cy="100" r="10"/>
           </g>
-          <!-- Mouth: small smirk -->
-          <path d="M50 74 Q60 79 70 74" stroke="#4A9A6B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <!-- Small arms -->
-          <rect x="14" y="64" width="16" height="10" rx="5" fill="#1C1C1C"/>
-          <rect x="90" y="64" width="16" height="10" rx="5" fill="#1C1C1C"/>
-          <!-- Feet -->
-          <ellipse cx="48" cy="100" rx="10" ry="5" fill="#1C1C1C"/>
-          <ellipse cx="72" cy="100" rx="10" ry="5" fill="#1C1C1C"/>
-          <!-- Red chest mark -->
-          <circle cx="60" cy="86" r="5" fill="#4A9A6B"/>
+          <!-- Neck -->
+          <path d="M53 68 h14 v18 c0 6 -14 6 -14 0 z" fill="#B07A4E"/>
+          <!-- Training top -->
+          <path d="M14 120 C14 99 33 88 60 88 C87 88 106 99 106 120 Z" fill="#1C1C1C"/>
+          <path d="M46 88 C50 100 70 100 74 88 C68 85 52 85 46 88 Z" fill="#C08A5E"/>
+          <!-- Necklace -->
+          <path d="M50 90 Q60 99 70 90" stroke="#D9A441" stroke-width="1.3" fill="none"/>
+          <circle cx="60" cy="96" r="1.6" fill="#F4E8CE"/>
+          <!-- Face -->
+          <ellipse cx="60" cy="52" rx="22" ry="25" fill="#C08A5E"/>
+          <!-- Hairline -->
+          <path d="M37 54 C37 31 46 25 60 25 C74 25 83 31 83 54 C81 41 73 36 60 36 C47 36 39 41 37 54 Z" fill="#2A2018"/>
+          <!-- Hoop earrings -->
+          <circle cx="36" cy="66" r="3.2" stroke="#D9A441" stroke-width="1.5" fill="none"/>
+          <circle cx="84" cy="66" r="3.2" stroke="#D9A441" stroke-width="1.5" fill="none"/>
+          <!-- Brows -->
+          <path d="M49 45.5 Q54 42.8 58.5 45" stroke="#2A2018" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <path d="M61.5 45 Q66 42.8 71 45.5" stroke="#2A2018" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <!-- Eyes (animated blink) -->
+          <g class="rb-eyes">
+            <ellipse cx="52.5" cy="53.5" rx="5.2" ry="5.6" fill="#FFFFFF"/>
+            <circle cx="53.1" cy="53.7" r="3.2" fill="#4A2C18"/>
+            <circle cx="54.2" cy="52.4" r="1.1" fill="#fff" opacity="0.92"/>
+            <ellipse cx="67.5" cy="53.5" rx="5.2" ry="5.6" fill="#FFFFFF"/>
+            <circle cx="68.1" cy="53.7" r="3.2" fill="#4A2C18"/>
+            <circle cx="69.2" cy="52.4" r="1.1" fill="#fff" opacity="0.92"/>
+          </g>
+          <!-- Blush -->
+          <ellipse cx="46" cy="61" rx="4" ry="2.2" fill="#B0603F" opacity="0.18"/>
+          <ellipse cx="74" cy="61" rx="4" ry="2.2" fill="#B0603F" opacity="0.18"/>
+          <!-- Nose and nose ring -->
+          <path d="M57.8 59.5 Q60 61.3 62.2 59.5" stroke="#A2673E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <circle cx="64.4" cy="59.8" r="1.6" stroke="#D9A441" stroke-width="1.2" fill="none"/>
+          <!-- Smile -->
+          <path d="M53 66.5 Q60 73.5 67 66.5 Z" fill="#8A4038"/>
+          <path d="M54.3 67.3 Q60 70.4 65.7 67.3 Z" fill="#FFFFFF"/>
         </svg>
       </div>
 
@@ -1256,7 +1288,7 @@ body::after {
 // ============================================================
 // CONFIGURATION
 // ============================================================
-const CALENDLY_URL = "https://calendly.com/admin-rhyahnbrock/30min";
+const CALENDLY_URL = "https://calendly.com/admin-rhyahnbrock/free-consultation";
 
 // ============================================================
 // DATA: QUESTIONS
