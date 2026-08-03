@@ -1446,7 +1446,7 @@ const RESULTS = {
 <p>Your biggest opportunity isn't motivation.</p>
 <p>It's direction.</p>`,
     benefits: ["Smarter programming", "Better progression", "Objective feedback", "Performance-focused coaching"],
-    mascotType: "panther"
+    mascotType: "stallion"
   },
   SC: {
     id: "SC",
@@ -1935,38 +1935,39 @@ function getQuestionMascot(index) {
 // Result mascots - each unique creature
 function getResultMascot(type) {
   const mascots = {
-    panther: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Panther: sleek, dark, coiled and calm -->
-      <ellipse cx="44" cy="52" rx="26" ry="28" fill="#1A1A3E"/>
-      <!-- Ears -->
-      <path d="M24 30 L18 16 L30 24z" fill="#1A1A3E"/>
-      <path d="M64 30 L70 16 L58 24z" fill="#1A1A3E"/>
-      <path d="M24 29 L20 19 L29 25z" fill="#6B6BFF" opacity="0.5"/>
-      <path d="M64 29 L68 19 L59 25z" fill="#6B6BFF" opacity="0.5"/>
-      <!-- Face -->
-      <ellipse cx="44" cy="42" rx="20" ry="18" fill="#22224A"/>
-      <!-- Eyes: sharp and knowing -->
-      <ellipse cx="37" cy="40" rx="5" ry="4" fill="#FDFBF8"/>
-      <ellipse cx="37" cy="40" rx="2.5" ry="3.5" fill="#6B6BFF"/>
-      <circle cx="37.8" cy="38.8" r="1" fill="white" opacity="0.7"/>
-      <ellipse cx="51" cy="40" rx="5" ry="4" fill="#FDFBF8"/>
-      <ellipse cx="51" cy="40" rx="2.5" ry="3.5" fill="#6B6BFF"/>
-      <circle cx="51.8" cy="38.8" r="1" fill="white" opacity="0.7"/>
-      <!-- Nose -->
-      <path d="M42 46 Q44 49 46 46" stroke="#B8B8FF" stroke-width="1.5" stroke-linecap="round"/>
-      <circle cx="44" cy="44.5" r="2" fill="#1A1A3E"/>
-      <!-- Whisker lines -->
-      <path d="M24 43 L36 45M24 47 L36 46" stroke="#B8B8FF" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
-      <path d="M64 43 L52 45M64 47 L52 46" stroke="#B8B8FF" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
-      <!-- Chest marking -->
-      <ellipse cx="44" cy="62" rx="10" ry="12" fill="#2A2A56"/>
-      <path d="M40 57 L44 70 L48 57" fill="#6B6BFF" opacity="0.4"/>
-      <!-- Paws -->
-      <ellipse cx="32" cy="76" rx="8" ry="5" fill="#1A1A3E"/>
-      <ellipse cx="56" cy="76" rx="8" ry="5" fill="#1A1A3E"/>
-      <!-- Tail -->
-      <path d="M70 60 Q80 50 75 38 Q72 30 68 35" stroke="#1A1A3E" stroke-width="4" stroke-linecap="round" fill="none"/>
-    </svg>`,
+    stallion: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stallion: dark, powerful, easy to underestimate -->
+            <!-- Mane: windswept, lighter navy so it reads against the dark card -->
+      <path d="M30 28 C16 38 12 58 16 80 C22 70 24 62 28 56 C26 46 27 36 32 30 Z" fill="#2A2A56"/>
+      <path d="M58 28 C72 38 76 58 72 80 C66 70 64 62 60 56 C62 46 61 36 56 30 Z" fill="#2A2A56"/>
+      <path d="M28 34 C20 44 18 60 20 74" stroke="#6B6BFF" stroke-width="1.4" opacity="0.35" fill="none" stroke-linecap="round"/>
+      <path d="M60 34 C68 44 70 60 68 74" stroke="#6B6BFF" stroke-width="1.4" opacity="0.35" fill="none" stroke-linecap="round"/>
+      <!-- Neck and chest -->
+      <path d="M33 54 C30 66 26 74 24 88 L64 88 C62 74 58 66 55 54 Z" fill="#1A1A3E"/>
+      <!-- Ears, based low enough to sit on the skull -->
+      <path d="M31 32 L26 10 L41 24z" fill="#2A2A56"/>
+      <path d="M57 32 L62 10 L47 24z" fill="#2A2A56"/>
+      <path d="M31.5 29 L28.5 16 L37 24z" fill="#6B6BFF" opacity="0.38"/>
+      <path d="M56.5 29 L59.5 16 L51 24z" fill="#6B6BFF" opacity="0.38"/>
+      <!-- Head: narrower skull tapering to a long muzzle -->
+      <ellipse cx="44" cy="39" rx="14" ry="16" fill="#1A1A3E"/>
+      <ellipse cx="44" cy="60" rx="9.5" ry="12" fill="#22224A"/>
+      <!-- Blaze, tapering down the face -->
+      <path d="M44 26 C41.5 34 41.5 50 42.5 66 C44 68 45.5 66 45.5 60 C46.5 46 46 33 44 26 Z" fill="#6B6BFF" opacity="0.2"/>
+      <!-- Forelock falling between the ears -->
+      <path d="M36 27 C39 17 49 17 52 27 C49 22 45 21 44 27 C43 21 39 22 36 27 Z" fill="#2A2A56"/>
+      <!-- Eyes -->
+      <ellipse cx="33" cy="41" rx="4.6" ry="4" fill="#FDFBF8"/>
+      <ellipse cx="33" cy="41" rx="2.4" ry="3.2" fill="#6B6BFF"/>
+      <circle cx="33.8" cy="39.9" r="0.9" fill="#fff" opacity="0.75"/>
+      <ellipse cx="55" cy="41" rx="4.6" ry="4" fill="#FDFBF8"/>
+      <ellipse cx="55" cy="41" rx="2.4" ry="3.2" fill="#6B6BFF"/>
+      <circle cx="55.8" cy="39.9" r="0.9" fill="#fff" opacity="0.75"/>
+      <!-- Nostrils and mouth -->
+      <ellipse cx="39.8" cy="63" rx="2.1" ry="2.7" fill="#101028"/>
+      <ellipse cx="48.2" cy="63" rx="2.1" ry="2.7" fill="#101028"/>
+      <path d="M40 70 Q44 72 48 70" stroke="#B8B8FF" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.5"/>
+      </svg></svg>`,
 
     owl: `<svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
       <!-- Owl: wise, round, thoughtful -->
