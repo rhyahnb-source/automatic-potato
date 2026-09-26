@@ -1171,10 +1171,12 @@
      own email app. Change this if your address changes. */
   const RECIPIENT_EMAIL = "hello@rhyahnbrock.com";
 
-  /* Backup delivery channel. Every submission is ALSO sent as plain text
-     through Web3Forms at the same time as EmailJS, so if one service is
-     down the other still gets the form to you. Key from web3forms.com. */
-  const WEB3FORMS_KEY = "d16f93be-bc5d-41ae-abe7-6908abf373fe";
+  /* PRIMARY delivery channel - reliable, no login token to expire.
+     Every submission is sent as plain text through Web3Forms. This is the
+     dependable one; EmailJS below is a bonus that also carries the
+     signature image when its Gmail connection happens to be live.
+     Key from web3forms.com (account: admin@rhyahnbrock.com). */
+  const WEB3FORMS_KEY = "1cd32777-48c5-4717-b403-cfba6fffdac7";
 
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
