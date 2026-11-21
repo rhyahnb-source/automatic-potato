@@ -1,0 +1,3 @@
+# Serve the quiz at the site root so the QR code can point at the bare
+# domain. Only "/" is rewritten, so /intake.html still resolves normally.
+/    /quiz.html    200

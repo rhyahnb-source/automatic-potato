@@ -8,6 +8,9 @@
   <!-- Tabler outline icons (webfont) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/dist/tabler-icons.min.css">
 
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
   <style>
     /* =============================================================
        ROOT VARIABLES
@@ -328,7 +331,10 @@
       background: var(--card-bg); border: 1.5px solid #E2E8F0;
       border-radius: var(--radius-sm); padding: 13px 14px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
     }
+    /* Unanswered-required highlight */
+    .toggle-item.error { border-color: var(--danger); background: #FEF2F2; }
     .toggle-item label { font-size: 14px; line-height: 1.45; color: var(--text); flex: 1; }
     .yn-btns { display: flex; gap: 6px; flex-shrink: 0; }
     .yn-btn {
@@ -351,6 +357,15 @@
     .sub-reveal.visible {
       max-height: 400px; /* generous upper bound; content never reaches this */
       opacity: 1;
+    }
+    /* The clearance section contains nested sub-reveals so needs more room */
+    #sub-clearance-section.visible { max-height: 700px; }
+
+    /* Informational note box (used for the no-clearance advisory) */
+    .info-note {
+      background: #FFF7ED; border: 1px solid #FED7AA;
+      border-radius: var(--radius-sm); padding: 14px 16px;
+      font-size: 14px; line-height: 1.65; color: #9A3412;
     }
 
     /* =============================================================
@@ -516,9 +531,88 @@
     }
 
     /* =============================================================
+       SEND-FAILURE OVERLAY
+       ============================================================= */
+    #send-error-overlay {
+      position: fixed; inset: 0; z-index: 9998;
+      background: rgba(15, 23, 42, 0.55);
+      display: none; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #send-error-overlay.visible { display: flex; }
+    .se-card {
+      background: var(--card-bg); border-radius: var(--radius-lg);
+      padding: 30px 24px; max-width: 380px; width: 100%;
+      text-align: center; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 14px; align-items: center;
+    }
+    .se-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #FEE2E2; color: var(--danger);
+      display: flex; align-items: center; justify-content: center; font-size: 32px;
+    }
+    .se-card h3 { font-size: 20px; font-weight: 900; color: var(--text); }
+    .se-card p  { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    .se-card .btn { width: 100%; }
+    .se-alt {
+      background: var(--card-bg); color: var(--accent-dark);
+      border: 1.5px solid var(--accent);
+    }
+
+    /* =============================================================
        LOADER SPIN (while submitting)
        ============================================================= */
     @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+    /* =============================================================
+       SIGNATURE PAD
+       ============================================================= */
+    .sig-wrap {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sig-consent {
+      font-size: 14px; color: var(--text-muted); line-height: 1.6;
+    }
+    .sig-canvas-wrap {
+      position: relative;
+      background: #fff;
+      border: 2px solid #E2E8F0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      touch-action: none; /* prevent scroll-jank while drawing */
+    }
+    .sig-canvas-wrap.error { border-color: var(--danger); }
+    #sig-canvas {
+      display: block; width: 100%; height: 180px; cursor: crosshair;
+    }
+    .sig-placeholder {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: #CBD5E1; pointer-events: none;
+      gap: 6px;
+    }
+    .sig-placeholder.hidden { display: none; }
+    .sig-actions {
+      display: flex; justify-content: flex-end;
+    }
+    .btn-clear {
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+      background: var(--card-bg); border: 1.5px solid #E2E8F0;
+      border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color 0.18s, color 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-clear:hover { border-color: var(--danger); color: var(--danger); }
+    .sig-err { font-size: 12px; color: var(--danger); display: none; }
+    .sig-err.visible { display: block; }
+    .sig-date {
+      font-size: 14px; color: var(--text-muted);
+      background: #F8FAFC; border: 1px solid #E2E8F0;
+      border-radius: var(--radius-sm); padding: 12px 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sig-date i { color: var(--accent); }
     .spin { animation: spin 0.8s linear infinite; display: inline-block; }
   </style>
 </head>
@@ -828,13 +922,14 @@
   <div class="screen" id="screen-12">
     <div class="section-tag">Step 12 of 12</div>
     <div class="screen-title">A few health questions</div>
+    <div class="screen-subtitle">Please answer every question below so I can keep your training safe.</div>
     <div class="privacy-note">
       <i class="ti ti-lock"></i>
       <span>This stays private and just helps me build a safe program for you.</span>
     </div>
 
     <div class="toggle-group">
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="heart-history">
         <label>You or a blood relative under 55 had heart disease, stroke, high cholesterol, or sudden death</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'heart-history','yes')">Yes</button>
@@ -842,33 +937,34 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-heart-history">
-        <div class="field">
+        <div class="field" id="f-heart-history-detail">
           <label>Can you tell me a bit more about this?</label>
           <textarea id="heart-history-detail" placeholder="e.g. My father had a heart attack at 52..." rows="3"></textarea>
+          <span class="err-msg">Please tell me a bit more</span>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="high-bp">
         <label>High blood pressure</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'high-bp','yes')">Yes</button>
           <button class="yn-btn no"  onclick="setYN(this,'high-bp','no')">No</button>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="smoker">
         <label>Smoker</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'smoker','yes')">Yes</button>
           <button class="yn-btn no"  onclick="setYN(this,'smoker','no')">No</button>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="high-chol">
         <label>High cholesterol</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'high-chol','yes')">Yes</button>
           <button class="yn-btn no"  onclick="setYN(this,'high-chol','no')">No</button>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="diabetes">
         <label>Diabetes</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'diabetes','yes')">Yes</button>
@@ -876,16 +972,17 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-diabetes">
-        <div class="field">
+        <div class="field" id="f-diabetes-type">
           <label>Type</label>
           <select id="diabetes-type">
             <option value="">Select type...</option>
             <option value="Type 1">Type 1</option>
             <option value="Type 2">Type 2</option>
           </select>
+          <span class="err-msg">Please select a type</span>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="medication">
         <label>On prescribed medication</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'medication','yes')">Yes</button>
@@ -893,12 +990,13 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-medication">
-        <div class="field">
+        <div class="field" id="f-medication-detail">
           <label>Will it affect your exercise?</label>
           <input type="text" id="medication-detail" placeholder="Name and any relevant info...">
+          <span class="err-msg">Please add a few details</span>
         </div>
       </div>
-      <div class="toggle-item">
+      <div class="toggle-item" data-key="pregnant">
         <label>Pregnant or given birth in the last 6 weeks</label>
         <div class="yn-btns">
           <button class="yn-btn yes" onclick="setYN(this,'pregnant','yes')">Yes</button>
@@ -906,9 +1004,10 @@
         </div>
       </div>
       <div class="sub-reveal" id="sub-pregnant">
-        <div class="field">
+        <div class="field" id="f-pregnant-detail">
           <label>Is there anything specific I should be aware of?</label>
           <textarea id="pregnant-detail" placeholder="Any relevant details are helpful..." rows="3"></textarea>
+          <span class="err-msg">Please add a few details</span>
         </div>
       </div>
     </div>
@@ -925,6 +1024,31 @@
     <div class="cards-grid" id="conditions-grid"></div>
     <div class="other-box" id="conditions-other-box">
       <input type="text" id="conditions-other-text" placeholder="Tell me about it...">
+    </div>
+
+    <!-- Revealed automatically when any health condition toggle above is Yes -->
+    <div class="sub-reveal" id="sub-clearance-section">
+      <div class="divider" style="margin-bottom:8px;"></div>
+      <div class="toggle-item" data-key="clearance">
+        <label>Have you received clearance from your doctor to exercise?</label>
+        <div class="yn-btns">
+          <button class="yn-btn yes" onclick="setDoctorClearance(this,'yes')">Yes</button>
+          <button class="yn-btn no"  onclick="setDoctorClearance(this,'no')">No</button>
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-clearance-no">
+        <div class="info-note">
+          We recommend getting a clearance letter from your GP before beginning any training program.
+          Rhyahn will discuss this with you at your first session.
+        </div>
+      </div>
+      <div class="sub-reveal" id="sub-clearance-yes">
+        <div class="field" id="f-doctor-clearance-detail">
+          <label>Great. When did you receive clearance, and is there anything specific your doctor flagged?</label>
+          <textarea id="doctor-clearance-detail" placeholder="e.g. Cleared last month, told to avoid high-impact until further review..." rows="3"></textarea>
+          <span class="err-msg">Please add a few details</span>
+        </div>
+      </div>
     </div>
 
     <div class="divider"></div>
@@ -961,7 +1085,34 @@
   </div>
 
   <!-- ====================================================
-       SCREEN 14: Celebration
+       SCREEN 14: Signature
+       ==================================================== -->
+  <div class="screen" id="screen-14">
+    <div class="section-tag">Final step</div>
+    <div class="screen-title">Your signature</div>
+    <div class="sig-wrap">
+      <p class="sig-consent">By signing below you confirm that the information you have provided is accurate and complete to the best of your knowledge.</p>
+      <div class="sig-canvas-wrap" id="sig-canvas-wrap">
+        <canvas id="sig-canvas"></canvas>
+        <div class="sig-placeholder" id="sig-placeholder">
+          <i class="ti ti-pencil"></i> Sign here with your finger
+        </div>
+      </div>
+      <span class="sig-err" id="sig-err">Please sign before continuing</span>
+      <div class="sig-actions">
+        <button class="btn-clear" onclick="clearSignature()">
+          <i class="ti ti-refresh"></i> Clear
+        </button>
+      </div>
+      <div class="sig-date">
+        <i class="ti ti-calendar"></i>
+        <span id="sig-date-display"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 15: Celebration
        ==================================================== -->
   <div class="screen" id="screen-celebrate">
     <div class="celebrate-ring"><i class="ti ti-check"></i></div>
@@ -987,14 +1138,47 @@
   </button>
 </div>
 
+<!-- ====================================================
+     SEND-FAILURE OVERLAY
+     Shown only if the automatic email send fails, so the
+     client's answers are never silently lost.
+     ==================================================== -->
+<div id="send-error-overlay">
+  <div class="se-card">
+    <div class="se-icon"><i class="ti ti-mail-exclamation"></i></div>
+    <h3>That didn't send</h3>
+    <p>Your answers are safe on this screen. Let's make sure Rhyahn gets them - please don't close this page yet.</p>
+    <button class="btn btn-next" onclick="retrySend()">
+      <i class="ti ti-refresh"></i> <span>Try again</span>
+    </button>
+    <button class="btn se-alt" onclick="emailFallback()">
+      <i class="ti ti-mail"></i> <span>Email it to Rhyahn instead</span>
+    </button>
+  </div>
+</div>
+
 
 <script>
   /* ==============================================================
-     CONFIG
-     Paste your Web3Forms key below to enable email delivery.
-     Get a free key at https://web3forms.com
+     CONFIG - EmailJS credentials
      ============================================================== */
-  const ACCESS_KEY = "d16f93be-bc5d-41ae-abe7-6908abf373fe";
+  const EMAILJS_SERVICE_ID  = "service_kcwha3p";
+  const EMAILJS_TEMPLATE_ID = "template_mlwkhpa";
+  const EMAILJS_PUBLIC_KEY  = "7BTeH5ZXQ-n1RvTlp";
+
+  /* Your business email - used ONLY as a fallback if the automatic send
+     fails, so the client can send you their answers straight from their
+     own email app. Change this if your address changes. */
+  const RECIPIENT_EMAIL = "hello@rhyahnbrock.com";
+
+  /* PRIMARY delivery channel - reliable, no login token to expire.
+     Every submission is sent as plain text through Web3Forms. This is the
+     dependable one; EmailJS below is a bonus that also carries the
+     signature image when its Gmail connection happens to be live.
+     Key from web3forms.com (account: admin@rhyahnbrock.com). */
+  const WEB3FORMS_KEY = "1cd32777-48c5-4717-b403-cfba6fffdac7";
+
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
   /* ==============================================================
      CARD DATA
@@ -1047,7 +1231,7 @@
   let goingBack   = false;
   let coins       = 0;
   let level       = 1;
-  const TOTAL_DATA_STEPS = 13; // steps 1-13
+  const TOTAL_DATA_STEPS = 14; // steps 1-14
 
   const formData = {
     firstname:'', lastname:'', mobile:'', email:'', dob:'', occupation:'',
@@ -1062,10 +1246,12 @@
     diabetes:'', diabetesType:'',
     medication:'', medicationDetail:'',
     pregnant:'', pregnantDetail:'',
+    doctorClearance:'', doctorClearanceDetail:'',
     injuries:[], injuriesOther:'',
     conditions:[], conditionsOther:'',
     healthNotes:'',
     emergencyName:'', emergencyRelationship:'', emergencyMobile:'',
+    signatureDataUrl:'', signatureDate:'',
   };
 
   /* key -> formData property mapping for Yes/No toggles */
@@ -1177,7 +1363,7 @@
      ============================================================== */
   function buildAvailGrid() {
     const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    const SLOTS = ['AM','PM'];
+    const SLOTS = ['AM','Midday','PM'];
     const tbody = document.getElementById('avail-body');
     SLOTS.forEach(slot => {
       const tr = document.createElement('tr');
@@ -1206,12 +1392,36 @@
   /* ==============================================================
      YES/NO TOGGLES
      ============================================================== */
+  /* Keys whose Yes answer should reveal the doctor-clearance question */
+  const HEALTH_CONDITION_KEYS = ['heart-history','high-bp','smoker','high-chol','diabetes','medication','pregnant'];
+
   function setYN(btn, key, val) {
-    btn.closest('.toggle-item').querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+    const item = btn.closest('.toggle-item');
+    item.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    item.classList.remove('error'); /* answered - clear any required highlight */
     if (YN_MAP[key]) formData[YN_MAP[key]] = val;
     const sub = document.getElementById(`sub-${key}`);
     if (sub) sub.classList.toggle('visible', val === 'yes');
+    /* Reveal the doctor-clearance block if any health condition is now Yes */
+    if (HEALTH_CONDITION_KEYS.includes(key)) checkClearanceReveal();
+  }
+
+  /* Show/hide the entire clearance question based on whether any condition is Yes */
+  function checkClearanceReveal() {
+    const anyYes = HEALTH_CONDITION_KEYS.some(k => formData[YN_MAP[k]] === 'yes');
+    document.getElementById('sub-clearance-section').classList.toggle('visible', anyYes);
+  }
+
+  /* Handle the doctor-clearance Yes/No - each answer reveals something different */
+  function setDoctorClearance(btn, val) {
+    const item = btn.closest('.toggle-item');
+    item.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    item.classList.remove('error'); /* answered - clear any required highlight */
+    formData.doctorClearance = val;
+    document.getElementById('sub-clearance-yes').classList.toggle('visible', val === 'yes');
+    document.getElementById('sub-clearance-no').classList.toggle('visible',  val === 'no');
   }
 
   /* ==============================================================
@@ -1241,7 +1451,7 @@
     /* Build the main-goal grid from whatever goals were selected */
     if (currentStep === 2) buildMainGoalGrid();
 
-    if (currentStep === 13) {
+    if (currentStep === 14) {
       submitForm();
       return;
     }
@@ -1267,10 +1477,11 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
     updateHUD();
     updateNav();
+    if (step === 14) initSignaturePad();
   }
 
   function stepId(s) {
-    return s === 14 ? 'screen-celebrate' : `screen-${s}`;
+    return s === 15 ? 'screen-celebrate' : `screen-${s}`;
   }
 
   /* ==============================================================
@@ -1288,12 +1499,12 @@
     const back = document.getElementById('btn-back');
     const lbl  = document.getElementById('btn-next-label');
     /* Hide nav on welcome and celebrate */
-    nav.classList.toggle('hidden', currentStep === 0 || currentStep === 14);
+    nav.classList.toggle('hidden', currentStep === 0 || currentStep === 15);
     back.style.visibility = currentStep <= 1 ? 'hidden' : 'visible';
-    lbl.textContent = currentStep === 13 ? 'Submit' : 'Next';
+    lbl.textContent = currentStep === 14 ? 'Submit' : 'Next';
     /* Show arrow on Next, hide on Submit */
     document.querySelector('#btn-next .ti-arrow-right').style.display =
-      currentStep === 13 ? 'none' : '';
+      currentStep === 14 ? 'none' : '';
   }
 
   /* ==============================================================
@@ -1369,10 +1580,60 @@
       ok = false;
     }
 
+    /* Health check: every Yes/No question is mandatory. The conditional
+       detail fields are only required when their parent answer is Yes. */
+    if (step === 12) {
+      let firstError = null;
+
+      /* Mark a required conditional field, red-border + fail if empty */
+      const reqIf = (cond, fieldId, inputId) => {
+        if (!cond) return;
+        const fEl = document.getElementById(fieldId);
+        const iEl = document.getElementById(inputId);
+        if (!fEl || !iEl) return;
+        const pass = iEl.value.trim() !== '';
+        fEl.classList.toggle('error', !pass);
+        if (!pass) { ok = false; firstError = firstError || fEl; }
+      };
+
+      /* All seven condition toggles must be answered */
+      HEALTH_CONDITION_KEYS.forEach(key => {
+        const answered = formData[YN_MAP[key]] === 'yes' || formData[YN_MAP[key]] === 'no';
+        const item = document.querySelector(`.toggle-item[data-key="${key}"]`);
+        if (item) item.classList.toggle('error', !answered);
+        if (!answered) { ok = false; firstError = firstError || item; }
+      });
+
+      /* Detail fields required only when the relevant answer is Yes */
+      reqIf(formData.heartHistory === 'yes', 'f-heart-history-detail', 'heart-history-detail');
+      reqIf(formData.diabetes     === 'yes', 'f-diabetes-type',        'diabetes-type');
+      reqIf(formData.medication   === 'yes', 'f-medication-detail',    'medication-detail');
+      reqIf(formData.pregnant     === 'yes', 'f-pregnant-detail',      'pregnant-detail');
+
+      /* Doctor clearance only applies when the section is shown (any condition Yes) */
+      const clearanceShown = HEALTH_CONDITION_KEYS.some(k => formData[YN_MAP[k]] === 'yes');
+      if (clearanceShown) {
+        const answered = formData.doctorClearance === 'yes' || formData.doctorClearance === 'no';
+        const item = document.querySelector('.toggle-item[data-key="clearance"]');
+        if (item) item.classList.toggle('error', !answered);
+        if (!answered) { ok = false; firstError = firstError || item; }
+        reqIf(formData.doctorClearance === 'yes', 'f-doctor-clearance-detail', 'doctor-clearance-detail');
+      }
+
+      /* Bring the first unanswered question into view */
+      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     if (step === 13) {
       req('f-ec-name',         'ec-name');
       req('f-ec-relationship', 'ec-relationship');
       req('f-ec-mobile',       'ec-mobile');
+    }
+
+    if (step === 14 && !hasSigned) {
+      document.getElementById('sig-canvas-wrap').classList.add('error');
+      document.getElementById('sig-err').classList.add('visible');
+      ok = false;
     }
 
     return ok;
@@ -1409,18 +1670,34 @@
       formData.currentlyExType = v('currently-ex-type');
     }
     if (step === 12) {
-      formData.heartHistoryDetail = v('heart-history-detail');
-      formData.diabetesType       = v('diabetes-type');
-      formData.medicationDetail   = v('medication-detail');
-      formData.pregnantDetail     = v('pregnant-detail');
-      formData.injuriesOther      = v('injuries-other-text');
-      formData.conditionsOther    = v('conditions-other-text');
-      formData.healthNotes        = v('health-notes');
+      formData.heartHistoryDetail   = v('heart-history-detail');
+      formData.diabetesType         = v('diabetes-type');
+      formData.medicationDetail     = v('medication-detail');
+      formData.pregnantDetail       = v('pregnant-detail');
+      formData.doctorClearanceDetail= v('doctor-clearance-detail');
+      formData.injuriesOther        = v('injuries-other-text');
+      formData.conditionsOther      = v('conditions-other-text');
+      formData.healthNotes          = v('health-notes');
     }
     if (step === 13) {
       formData.emergencyName         = v('ec-name');
       formData.emergencyRelationship = v('ec-relationship');
       formData.emergencyMobile       = v('ec-mobile');
+    }
+    if (step === 14) {
+      const src = document.getElementById('sig-canvas');
+      /* Normalise to a fixed 400x140 JPEG regardless of screen DPR.
+         This keeps the base64 payload small (~10-20 KB) so it fits
+         inside Web3Forms' request limits without issue. */
+      const out = document.createElement('canvas');
+      out.width  = 400;
+      out.height = 140;
+      const octx = out.getContext('2d');
+      octx.fillStyle = '#ffffff';
+      octx.fillRect(0, 0, 400, 140);
+      octx.drawImage(src, 0, 0, 400, 140);
+      formData.signatureDataUrl = out.toDataURL('image/jpeg', 0.80);
+      formData.signatureDate    = document.getElementById('sig-date-display').textContent;
     }
   }
 
@@ -1456,6 +1733,103 @@
   }
 
   /* ==============================================================
+     SIGNATURE PAD
+     ============================================================== */
+  let hasSigned   = false;
+  let sigPadReady = false; /* init only once */
+
+  function initSignaturePad() {
+    if (sigPadReady) return;
+    sigPadReady = true;
+
+    const canvas      = document.getElementById('sig-canvas');
+    const wrap        = document.getElementById('sig-canvas-wrap');
+    const placeholder = document.getElementById('sig-placeholder');
+    const ctx         = canvas.getContext('2d');
+
+    /* Size canvas to its CSS display size, honouring device pixel ratio */
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const w   = wrap.clientWidth;
+      const h   = 180;
+      canvas.width  = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width  = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.scale(dpr, dpr);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#0F172A';
+      ctx.lineWidth   = 2.5;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+    }
+    resizeCanvas();
+
+    /* Set today's date display */
+    const today = new Date();
+    document.getElementById('sig-date-display').textContent =
+      today.toLocaleDateString('en-AU', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+    let drawing = false;
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const src  = e.touches ? e.touches[0] : e;
+      return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      drawing = true;
+      const { x, y } = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      /* First mark: hide placeholder, clear error */
+      if (!hasSigned) {
+        hasSigned = true;
+        placeholder.classList.add('hidden');
+        wrap.classList.remove('error');
+        document.getElementById('sig-err').classList.remove('visible');
+      }
+    }
+    function draw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const { x, y } = getPos(e);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+    function endDraw() { drawing = false; }
+
+    canvas.addEventListener('mousedown',  startDraw);
+    canvas.addEventListener('mousemove',  draw);
+    canvas.addEventListener('mouseup',    endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove',  draw,      { passive: false });
+    canvas.addEventListener('touchend',   endDraw);
+  }
+
+  function clearSignature() {
+    const canvas = document.getElementById('sig-canvas');
+    const ctx    = canvas.getContext('2d');
+    const dpr    = window.devicePixelRatio || 1;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth   = 2.5;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    hasSigned = false;
+    document.getElementById('sig-placeholder').classList.remove('hidden');
+    document.getElementById('sig-canvas-wrap').classList.remove('error');
+    document.getElementById('sig-err').classList.remove('visible');
+  }
+
+  /* ==============================================================
      SUBMIT
      ============================================================== */
   async function submitForm() {
@@ -1463,6 +1837,7 @@
     collectStep(11);
     collectStep(12);
     collectStep(13);
+    collectStep(14);
 
     const btn = document.getElementById('btn-next');
     btn.disabled = true;
@@ -1479,89 +1854,180 @@
     const availStr    = formData.availability.length ? formData.availability.join(', ') : 'None selected';
     const areasStr    = formData.bodyAreas.length    ? formData.bodyAreas.join(', ')    : 'None selected';
 
+    /* Helper: format a single labelled line, padding the label so values line up */
+    const line = (label, value) => `${(label + ':').padEnd(26)}${value || 'Not answered'}`;
+
+    /* Build a clean, readable PLAIN TEXT summary. No HTML tags. */
     const message = [
-      'NEW CLIENT INTAKE - Rhyahn Brock Health & Fitness',
-      '===================================================',
+      'NEW CLIENT INTAKE',
+      'Rhyahn Brock Health & Fitness',
+      '==================================================',
       '',
-      '--- ABOUT ---',
-      `Name:              ${formData.firstname} ${formData.lastname}`,
-      `Mobile:            ${formData.mobile}`,
-      `Email:             ${formData.email}`,
-      `Date of birth:     ${formData.dob}`,
-      `Occupation:        ${formData.occupation}`,
+      'ABOUT YOU',
+      '--------------------------------------------------',
+      line('Name',          `${formData.firstname} ${formData.lastname}`),
+      line('Mobile',        formData.mobile),
+      line('Email',         formData.email),
+      line('Date of birth', formData.dob),
+      line('Occupation',    formData.occupation),
       '',
-      '--- GOALS ---',
-      `Goals selected:    ${goalLabels}${formData.goalsOther ? ` (Other: ${formData.goalsOther})` : ''}`,
-      `Top priority goal: ${mainLabel}`,
+      'GOALS',
+      '--------------------------------------------------',
+      line('Goals selected',    goalLabels + (formData.goalsOther ? ` (Other: ${formData.goalsOther})` : '')),
+      line('Top priority goal', mainLabel),
       '',
-      '--- BODY MAP ---',
-      `Focus areas:       ${areasStr}`,
+      'BODY MAP',
+      '--------------------------------------------------',
+      line('Focus areas', areasStr),
       '',
-      '--- MOTIVATION ---',
-      `Importance (1-10): ${formData.importance}`,
-      `Why:               ${formData.why}`,
-      `Target timeframe:  ${formData.targetDate}`,
-      `Biggest obstacle:  ${formData.obstacle}`,
-      `Favourite movement:${formData.favouriteMove}`,
+      'MOTIVATION',
+      '--------------------------------------------------',
+      line('Importance (1-10)',  formData.importance),
+      line('Why',                formData.why),
+      line('Target timeframe',   formData.targetDate),
+      line('Biggest obstacle',   formData.obstacle),
+      line('Favourite movement', formData.favouriteMove),
       '',
-      '--- AVAILABILITY ---',
-      availStr,
+      'AVAILABILITY',
+      '--------------------------------------------------',
+      line('Slots', availStr),
       '',
-      '--- EXPERIENCE ---',
-      `Level:             ${expLabel}`,
-      `Currently exercising: ${formData.currentlyExercising || 'Not answered'}${formData.currentlyExType ? ` (${formData.currentlyExType})` : ''}`,
-      `Gym member before: ${formData.gymMember || 'Not answered'}`,
-      `Trained with PT:   ${formData.ptBefore  || 'Not answered'}`,
+      'EXPERIENCE',
+      '--------------------------------------------------',
+      line('Level',                expLabel),
+      line('Currently exercising', (formData.currentlyExercising || 'Not answered') + (formData.currentlyExType ? ` (${formData.currentlyExType})` : '')),
+      line('Gym member before',    formData.gymMember),
+      line('Trained with PT',      formData.ptBefore),
       '',
-      '--- HEALTH ---',
-      `Heart disease / family history: ${formData.heartHistory  || 'Not answered'}${formData.heartHistoryDetail ? ` - ${formData.heartHistoryDetail}` : ''}`,
-      `High blood pressure:            ${formData.highBP        || 'Not answered'}`,
-      `Smoker:                         ${formData.smoker        || 'Not answered'}`,
-      `High cholesterol:               ${formData.highChol      || 'Not answered'}`,
-      `Diabetes:                       ${formData.diabetes      || 'Not answered'}${formData.diabetesType ? ` (${formData.diabetesType})` : ''}`,
-      `On medication:                  ${formData.medication    || 'Not answered'}${formData.medicationDetail ? ` - ${formData.medicationDetail}` : ''}`,
-      `Pregnant / recently given birth:${formData.pregnant      || 'Not answered'}${formData.pregnantDetail ? ` - ${formData.pregnantDetail}` : ''}`,
-      `Injuries:   ${injLabels  || 'None'}${formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : ''}`,
-      `Conditions: ${condLabels || 'None'}${formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : ''}`,
-      `Anything else: ${formData.healthNotes || 'Nothing added'}`,
+      'HEALTH',
+      '--------------------------------------------------',
+      line('Heart disease/family', formData.heartHistory + (formData.heartHistoryDetail ? ` - ${formData.heartHistoryDetail}` : '')),
+      line('High blood pressure',  formData.highBP),
+      line('Smoker',               formData.smoker),
+      line('High cholesterol',     formData.highChol),
+      line('Diabetes',             formData.diabetes + (formData.diabetesType ? ` (${formData.diabetesType})` : '')),
+      line('On medication',        formData.medication + (formData.medicationDetail ? ` - ${formData.medicationDetail}` : '')),
+      line('Pregnant/recent birth',formData.pregnant + (formData.pregnantDetail ? ` - ${formData.pregnantDetail}` : '')),
+      line('Injuries',             (injLabels  || 'None') + (formData.injuriesOther   ? ` (Other: ${formData.injuriesOther})`   : '')),
+      line('Conditions',           (condLabels || 'None') + (formData.conditionsOther ? ` (Other: ${formData.conditionsOther})` : '')),
+      line('Doctor clearance',     (formData.doctorClearance || 'Not shown / not answered') + (formData.doctorClearanceDetail ? ` - ${formData.doctorClearanceDetail}` : '')),
+      line('Anything else',        formData.healthNotes || 'Nothing added'),
       '',
-      '--- EMERGENCY CONTACT ---',
-      `Name:         ${formData.emergencyName}`,
-      `Relationship: ${formData.emergencyRelationship}`,
-      `Mobile:       ${formData.emergencyMobile}`,
+      'EMERGENCY CONTACT',
+      '--------------------------------------------------',
+      line('Name',         formData.emergencyName),
+      line('Relationship', formData.emergencyRelationship),
+      line('Mobile',       formData.emergencyMobile),
+      '',
+      'SIGNATURE',
+      '--------------------------------------------------',
+      line('Date signed', formData.signatureDate),
     ].join('\n');
 
-    const payload = {
-      access_key: ACCESS_KEY,
-      subject:    `New Client Intake - ${formData.firstname} ${formData.lastname}`,
-      from_name:  `${formData.firstname} ${formData.lastname}`,
-      replyto:    formData.email,
-      message,
-    };
-
-    let failed = false;
+    /* EmailJS: pass the full plain-text summary plus the signature image
+       as a base64 data URL. Your template should include these variables:
+         {{from_name}}      - client full name
+         {{reply_to}}       - client email address
+         {{message}}        - full plain-text summary (wrap in <pre> in the template)
+         {{signature_date}} - date the form was signed
+         {{signature_img}}  - base64 JPEG data URL of the signature drawing
+       Recommended template body:
+         <pre>{{message}}</pre>
+         <p><strong>Signed on:</strong> {{signature_date}}</p>
+         <img src="{{signature_img}}" style="max-width:400px;border:1px solid #ddd"> */
+    /* Keep the full summary around so the retry / email-fallback buttons
+       can reuse it, and stash a local backup so a completed form is never
+       lost even if every send attempt fails. */
+    lastSummary = message;
     try {
-      const res  = await fetch('https://api.web3forms.com/submit', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!data.success) failed = true;
-    } catch {
-      failed = true;
+      localStorage.setItem('rbhf_last_submission', JSON.stringify({
+        when: new Date().toISOString(),
+        name: `${formData.firstname} ${formData.lastname}`,
+        summary: message,
+      }));
+    } catch (e) { /* private mode etc - ignore */ }
+
+    const fullName = `${formData.firstname} ${formData.lastname}`;
+    const subject  = `New Client Intake - ${fullName}`;
+
+    /* Channel 1: EmailJS (carries the signature image) */
+    async function sendEmailJS() {
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          from_name:      fullName,
+          reply_to:       formData.email,
+          message,
+          signature_date: formData.signatureDate,
+          signature_img:  formData.signatureDataUrl,
+        });
+        return true;
+      } catch (e) {
+        console.error('EmailJS send failed:', e);
+        return false;
+      }
     }
+
+    /* Channel 2: Web3Forms (plain-text backup, proven reliable) */
+    async function sendWeb3Forms() {
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            subject,
+            from_name:  fullName,
+            replyto:    formData.email,
+            message,
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) console.error('Web3Forms rejected:', data);
+        return !!data.success;
+      } catch (e) {
+        console.error('Web3Forms send failed:', e);
+        return false;
+      }
+    }
+
+    /* Fire both at once - the form succeeds if EITHER channel delivers */
+    const results = await Promise.allSettled([sendEmailJS(), sendWeb3Forms()]);
+    const anyOk   = results.some(r => r.status === 'fulfilled' && r.value === true);
 
     btn.disabled = false;
     btn.innerHTML = '<span>Submit</span>';
-    showCelebration(failed);
+
+    if (anyOk) {
+      showCelebration(false);
+    } else {
+      /* Both channels failed - the client must know it didn't send */
+      document.getElementById('send-error-overlay').classList.add('visible');
+    }
   }
+
+  /* Full plain-text summary of the latest submission, for retry / fallback */
+  let lastSummary = '';
+
+  /* Retry the automatic send */
+  function retrySend() {
+    document.getElementById('send-error-overlay').classList.remove('visible');
+    submitForm();
+  }
+
+  /* Fallback: open the client's own email app with everything pre-filled,
+     addressed to Rhyahn. Works even if EmailJS is down. */
+  function emailFallback() {
+    const subject = encodeURIComponent(`New Client Intake - ${formData.firstname} ${formData.lastname}`);
+    const body    = encodeURIComponent(lastSummary + '\n\n(Signature was captured on the form.)');
+    window.location.href = `mailto:${RECIPIENT_EMAIL}?subject=${subject}&body=${body}`;
+  }
+
 
   /* ==============================================================
      CELEBRATION
      ============================================================== */
   function showCelebration(failed = false) {
-    navigateTo(14, false);
+    navigateTo(15, false);
     if (failed) document.getElementById('email-error').classList.add('visible');
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) launchConfetti();
   }
