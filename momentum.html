@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6 Weeks to Build Momentum - Rhyahn Brock Health &amp; Fitness</title>
+  <meta name="description" content="New to the gym or getting back into the swing of it? A 6-week coaching program at Goodlife Burleigh Waters. Only 12 spots.">
+  <meta property="og:title" content="6 Weeks to Build Momentum">
+  <meta property="og:description" content="One-on-one coaching every week, a program for your solo sessions and someone in your corner the whole way. Only 12 spots.">
+  <meta name="color-scheme" content="light">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&family=Poppins:wght@400;500;600;700;800&display=swap">
+
+  <style>
+    /* =============================================================
+       THEME - scrapbook / notebook look from the "January You" posts
+       ============================================================= */
+    :root {
+      --ink:        #1E1E1E;
+      --ink-soft:   #3E444A;
+      --ink-muted:  #50565C;
+      --paper:      #FCFCFA;
+      --grid:       #E4E8EB;
+      --accent:     #6B4E9B;   /* jacaranda purple */
+      --accent-tint: rgba(107, 78, 155, 0.30);
+      --error:      #B3261E;
+      --script: 'Nothing You Could Do', 'Segoe Script', cursive;
+      --sans:   Poppins, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: var(--sans); color: var(--ink); background: #3E6E9F; -webkit-font-smoothing: antialiased; }
+    img { max-width: 100%; }
+    a { color: var(--ink); }
+    a:hover { color: var(--accent); }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+    .band-top    { background: #3F7FCB url(img/momentum/jacaranda.jpg) center top / cover no-repeat; padding: 64px 16px 72px; }
+    .band-bottom { background: #3E6E9F url(img/momentum/southbank.jpg) center center / cover no-repeat; padding: 72px 16px; }
+    .band-top, .band-bottom { overflow-x: hidden; overflow-x: clip; }
+    .col { max-width: 540px; margin: 0 auto; display: flex; flex-direction: column; }
+    .band-top .col { gap: 64px; }
+    .band-bottom .col { gap: 60px; }
+
+    /* Notebook paper */
+    .paper {
+      position: relative;
+      background-color: var(--paper);
+      background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 18px 18px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 18px 40px rgba(0,0,0,.30);
+    }
+
+    /* Spiral binding (rings are added by script) */
+    .spiral { position: absolute; left: -14px; top: 24px; bottom: 24px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+    .ring { display: flex; align-items: center; }
+    .ring::before {
+      content: ""; width: 30px; height: 7px; border-radius: 4px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #D2D4D6 28%, #8A8E92 58%, #3E4246 84%, #9EA2A6 100%);
+      box-shadow: 0 2px 3px rgba(0,0,0,.38);
+    }
+    .ring::after {
+      content: ""; width: 9px; height: 9px; border-radius: 50%; margin-left: -7px;
+      background: radial-gradient(circle at 45% 40%, #141414, #4B4F53);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    /* Washi tape */
+    .tape {
+      position: absolute; height: 24px; z-index: 2;
+      background: linear-gradient(180deg, rgba(240,228,196,.88), rgba(224,207,168,.82));
+      clip-path: polygon(2% 0, 98% 6%, 100% 30%, 97% 55%, 100% 82%, 98% 100%, 3% 95%, 0 72%, 3% 46%, 0 22%);
+    }
+
+    /* Polaroids */
+    .polaroid { position: relative; background: #FFFFFF; box-shadow: 0 2px 3px rgba(0,0,0,.18), 0 14px 28px rgba(0,0,0,.30); }
+    .polaroid img { display: block; object-fit: cover; }
+    .polaroid figcaption { text-align: center; font-family: var(--script); line-height: 1.2; }
+    figure { margin: 0; }
+
+    .script { font-family: var(--script); font-weight: 400; }
+    .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); line-height: 1.6; }
+    h1, h2 { margin: 0; text-wrap: balance; }
+
+    /* ---------- HERO ---------- */
+    .hero { position: relative; }
+    .hero-pol { position: absolute; right: -8px; top: -40px; width: 150px; padding: 9px 9px 0; transform: rotate(5deg); z-index: 3; }
+    .hero-pol img { width: 132px; height: 140px; object-position: center 20%; }
+    .hero-pol figcaption { padding: 7px 4px 9px; font-size: 16px; }
+    .hero-pol .tape { top: -12px; left: 36px; width: 80px; transform: rotate(-6deg); }
+    .hero .paper { padding: 42px 26px 34px 48px; transform: rotate(-1.2deg); }
+    .hero .eyebrow { margin-bottom: 14px; max-width: 270px; }
+    .hero h1 { font-family: var(--script); font-weight: 400; font-size: 48px; line-height: 1.12; max-width: 340px; margin-bottom: 16px; }
+    .hero-lead { margin: 0 0 22px; font-size: 16px; line-height: 1.65; max-width: 410px; }
+    .facts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 26px; font-size: 14px; font-weight: 600; }
+    .facts span { display: flex; align-items: center; gap: 6px; }
+
+    .spots { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .spots-headline { font-family: var(--script); font-size: 25px; line-height: 1.2; }
+    .spots-boxes { display: flex; flex-wrap: wrap; gap: 7px; }
+    .spot { width: 22px; height: 22px; border: 1.5px solid var(--ink); border-radius: 2px; background: var(--paper); display: flex; align-items: center; justify-content: center; }
+    .spot.taken { background: var(--ink); }
+    .spots-note { font-size: 13px; color: var(--ink-muted); }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 26px;
+      border: 1.5px solid var(--ink); border-radius: 999px; text-decoration: none;
+      font-size: 15px; font-weight: 600; background: var(--paper); color: var(--ink);
+      transition: transform .15s ease;
+    }
+    .btn-outline:hover { color: var(--ink); transform: translateX(2px); }
+    .btn-outline:focus-visible, .btn-solid:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+    @media (max-width: 480px) {
+      .hero-pol { width: 112px; padding: 7px 7px 0; top: -34px; right: -6px; }
+      .hero-pol img { width: 98px; height: 104px; }
+      .hero-pol figcaption { font-size: 13px; padding: 5px 2px 7px; }
+      .hero .eyebrow { max-width: calc(100% - 118px); margin-bottom: 22px; }
+      .hero h1 { font-size: 42px; }
+      .spots-boxes { gap: 5px; }
+      .spot { width: 18px; height: 18px; }
+      .spot svg { width: 11px; height: 11px; }
+    }
+
+    /* ---------- INCLUDED ---------- */
+    .included { padding: 44px 28px 30px; transform: rotate(1deg); }
+    .included .clip { position: absolute; top: -34px; left: 26px; filter: drop-shadow(0 4px 3px rgba(0,0,0,.35)); }
+    .section-title { font-family: var(--script); font-weight: 400; font-size: 36px; line-height: 1.2; margin-bottom: 6px; }
+    .section-lead { margin: 0 0 14px; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
+    .checklist { list-style: none; margin: 0; padding: 0; }
+    .checklist li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px dashed #C3C9CE; }
+    .tick { flex: 0 0 auto; margin-top: 2px; width: 18px; height: 18px; border: 1.5px solid var(--ink); border-radius: 2px; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+    .checklist strong { display: block; font-size: 15px; font-weight: 600; }
+    .checklist span.body { display: block; font-size: 14px; line-height: 1.5; color: #454B51; margin-top: 2px; }
+
+    .price { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
+    .price-figure { position: relative; padding: 0 4px; }
+    .price-figure::before {
+      content: ""; position: absolute; left: -4px; right: -10px; top: 46%; height: 26px;
+      background: var(--accent-tint); transform: rotate(-2.5deg); border-radius: 4px 10px 6px 12px;
+    }
+    .price-figure span { position: relative; font-size: 58px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+    .price-sub { display: flex; flex-direction: column; gap: 2px; }
+    .price-sub strong { font-size: 16px; font-weight: 600; }
+    .price-sub span { font-size: 14px; color: var(--ink-soft); }
+    @media (max-width: 480px) {
+      .price { flex-direction: column; justify-content: center; text-align: center; }
+      .price-sub { align-items: center; }
+    }
+
+    /* ---------- HOW IT WORKS ---------- */
+    .how { display: flex; flex-direction: column; gap: 24px; }
+    .bike-pol { align-self: center; width: 230px; padding: 11px 11px 0; transform: rotate(-3deg); }
+    .bike-pol img { width: 208px; height: 250px; object-position: center 15%; }
+    .bike-pol figcaption { padding: 10px 6px 14px; font-size: 20px; line-height: 1.25; }
+    .bike-pol .tape { top: -13px; left: 72px; width: 86px; transform: rotate(4deg); }
+    .how .paper { padding: 34px 28px; transform: rotate(-.6deg); }
+    .steps { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+    .steps li { display: flex; gap: 14px; align-items: flex-start; }
+    .step-n { flex: 0 0 auto; width: 34px; height: 34px; border: 1.5px solid var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--script); font-size: 20px; line-height: 1; }
+    .steps strong { display: block; font-size: 15px; font-weight: 600; padding-top: 4px; }
+    .steps span.body { display: block; font-size: 14px; line-height: 1.55; color: #454B51; margin-top: 3px; }
+
+    /* ---------- FORM ---------- */
+    .form-paper { padding: 46px 26px 36px 48px; transform: rotate(.5deg); box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 22px 48px rgba(0,0,0,.34); }
+    #apply-form { display: flex; flex-direction: column; gap: 34px; }
+    .form-head { display: flex; flex-direction: column; gap: 10px; }
+    .form-head h2 { font-family: var(--script); font-weight: 400; font-size: 40px; line-height: 1.15; }
+    .form-head p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
+
+    fieldset { border: none; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; }
+    .basics { gap: 18px; }
+    .basics legend { padding: 0; margin-bottom: 14px; font-family: var(--script); font-size: 26px; }
+    .row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .field label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #454B51; }
+    .line {
+      width: 100%; border: none; border-bottom: 1.5px solid var(--ink); background: transparent; border-radius: 0;
+      padding: 8px 2px 7px; font: 400 16px var(--sans); color: var(--ink);
+    }
+    .line::placeholder { color: #7D8389; }
+    .line:focus { outline: none; border-bottom-width: 2px; border-bottom-color: var(--accent); }
+    .field.invalid .line { border-bottom-color: var(--error); }
+
+    .q legend { padding: 0; margin-bottom: 4px; font-size: 16px; font-weight: 600; line-height: 1.4; }
+    .q-hint { font-size: 13px; color: var(--ink-muted); margin-bottom: 4px; }
+    .todo { position: relative; display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 9px 0; font-size: 15px; line-height: 1.4; }
+    .todo input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .todo .box { flex: 0 0 auto; width: 18px; height: 18px; border: 1.5px solid var(--ink); border-radius: 2px; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+    .todo .box svg { opacity: 0; transition: opacity .12s; }
+    .todo input:checked + .box svg { opacity: 1; }
+    .todo input:checked ~ .txt { font-weight: 600; }
+    .todo input:focus-visible + .box { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .q.invalid .box { border-color: var(--error); }
+
+    .err { display: none; font-size: 12px; font-weight: 600; color: var(--error); margin-top: 2px; }
+    .invalid > .err, .invalid .err { display: block; }
+
+    .note { display: flex; flex-direction: column; gap: 10px; }
+    .note label.script { font-size: 26px; line-height: 1.2; }
+    .note .q-hint { margin-top: -4px; }
+    .note textarea {
+      width: 100%; border: none; resize: vertical; padding: 4px 2px;
+      font: 400 16px/32px var(--sans); color: var(--ink);
+      background-color: transparent;
+      background-image: linear-gradient(transparent 31px, var(--ink) 31px, var(--ink) 32px);
+      background-size: 100% 32px; background-attachment: local;
+    }
+    .note textarea:focus { outline: 2px solid var(--accent-tint); outline-offset: 4px; }
+    .counter { font-size: 12px; color: var(--ink-muted); text-align: right; }
+
+    .consent { font-size: 13px; color: var(--ink-soft); align-items: flex-start; }
+    .consent .box { margin-top: 1px; }
+
+    .submit-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .form-alert { display: none; font-size: 14px; font-weight: 600; color: var(--error); text-align: center; line-height: 1.5; }
+    .form-alert.visible { display: block; }
+    .btn-solid {
+      display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 54px; width: 100%;
+      border: 1.5px solid var(--ink); border-radius: 999px; background: var(--ink); color: var(--paper);
+      font: 600 16px var(--sans); cursor: pointer;
+    }
+    .btn-solid:disabled { opacity: .7; cursor: progress; }
+
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+    /* Footer */
+    .footer { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; background: rgba(252,252,250,.92); padding: 18px 20px; border-radius: 3px; box-shadow: 0 8px 20px rgba(0,0,0,.2); }
+    .footer strong { font-size: 14px; font-weight: 600; }
+    .footer span { font-size: 13px; color: var(--ink-soft); }
+    .footer a { color: inherit; }
+
+    /* ---------- THANK YOU ---------- */
+    #thanks { display: none; min-height: 100vh; }
+    body.done #page { display: none; }
+    body.done #thanks { display: block; }
+    #thanks .col { align-items: center; gap: 32px; max-width: 420px; }
+    .coffee-pol { width: 230px; padding: 10px 10px 0; transform: rotate(-4deg); }
+    .coffee-pol img { width: 210px; height: 188px; object-position: 60% 30%; }
+    .coffee-pol figcaption { padding: 8px 4px 12px; font-size: 19px; }
+    .coffee-pol .tape { top: -13px; left: 74px; width: 82px; transform: rotate(5deg); }
+    .thanks-paper { width: 100%; padding: 34px 22px 30px 42px; transform: rotate(1deg); display: flex; flex-direction: column; gap: 16px; }
+    .thanks-paper .spiral { top: 20px; bottom: 20px; }
+    .thanks-paper h1 { font-family: var(--script); font-weight: 400; font-size: 36px; line-height: 1.15; }
+    .thanks-list { list-style: none; margin: 0; padding: 0; }
+    .thanks-list li { display: flex; gap: 12px; align-items: center; padding: 8px 0; font-size: 15px; }
+    .thanks-list li.done-item { text-decoration: line-through; color: var(--ink-muted); }
+    .thanks-paper p { margin: 0; font-size: 15px; line-height: 1.65; }
+    .thanks-paper .small { font-size: 13px; color: var(--ink-muted); }
+  </style>
+</head>
+<body>
+
+<!-- Reusable tick icon -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="tick" viewBox="0 0 24 24"><path d="M4 13l5 5L20 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="arrow" viewBox="0 0 34 12"><path d="M1 6h31M27 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div id="page">
+
+  <!-- ================= BAND 1 ================= -->
+  <div class="band-top">
+    <div class="col">
+
+      <section class="hero" aria-labelledby="hero-title">
+        <figure class="polaroid hero-pol">
+          <div class="tape"></div>
+          <img src="img/momentum/rhyahn.jpg" alt="Rhyahn smiling in the gym" width="132" height="140">
+          <figcaption>Your coach Rhyahn</figcaption>
+        </figure>
+
+        <div class="paper">
+          <div class="spiral" data-rings="16"></div>
+          <div class="eyebrow">New to the gym? Getting back into the swing of it?</div>
+          <h1 id="hero-title">6 weeks to build momentum.</h1>
+          <p class="hero-lead">Either way, let's make 2027 yours. One-on-one coaching every week, a program for your solo sessions and someone in your corner the whole way.</p>
+
+          <div class="facts">
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span id="opens-label">Applications open Mon 4 Jan</span></span>
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>6 weeks</span>
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Goodlife Burleigh Waters</span>
+          </div>
+
+          <div class="spots">
+            <div class="spots-headline" id="spots-headline">Only 12 spots. That's it.</div>
+            <div class="spots-boxes" id="spots-boxes" role="img" aria-label="12 of 12 spots left"></div>
+            <div class="spots-note">Applications close 31 Jan · first in, first served</div>
+          </div>
+
+          <a href="#apply" class="btn-outline">Apply for a spot <svg width="34" height="12" aria-hidden="true"><use href="#arrow"/></svg></a>
+        </div>
+      </section>
+
+      <section class="paper included" aria-labelledby="inc-title">
+        <svg class="clip" width="78" height="64" viewBox="0 0 78 64" aria-hidden="true">
+          <defs>
+            <linearGradient id="bcWire" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#6E7276"/><stop offset=".3" stop-color="#F4F5F6"/><stop offset=".55" stop-color="#9DA1A5"/><stop offset=".8" stop-color="#E6E8EA"/><stop offset="1" stop-color="#6E7276"/>
+            </linearGradient>
+            <linearGradient id="bcBody" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5A5E62"/><stop offset=".18" stop-color="#2A2C2E"/><stop offset=".5" stop-color="#0C0D0E"/><stop offset=".85" stop-color="#1E2022"/><stop offset="1" stop-color="#3A3D40"/>
+            </linearGradient>
+            <linearGradient id="bcShine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/><stop offset=".35" stop-color="#FFFFFF" stop-opacity=".28"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M22 34 L15 6 Q14 2 18 2 L60 2 Q64 2 63 6 L56 34" fill="none" stroke="#45494D" stroke-width="4.2" stroke-linecap="round"/>
+          <path d="M22 34 L15 6 Q14 2 18 2 L60 2 Q64 2 63 6 L56 34" fill="none" stroke="url(#bcWire)" stroke-width="2.8" stroke-linecap="round"/>
+          <path d="M7 34 Q7 30 11 30 L67 30 Q71 30 71 34 L67 62 L11 62 Z" fill="url(#bcBody)"/>
+          <path d="M7 34 Q7 30 11 30 L67 30 Q71 30 71 34 L67 62 L11 62 Z" fill="url(#bcShine)"/>
+          <path d="M10 33.5 H68" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="1"/>
+          <circle cx="10" cy="34" r="3.2" fill="#2A2C2E" stroke="#6E7276" stroke-width="1"/>
+          <circle cx="68" cy="34" r="3.2" fill="#2A2C2E" stroke="#6E7276" stroke-width="1"/>
+        </svg>
+
+        <h2 class="section-title" id="inc-title">What's included</h2>
+        <p class="section-lead">Everything you need to get going, already sorted.</p>
+        <ul class="checklist">
+          <li><span class="tick"><svg width="15" height="15" style="color:var(--accent)" aria-hidden="true"><use href="#tick"/></svg></span><div><strong>6 × 45-minute personal training sessions</strong><span class="body">One face-to-face session with me every week.</span></div></li>
+          <li><span class="tick"><svg width="15" height="15" style="color:var(--accent)" aria-hidden="true"><use href="#tick"/></svg></span><div><strong>Your own program for 1–2 solo sessions a week</strong><span class="body">Delivered through my app, so you always know exactly what to do.</span></div></li>
+          <li><span class="tick"><svg width="15" height="15" style="color:var(--accent)" aria-hidden="true"><use href="#tick"/></svg></span><div><strong>Body scan at the start and the end</strong><span class="body">So you can see your progress, not just feel it.</span></div></li>
+          <li><span class="tick"><svg width="15" height="15" style="color:var(--accent)" aria-hidden="true"><use href="#tick"/></svg></span><div><strong>Weekly check-ins with me</strong><span class="body">We look at how the week went and adjust as we go.</span></div></li>
+          <li><span class="tick"><svg width="15" height="15" style="color:var(--accent)" aria-hidden="true"><use href="#tick"/></svg></span><div><strong>End-of-program catch-up</strong><span class="body">A quick 15-minute chat to see how you went and plan what comes next.</span></div></li>
+          <li><span class="tick"><svg width="15" height="15" style="color:var(--accent)" aria-hidden="true"><use href="#tick"/></svg></span><div><strong>👭 Bring a friend option</strong><span class="body">Train together and keep each other accountable.</span></div></li>
+        </ul>
+
+        <div class="price">
+          <div class="price-figure"><span>$499</span></div>
+          <div class="price-sub"><strong>for the full six weeks</strong><span>or 2 payments of $249.50</span></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ================= BAND 2 ================= -->
+  <div class="band-bottom">
+    <div class="col">
+
+      <section class="how" aria-labelledby="how-title">
+        <figure class="polaroid bike-pol">
+          <div class="tape"></div>
+          <img src="img/momentum/bike.jpg" alt="Rhyahn as a toddler climbing an exercise bike" width="208" height="250" loading="lazy">
+          <figcaption>building momentum<br>since day one</figcaption>
+        </figure>
+        <div class="paper">
+          <h2 class="section-title" id="how-title">How it works</h2>
+          <ol class="steps">
+            <li><span class="step-n" aria-hidden="true">1</span><div><strong>Apply below</strong><span class="body">About three minutes. Tell me a bit about you and what you want from the six weeks.</span></div></li>
+            <li><span class="step-n" aria-hidden="true">2</span><div><strong>Grab a coffee with me</strong><span class="body">A free 30-minute consult. We chat about your goals, what has been getting in the way and whether this is the right fit.</span></div></li>
+            <li><span class="step-n" aria-hidden="true">3</span><div><strong>Lock in your spot</strong><span class="body">Pay in full or in two parts, and we get started.</span></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="paper form-paper" id="apply" aria-labelledby="apply-title">
+        <div class="spiral" data-rings="52"></div>
+
+        <form id="apply-form" novalidate>
+          <div class="hp" aria-hidden="true">
+            <label>Leave this empty <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off"></label>
+          </div>
+
+          <div class="form-head">
+            <div class="eyebrow">Apply · about 3 minutes</div>
+            <h2 id="apply-title">Save your spot</h2>
+            <p>Fill this in and I'll be in touch to book a free 30-minute consult over coffee. No workout, no pressure, nothing to pay today.</p>
+          </div>
+
+          <fieldset class="basics">
+            <legend>First, the basics</legend>
+            <div class="row2">
+              <div class="field" data-field="firstname">
+                <label for="firstname">First name</label>
+                <input id="firstname" name="firstname" class="line" placeholder="Sarah" autocomplete="given-name" required>
+                <div class="err">Add your first name</div>
+              </div>
+              <div class="field" data-field="lastname">
+                <label for="lastname">Last name</label>
+                <input id="lastname" name="lastname" class="line" placeholder="Taylor" autocomplete="family-name" required>
+                <div class="err">Add your last name</div>
+              </div>
+            </div>
+            <div class="field" data-field="email">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" class="line" placeholder="sarah@email.com" autocomplete="email" inputmode="email" required>
+              <div class="err">Add an email I can reply to</div>
+            </div>
+            <div class="row2">
+              <div class="field" data-field="mobile">
+                <label for="mobile">Mobile</label>
+                <input id="mobile" name="mobile" type="tel" class="line" placeholder="04xx xxx xxx" autocomplete="tel" inputmode="tel" required>
+                <div class="err">Add a mobile number</div>
+              </div>
+              <div class="field">
+                <label for="instagram">Instagram (optional)</label>
+                <input id="instagram" name="instagram" class="line" placeholder="@handle" autocapitalize="off" autocomplete="off">
+              </div>
+            </div>
+          </fieldset>
+
+          <div id="questions" style="display:contents"></div>
+
+          <div class="note">
+            <label for="note" class="script">Leave me a little note</label>
+            <div class="q-hint" id="note-hint">What's made you want to start now? Any injuries, worries or wins? (optional)</div>
+            <textarea id="note" name="note" rows="5" maxlength="1000" placeholder="Write anything here..." aria-describedby="note-hint"></textarea>
+          </div>
+
+          <div class="field consent-wrap" data-field="consent">
+            <label class="todo consent" style="text-transform:none;letter-spacing:0;font-weight:400;font-size:13px">
+              <input type="checkbox" id="consent" name="consent" value="yes">
+              <span class="box" aria-hidden="true"><svg width="15" height="15" style="color:var(--accent)"><use href="#tick"/></svg></span>
+              <span>I'm happy for Rhyahn to contact me by text, call or email about the program.</span>
+            </label>
+            <div class="err">Tick this so I can get in touch</div>
+          </div>
+
+          <div class="submit-wrap">
+            <div class="form-alert" id="form-alert" role="alert"></div>
+            <button type="submit" class="btn-solid" id="submit-btn">
+              <span>Send it to Rhyahn</span><svg width="34" height="12" aria-hidden="true"><use href="#arrow"/></svg>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <footer class="footer">
+        <strong>Rather just chat? Call or text 0402 655 877</strong>
+        <span>Rhyahn Brock – Health &amp; Fitness</span>
+        <span><a href="https://instagram.com/rhyahn_brock" target="_blank" rel="noopener">@rhyahn_brock</a> · Goodlife Burleigh Waters</span>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= THANK YOU ================= -->
+<div id="thanks" class="band-top" aria-live="polite">
+  <div class="col">
+    <figure class="polaroid coffee-pol">
+      <div class="tape"></div>
+      <img src="img/momentum/coffee.jpg" alt="Rhyahn at a cafe with an iced chocolate" width="210" height="188" loading="lazy">
+      <figcaption>see you for coffee</figcaption>
+    </figure>
+
+    <div class="paper thanks-paper">
+      <div class="spiral" data-rings="12"></div>
+      <h1 tabindex="-1" id="thanks-title">Done. Momentum started.</h1>
+      <ul class="thanks-list">
+        <li class="done-item"><span class="tick"><svg width="15" height="15" style="color:var(--accent)" aria-hidden="true"><use href="#tick"/></svg></span>Apply for 6 Weeks to Build Momentum</li>
+        <li><span class="tick"></span>Coffee with Rhyahn</li>
+        <li><span class="tick"></span>Start building momentum</li>
+      </ul>
+      <p><span id="thanks-name">Thanks!</span> I'll be in touch within 48 hours (usually much sooner) to book your free 30-minute consult. Coffee's on me ☕️</p>
+      <p class="small">Keep an eye on your phone and inbox.</p>
+    </div>
+
+    <a href="https://instagram.com/rhyahn_brock" target="_blank" rel="noopener" class="btn-outline" style="font-size:14px;padding:0 24px">Follow @rhyahn_brock <svg width="30" height="12" aria-hidden="true"><use href="#arrow"/></svg></a>
+  </div>
+</div>
+
+<script>
+  /* ==============================================================
+     SETTINGS - the only bits you should need to change
+     ============================================================== */
+
+  // How many spots, and how many are already taken.
+  // Bump SPOTS_TAKEN as people sign up - each one blacks out a box.
+  const SPOTS_TOTAL = 12;
+  const SPOTS_TAKEN = 0;
+
+  // Web3Forms key - same one as intake.html (account: admin@rhyahnbrock.com).
+  // Applications are emailed to whichever inbox this key is set up for.
+  const WEB3FORMS_KEY = "1cd32777-48c5-4717-b403-cfba6fffdac7";
+
+  const QUESTIONS = [
+    { name: 'level',    label: 'Which sounds most like you?', type: 'radio',
+      options: ['New to the gym', 'Getting back into the swing of it', 'Already training, but want more structure'] },
+    { name: 'goals',    label: 'What would you love the six weeks to give you?', hint: 'Pick up to three.', type: 'checkbox', max: 3,
+      options: ['Feel confident in the gym', 'Get stronger', 'Actually be consistent', 'Learn how to train properly', 'Have more energy', 'Lose some body fat'] },
+    { name: 'commit',   label: 'Can you commit to one session with me each week, plus 1–2 on your own?', type: 'radio',
+      options: ['Yes, I can make that work', 'Probably, depends on the week', 'Not sure yet'] },
+    { name: 'invest',   label: 'The program is $499, or 2 payments of $249.50. Does that work for you?', type: 'radio',
+      options: ['Yes, I would pay in full', 'Yes, I would use the payment plan', 'I would like to chat about it first'] },
+    { name: 'friend',   label: 'Thinking of bringing a friend?', type: 'radio',
+      options: ['Yes, they are keen too', 'Maybe, I will ask them', 'No, just me'] },
+    { name: 'calltime', label: 'Best time to grab that coffee?', hint: 'Tick any that work.', type: 'checkbox',
+      options: ['Early mornings', 'Late mornings', 'Afternoons'] },
+  ];
+
+  /* ==============================================================
+     BUILD THE PAGE
+     ============================================================== */
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // Spiral rings
+  document.querySelectorAll('.spiral').forEach((el) => {
+    const n = +el.dataset.rings || 12;
+    el.innerHTML = '<span class="ring"></span>'.repeat(n);
+  });
+
+  // Spots
+  (function renderSpots() {
+    const taken = Math.max(0, Math.min(SPOTS_TAKEN, SPOTS_TOTAL));
+    const left = SPOTS_TOTAL - taken;
+    const boxes = document.getElementById('spots-boxes');
+    let html = '';
+    for (let i = 0; i < SPOTS_TOTAL; i++) {
+      html += i < taken
+        ? '<span class="spot taken"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FCFCFA" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></span>'
+        : '<span class="spot"></span>';
+    }
+    boxes.innerHTML = html;
+    boxes.setAttribute('aria-label', `${left} of ${SPOTS_TOTAL} spots left`);
+    document.getElementById('spots-headline').textContent =
+      left === 0 ? 'All spots taken. Apply to join the waitlist.'
+      : taken > 0 ? `Only ${left} of ${SPOTS_TOTAL} spots left.`
+      : `Only ${SPOTS_TOTAL} spots. That's it.`;
+  })();
+
+  // Questions
+  document.getElementById('questions').innerHTML = QUESTIONS.map((q) => `
+    <fieldset class="q" data-q="${q.name}">
+      <legend>${esc(q.label)}</legend>
+      ${q.hint ? `<div class="q-hint">${esc(q.hint)}</div>` : ''}
+      ${q.options.map((o) => `
+        <label class="todo">
+          <input type="${q.type}" name="${q.name}" value="${esc(o)}">
+          <span class="box" aria-hidden="true"><svg width="15" height="15" style="color:var(--accent)"><use href="#tick"/></svg></span>
+          <span class="txt">${esc(o)}</span>
+        </label>`).join('')}
+      <div class="err"></div>
+    </fieldset>`).join('');
+
+  /* ==============================================================
+     VALIDATION
+     ============================================================== */
+  const form = document.getElementById('apply-form');
+  const alertBox = document.getElementById('form-alert');
+  const val = (n) => (form.elements[n] && form.elements[n].value || '').trim();
+  const picks = (n) => [...form.querySelectorAll(`input[name="${n}"]:checked`)].map((i) => i.value);
+
+  // Cap "pick up to three"
+  QUESTIONS.filter((q) => q.max).forEach((q) => {
+    form.querySelectorAll(`input[name="${q.name}"]`).forEach((cb) => {
+      cb.addEventListener('change', () => {
+        if (picks(q.name).length > q.max) cb.checked = false;
+      });
+    });
+  });
+
+  // Clear an error as soon as it's fixed
+  form.addEventListener('input', (e) => {
+    const holder = e.target.closest('.field, .q');
+    if (holder) holder.classList.remove('invalid');
+    if (!form.querySelector('.invalid')) alertBox.classList.remove('visible');
+  });
+  form.addEventListener('change', (e) => {
+    const holder = e.target.closest('.field, .q');
+    if (holder) holder.classList.remove('invalid');
+    if (!form.querySelector('.invalid')) alertBox.classList.remove('visible');
+  });
+
+  function validate() {
+    const bad = [];
+    const mark = (el, ok) => { el.classList.toggle('invalid', !ok); if (!ok) bad.push(el); };
+
+    mark(form.querySelector('[data-field="firstname"]'), !!val('firstname'));
+    mark(form.querySelector('[data-field="lastname"]'), !!val('lastname'));
+    mark(form.querySelector('[data-field="email"]'), /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('email')));
+    mark(form.querySelector('[data-field="mobile"]'), val('mobile').replace(/\D/g, '').length >= 8);
+
+    QUESTIONS.forEach((q) => {
+      const box = form.querySelector(`[data-q="${q.name}"]`);
+      const n = picks(q.name).length;
+      box.querySelector('.err').textContent = q.type === 'checkbox' ? 'Tick at least one' : 'Pick one';
+      mark(box, n > 0);
+    });
+
+    mark(form.querySelector('[data-field="consent"]'), form.elements.consent.checked);
+    return bad;
+  }
+
+  /* ==============================================================
+     SUBMIT
+     ============================================================== */
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertBox.classList.remove('visible');
+
+    const bad = validate();
+    if (bad.length) {
+      alertBox.textContent = "A few things still need filling in. They're marked in red above.";
+      alertBox.classList.add('visible');
+      bad[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const focusable = bad[0].querySelector('input');
+      if (focusable) setTimeout(() => focusable.focus({ preventScroll: true }), 350);
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'Sending...';
+
+    const first = val('firstname');
+    const name = `${first} ${val('lastname')}`;
+    const lines = [
+      '--- CONTACT ---',
+      `Name:       ${name}`,
+      `Email:      ${val('email')}`,
+      `Mobile:     ${val('mobile')}`,
+      `Instagram:  ${val('instagram') || '-'}`,
+      '',
+      '--- ANSWERS ---',
+      ...QUESTIONS.map((q) => `${q.label}\n  ${picks(q.name).join(', ')}`),
+      '',
+      '--- NOTE ---',
+      val('note') || 'No note left',
+    ];
+
+    let ok = false;
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: `6 Weeks to Build Momentum - application from ${name}`,
+          from_name: name,
+          replyto: val('email'),
+          botcheck: form.elements.botcheck.checked,
+          message: lines.join('\n'),
+        }),
+      });
+      const data = await res.json();
+      ok = !!data.success;
+      if (!ok) console.error('Web3Forms rejected:', data);
+    } catch (err) {
+      console.error('Send failed:', err);
+    }
+
+    btn.disabled = false;
+    btn.querySelector('span').textContent = 'Send it to Rhyahn';
+
+    if (!ok) {
+      alertBox.textContent = "Sorry, that didn't send. Please try again, or text Rhyahn on 0402 655 877.";
+      alertBox.classList.add('visible');
+      return;
+    }
+
+    document.getElementById('thanks-name').textContent = first ? `Thanks ${first}!` : 'Thanks!';
+    document.body.classList.add('done');
+    window.scrollTo(0, 0);
+    document.getElementById('thanks-title').focus({ preventScroll: true });
+  });
+</script>
+</body>
+</html>
